@@ -177,6 +177,20 @@
   .drange label{font-size:11px;color:var(--text2);white-space:nowrap;font-weight:600;text-transform:uppercase;letter-spacing:.4px}
   .drange input{background:var(--bg2);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:5px 8px;font-size:12px;outline:none}
   .drange input:focus{border-color:var(--accent)}
+  /* Task milestone badges */
+  .task-milestone{display:inline-block;padding:3px 8px;border-radius:6px;font-size:10px;font-weight:600;margin-right:6px;margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px}
+  .tm-concept{background:#f5a623;color:#1a1a1a}
+  .tm-shoot{background:#e05c5c;color:#fff}
+  .tm-review{background:#3dbfb8;color:#fff}
+  .tm-publish{background:#4caf7d;color:#fff}
+  /* Gen modal */
+  .gen-option{display:flex;align-items:center;gap:12px;padding:12px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;margin-bottom:8px;cursor:pointer;transition:all .15s}
+  .gen-option:hover{border-color:var(--accent);background:var(--bg2)}
+  .gen-option input[type="radio"]{cursor:pointer;width:18px;height:18px}
+  .gen-option label{flex:1;cursor:pointer}
+  .gen-control{display:flex;gap:8px;align-items:center;margin-bottom:12px}
+  .gen-control input{background:var(--bg2);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:6px 10px;font-size:12px;outline:none;width:60px}
+  .gen-control input:focus{border-color:var(--accent)}
 </style>
 </head>
 <body>
@@ -195,6 +209,7 @@
   <div class="spacer"></div>
   <div class="toolbtns">
     <button class="btn btn-primary" onclick="openNewEvent()">+ Neuer Termin</button>
+    <button class="btn" onclick="openGenModal()">🔧 Kalender generieren</button>
     <button class="btn" onclick="openImport()">📥 Ideen / Import</button>
     <button class="btn" onclick="exportICS(false)">📅 Export .ics</button>
     <button class="btn" onclick="openDrawer()">📋 Strategie & Formate</button>
@@ -341,6 +356,65 @@ Schnell-Modus: einfach pro Zeile eine Idee (nur Titel, keine Doppelpunkte)
   </div>
 </div>
 
+<!-- Generation modal -->
+<div class="overlay" id="genOverlay">
+  <div class="modal" style="max-width:560px">
+    <div class="modal-head">
+      <div class="mh-color" style="background:var(--accent)"></div>
+      <h2>Kalender generieren</h2>
+      <button class="modal-close" onclick="closeGenModal()">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="help" style="margin-bottom:14px">Erstelle einen Kalender aus dem Seed-Plan mit automatischen Produktion-Milestones (Konzept 🟠, Dreh 🔴, Veröffentlichung 🟢).</div>
+
+      <div class="field"><label>Dauer</label>
+        <div class="gen-option">
+          <input type="radio" id="gen-months" name="genType" value="months" checked>
+          <label for="gen-months">Anzahl Monate</label>
+          <input class="gen-control" id="genMonths" type="number" value="3" min="1" max="12" style="width:50px">
+        </div>
+        <div class="gen-option">
+          <input type="radio" id="gen-until" name="genType" value="until">
+          <label for="gen-until">Bis zu einem Datum</label>
+          <input class="gen-control" id="genUntil" type="date" style="width:120px">
+        </div>
+      </div>
+
+      <div class="field"><label>Milestones generieren</label>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
+          <label style="display:flex;gap:6px;align-items:center;cursor:pointer;font-size:12px">
+            <input type="checkbox" id="genConcept" checked>
+            <span class="task-milestone tm-concept">Konzept</span>
+          </label>
+          <label style="display:flex;gap:6px;align-items:center;cursor:pointer;font-size:12px">
+            <input type="checkbox" id="genShoot" checked>
+            <span class="task-milestone tm-shoot">Dreh</span>
+          </label>
+          <label style="display:flex;gap:6px;align-items:center;cursor:pointer;font-size:12px">
+            <input type="checkbox" id="genReview" checked>
+            <span class="task-milestone tm-review">Review</span>
+          </label>
+          <label style="display:flex;gap:6px;align-items:center;cursor:pointer;font-size:12px">
+            <input type="checkbox" id="genPublish" checked>
+            <span class="task-milestone tm-publish">Veröff.</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="field"><label>Einstellungen</label>
+        <label style="display:flex;gap:8px;align-items:center;cursor:pointer;font-size:12px;margin-bottom:6px">
+          <input type="checkbox" id="genClearFirst" checked>
+          <span>Bestehende Termine zuerst löschen</span>
+        </label>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-primary" onclick="generateCalendar()">Generieren</button>
+      <button class="btn" onclick="closeGenModal()">Abbrechen</button>
+    </div>
+  </div>
+</div>
+
 <!-- Reference drawer -->
 <div class="drawer" id="drawer">
   <div class="drawer-head">
@@ -464,7 +538,7 @@ function seedToEvent(p){
     variants:(p.variants||[]).slice(), goal:p.goal||"", cta:p.cta||"",
     location:p.prod?p.prod.location:"", equipment:p.prod?p.prod.equipment.slice():[],
     hours:p.prod?p.prod.hours:"", team:p.prod?p.prod.team:"", notes:p.prod?p.prod.notes:"",
-    tasks
+    tasks, parent:"", milestone:"", color:"", skip:false
   };
 }
 function uid(){return "id"+Math.random().toString(36).slice(2,9)}
@@ -521,15 +595,16 @@ function renderCalendar(){
     const d=new Date(start); d.setDate(start.getDate()+i);
     const ds=isoDate(d);
     const other=d.getMonth()!==viewMonth;
-    const dayEvents=events.filter(e=>e.date===ds && activePillars.has(e.pillar));
+    const dayEvents=events.filter(e=>e.date===ds && activePillars.has(e.pillar) && !e.skip);
     html+=`<div class="cal-cell ${other?'other-month':''} ${ds===todayStr?'today':''}" onclick="cellClick(event,'${ds}')">
       <div class="cell-date"><span>${d.getDate()}</span><span class="cell-add">＋</span></div>
       ${dayEvents.map(e=>{
         const total=e.tasks.length, done=e.tasks.filter(t=>t.done).length;
         const allDone=total>0&&done===total;
-        const col=pillarColor(e.pillar);
-        return `<div class="evt ${allDone?'done-evt':''}" style="background:${col};color:${textOn(col)}" onclick="event.stopPropagation();openEvent('${e.id}')" title="${esc(e.title)}${e.series?' · 📺 '+esc(e.series):''}">
-          ${esc(e.title)}${e.series?`<span class="evt-task-badge" style="background:rgba(0,0,0,.4)" title="${esc(e.series)}">📺</span>`:''}${total&&!e.series?`<span class="evt-task-badge">${done}/${total}</span>`:''}
+        const col=e.color||pillarColor(e.pillar);
+        const isMilestone=!!e.milestone;
+        return `<div class="evt ${allDone?'done-evt':''}" style="background:${col};color:${textOn(col)};${isMilestone?'opacity:.85;':''}" onclick="event.stopPropagation();openEvent('${e.id}')" title="${esc(e.title)}${e.parent?' ← '+esc((events.find(x=>x.id===e.parent)||{}).title||''):''}" style="cursor:pointer">
+          ${esc(e.title).slice(0,18)}${isMilestone?'<span class="evt-task-badge" style="background:rgba(0,0,0,.3);border-radius:3px">⊳</span>':''}${e.series?`<span class="evt-task-badge" style="background:rgba(0,0,0,.4)" title="${esc(e.series)}">📺</span>`:''}${total&&!e.series&&!isMilestone?`<span class="evt-task-badge">${done}/${total}</span>`:''}
         </div>`;
       }).join('')}
     </div>`;
@@ -541,8 +616,9 @@ function renderCalendar(){
 function cellClick(ev,ds){ openNewEvent(ds); }
 
 function updateStats(){
-  document.getElementById("statTotal").textContent=events.length;
-  let t=0,d=0; events.forEach(e=>{t+=e.tasks.length; d+=e.tasks.filter(x=>x.done).length;});
+  const active=events.filter(e=>!e.skip);
+  document.getElementById("statTotal").textContent=active.length+(events.length>active.length?" ("+events.length+" total)":"");
+  let t=0,d=0; active.forEach(e=>{t+=e.tasks.length; d+=e.tasks.filter(x=>x.done).length;});
   document.getElementById("statTasks").textContent=t;
   document.getElementById("statDone").textContent=d;
 }
@@ -574,15 +650,27 @@ function openNewEvent(date){
 }
 
 function renderModal(isNew){
-  document.getElementById("modalTitle").textContent=isNew?"Neuer Termin":draft.title||"Termin bearbeiten";
-  document.getElementById("mhColor").style.background=pillarColor(draft.pillar);
+  const isMilestone=!!draft.milestone;
+  const parentEvent=draft.parent?events.find(e=>e.id===draft.parent):null;
+  document.getElementById("modalTitle").innerHTML=(isMilestone?`<span style="font-size:12px;opacity:.7">${esc(draft.milestone.toUpperCase())} von</span> `:"")+esc(isNew?"Neuer Termin":draft.title||"Termin bearbeiten");
+  document.getElementById("mhColor").style.background=draft.color||pillarColor(draft.pillar);
   document.getElementById("deleteBtn").style.display=isNew?"none":"";
 
   const total=draft.tasks.length, done=draft.tasks.filter(t=>t.done).length;
 
-  document.getElementById("modalBody").innerHTML=`
+  const milestoneInfo=(isMilestone&&parentEvent)?`
+    <div class="help" style="margin-bottom:12px;border-color:${draft.color}">
+      <b>Produktionsschritt</b> für: <a href="#" onclick="event.preventDefault();openEvent('${esc(parentEvent.id)}')" style="color:${draft.color};text-decoration:underline">${esc(parentEvent.title)}</a>
+    </div>`:("");
+
+  document.getElementById("modalBody").innerHTML=milestoneInfo+`
     <div class="field"><label>Titel / Hook-Überschrift</label>
       <input id="f_title" value="${esc(draft.title)}" placeholder="Worum geht es?"></div>
+    ${!isMilestone?`
+    <label style="display:flex;gap:8px;align-items:center;cursor:pointer;font-size:12px;margin-bottom:12px;padding:8px;background:var(--bg3);border:1px solid var(--border);border-radius:8px">
+      <input type="checkbox" id="f_skip" ${draft.skip?'checked':''}>
+      <span>Diesen Termin aussetzen (aus Kalender verbergen)</span>
+    </label>`:''}
     <div class="row3">
       <div class="field"><label>Datum</label><input type="date" id="f_date" value="${draft.date}"></div>
       <div class="field"><label>Säule</label>
@@ -591,8 +679,8 @@ function renderModal(isNew){
         </select></div>
       <div class="field"><label>Format</label><input id="f_format" value="${esc(draft.format)}" placeholder="z.B. F1"></div>
     </div>
-    <div class="field"><label>📺 Serie (optional – für einheitliche Videoserien)</label>
-      <input id="f_series" value="${esc(draft.series||'')}" placeholder="z.B. Solar-Basics-Reihe, Kundenstory-Serie, Behind-the-Scenes"></div>
+    ${!isMilestone?`<div class="field"><label>📺 Serie (optional – für einheitliche Videoserien)</label>
+      <input id="f_series" value="${esc(draft.series||'')}" placeholder="z.B. Solar-Basics-Reihe, Kundenstory-Serie, Behind-the-Scenes"></div>`:''}`
     <div class="field"><label>Hook (Aufhänger)</label>
       <textarea id="f_hook" placeholder="Der erste Satz, der Aufmerksamkeit erzeugt">${esc(draft.hook)}</textarea></div>
     <div class="field"><label>Idee / Beschreibung</label>
@@ -669,6 +757,8 @@ function collectDraft(){
   draft.location=val("f_location"); draft.hours=val("f_hours"); draft.team=val("f_team"); draft.notes=val("f_notes");
   draft.equipment=val("f_equipment").split(",").map(s=>s.trim()).filter(Boolean);
   draft.series=val("f_series").trim();
+  const skipEl=document.getElementById("f_skip");
+  draft.skip=skipEl?skipEl.checked:false;
   // pillar already synced via change handler; ensure:
   draft.pillar=val("f_pillar");
 }
@@ -927,7 +1017,7 @@ const KEYMAP={
 };
 let _newIdeaCounter=0;
 function defaultDate(){ const b=new Date(viewYear,viewMonth,1); b.setDate(b.getDate()+_newIdeaCounter*2); _newIdeaCounter++; return isoDate(b); }
-function newEventFrom(o){ return Object.assign({id:uid(),date:defaultDate(),pillar:"custom",format:"",series:"",title:"(Ohne Titel)",hook:"",idea:"",variants:[],goal:"",cta:"",location:"",equipment:[],hours:"",team:"",notes:"",tasks:[]}, o); }
+function newEventFrom(o){ return Object.assign({id:uid(),date:defaultDate(),pillar:"custom",format:"",series:"",title:"(Ohne Titel)",hook:"",idea:"",variants:[],goal:"",cta:"",location:"",equipment:[],hours:"",team:"",notes:"",tasks:[],parent:"",milestone:"",color:"",skip:false}, o); }
 function parseHeader(line){
   const parts=line.split("|").map(s=>s.trim());
   let date="",pillar="",id="",titleParts=[];
@@ -1057,7 +1147,8 @@ function normalizeEvent(e){
     variants:Array.isArray(e.variants)?e.variants:[], goal:e.goal||"", cta:e.cta||"",
     location:e.location||"", equipment:Array.isArray(e.equipment)?e.equipment:[],
     hours:e.hours==null?"":e.hours, team:e.team==null?"":e.team, notes:e.notes||"",
-    tasks:Array.isArray(e.tasks)?e.tasks.map(t=>({id:t.id||uid(),text:t.text||"",date:t.date||"",note:t.note||"",done:!!t.done})):[]
+    tasks:Array.isArray(e.tasks)?e.tasks.map(t=>({id:t.id||uid(),text:t.text||"",date:t.date||"",note:t.note||"",done:!!t.done})):[],
+    parent:e.parent||"", milestone:e.milestone||"", color:e.color||"", skip:!!e.skip
   };
 }
 function importJSON(replace){
@@ -1476,6 +1567,97 @@ function seriesBulkAddTask(sName,inputId){
     if(!e.tasks.some(t=>t.text===text)){ e.tasks.push({id:uid(),text,date:"",note:"",done:false}); count++; }
   });
   save(); renderCalendar(); toast("Aufgabe zu "+count+" Terminen hinzugefügt");
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+//  CALENDAR GENERATION mit Milestones
+// ════════════════════════════════════════════════════════════════════════════
+function openGenModal(){
+  const today=new Date(); today.setDate(today.getDate()+90);
+  document.getElementById("genUntil").value=isoDate(today);
+  document.getElementById("genOverlay").classList.add("open");
+}
+function closeGenModal(){ document.getElementById("genOverlay").classList.remove("open"); }
+
+function generateCalendar(){
+  const clearFirst=document.getElementById("genClearFirst").checked;
+  const genType=document.querySelector('input[name="genType"]:checked').value;
+  let endDate;
+
+  if(genType==="until"){
+    endDate=val("genUntil").trim();
+    if(!endDate){ toast("Bitte Enddatum eingeben"); return; }
+  } else {
+    const months=parseInt(val("genMonths"))||3;
+    const d=new Date();
+    d.setMonth(d.getMonth()+months);
+    endDate=isoDate(d);
+  }
+
+  const genConcept=document.getElementById("genConcept").checked;
+  const genShoot=document.getElementById("genShoot").checked;
+  const genReview=document.getElementById("genReview").checked;
+  const genPublish=document.getElementById("genPublish").checked;
+
+  if(clearFirst){
+    if(!confirm("Alle bestehenden Termine löschen und neu generieren?")) return;
+    events=[];
+  }
+
+  let seedPostCount=0, milestoneCount=0;
+
+  SEED.posts.forEach(p=>{
+    const eventDate=new Date(p.date);
+    if(isoDate(eventDate)<=endDate){
+      const ev=seedToEvent(p);
+      ev.skip=false;
+      events.push(ev);
+      seedPostCount++;
+
+      // Milestones generieren
+      if(p.milestones){
+        const m=p.milestones;
+        const milestones=[
+          {key:"concept",label:"Konzept",date:m.concept,color:"#f5a623",icon:"🟠",enabled:genConcept},
+          {key:"shoot",label:"Dreh",date:m.shoot,color:"#e05c5c",icon:"🔴",enabled:genShoot},
+          {key:"review",label:"Review",date:m.review,color:"#3dbfb8",icon:"🟢",enabled:genReview}
+        ];
+        milestones.forEach(ms=>{
+          if(ms.enabled && ms.date && /^\d{4}-\d{2}-\d{2}$/.test(ms.date)){
+            const milevent={
+              id:p.id+"-"+ms.key, date:ms.date, parent:p.id, milestone:ms.key,
+              pillar:p.pillar, format:p.format||"", series:"",
+              title:ms.icon+" "+ms.label+" · "+p.title,
+              hook:"", idea:"Produktionsschritt für: "+p.title,
+              variants:[], goal:"", cta:"",
+              location:p.prod?.location||"", equipment:[], hours:"", team:"", notes:ms.label,
+              color:ms.color, tasks:[]
+            };
+            events.push(milevent);
+            milestoneCount++;
+          }
+        });
+
+        // Veröffentlichung (Publish) auf Haupt-Post-Datum
+        if(genPublish){
+          const publev={
+            id:p.id+"-publish", date:p.date, parent:p.id, milestone:"publish",
+            pillar:p.pillar, format:p.format||"", series:"",
+            title:"🟢 Veröffentlichung · "+p.title,
+            hook:"", idea:"Post live: "+p.title,
+            variants:[], goal:"", cta:"",
+            location:"", equipment:[], hours:"", team:"", notes:"Veröffentlichung",
+            color:"#4caf7d", tasks:[]
+          };
+          events.push(publev);
+          milestoneCount++;
+        }
+      }
+    }
+  });
+
+  save(); renderCalendar(); closeGenModal();
+  toast(seedPostCount+" Posts + "+milestoneCount+" Milestones bis "+endDate+" generiert");
 }
 
 // ── INIT ──
