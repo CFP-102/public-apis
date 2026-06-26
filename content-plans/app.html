@@ -658,63 +658,68 @@ function renderModal(isNew){
 
   const total=draft.tasks.length, done=draft.tasks.filter(t=>t.done).length;
 
-  const milestoneInfo=(isMilestone&&parentEvent)?`
-    <div class="help" style="margin-bottom:12px;border-color:${draft.color}">
+  let html='';
+  if(isMilestone&&parentEvent){
+    html+=`<div class="help" style="margin-bottom:12px;border-color:${draft.color}">
       <b>Produktionsschritt</b> für: <a href="#" onclick="event.preventDefault();openEvent('${esc(parentEvent.id)}')" style="color:${draft.color};text-decoration:underline">${esc(parentEvent.title)}</a>
-    </div>`:("");
+    </div>`;
+  }
 
-  document.getElementById("modalBody").innerHTML=milestoneInfo+`
-    <div class="field"><label>Titel / Hook-Überschrift</label>
-      <input id="f_title" value="${esc(draft.title)}" placeholder="Worum geht es?"></div>
-    ${!isMilestone?`
-    <label style="display:flex;gap:8px;align-items:center;cursor:pointer;font-size:12px;margin-bottom:12px;padding:8px;background:var(--bg3);border:1px solid var(--border);border-radius:8px">
+  html+=`<div class="field"><label>Titel / Hook-Überschrift</label>
+    <input id="f_title" value="${esc(draft.title)}" placeholder="Worum geht es?"></div>`;
+
+  if(!isMilestone){
+    html+=`<label style="display:flex;gap:8px;align-items:center;cursor:pointer;font-size:12px;margin-bottom:12px;padding:8px;background:var(--bg3);border:1px solid var(--border);border-radius:8px">
       <input type="checkbox" id="f_skip" ${draft.skip?'checked':''}>
       <span>Diesen Termin aussetzen (aus Kalender verbergen)</span>
-    </label>`:''}
-    <div class="row3">
-      <div class="field"><label>Datum</label><input type="date" id="f_date" value="${draft.date}"></div>
-      <div class="field"><label>Säule</label>
-        <select id="f_pillar">
-          ${legendIds().map(p=>`<option value="${p}" ${draft.pillar===p?'selected':''}>${p==='custom'?'Eigener Termin':p+' · '+esc(pillarName(p))}</option>`).join('')}
-        </select></div>
-      <div class="field"><label>Format</label><input id="f_format" value="${esc(draft.format)}" placeholder="z.B. F1"></div>
-    </div>
-    ${!isMilestone?`<div class="field"><label>📺 Serie (optional – für einheitliche Videoserien)</label>
-      <input id="f_series" value="${esc(draft.series||'')}" placeholder="z.B. Solar-Basics-Reihe, Kundenstory-Serie, Behind-the-Scenes"></div>`:''}`
-    <div class="field"><label>Hook (Aufhänger)</label>
-      <textarea id="f_hook" placeholder="Der erste Satz, der Aufmerksamkeit erzeugt">${esc(draft.hook)}</textarea></div>
-    <div class="field"><label>Idee / Beschreibung</label>
-      <textarea id="f_idea" placeholder="Konkrete Umsetzungsidee">${esc(draft.idea)}</textarea></div>
+    </label>`;
+  }
 
-    <div class="field"><label>Varianten</label>
-      <div id="variantList"></div>
-      <button class="add-link" onclick="addVariant()">+ Variante hinzufügen</button></div>
+  html+=`<div class="row3">
+    <div class="field"><label>Datum</label><input type="date" id="f_date" value="${draft.date}"></div>
+    <div class="field"><label>Säule</label>
+      <select id="f_pillar">
+        ${legendIds().map(p=>`<option value="${p}" ${draft.pillar===p?'selected':''}>${p==='custom'?'Eigener Termin':p+' · '+esc(pillarName(p))}</option>`).join('')}
+      </select></div>
+    <div class="field"><label>Format</label><input id="f_format" value="${esc(draft.format)}" placeholder="z.B. F1"></div>
+  </div>`;
 
-    <div class="row2">
-      <div class="field"><label>Ziel</label><textarea id="f_goal" placeholder="Was soll der Post erreichen?">${esc(draft.goal)}</textarea></div>
-      <div class="field"><label>Call-to-Action</label><textarea id="f_cta" placeholder="Handlungsaufforderung">${esc(draft.cta)}</textarea></div>
-    </div>
+  if(!isMilestone){
+    html+=`<div class="field"><label>📺 Serie (optional – für einheitliche Videoserien)</label>
+      <input id="f_series" value="${esc(draft.series||'')}" placeholder="z.B. Solar-Basics-Reihe, Kundenstory-Serie, Behind-the-Scenes"></div>`;
+  }
 
-    <div class="field"><label>📍 Drehort</label><input id="f_location" value="${esc(draft.location)}" placeholder="Realistischer Drehort"></div>
-    <div class="row3">
-      <div class="field"><label>Aufwand (h)</label><input id="f_hours" value="${esc(String(draft.hours))}" placeholder="z.B. 5"></div>
-      <div class="field"><label>Team (Personen)</label><input id="f_team" value="${esc(String(draft.team))}" placeholder="z.B. 3"></div>
-      <div class="field"><label>&nbsp;</label><input id="f_equipdummy" value="" style="visibility:hidden"></div>
+  html+=`<div class="field"><label>Hook (Aufhänger)</label>
+    <textarea id="f_hook" placeholder="Der erste Satz, der Aufmerksamkeit erzeugt">${esc(draft.hook)}</textarea></div>
+  <div class="field"><label>Idee / Beschreibung</label>
+    <textarea id="f_idea" placeholder="Konkrete Umsetzungsidee">${esc(draft.idea)}</textarea></div>
+  <div class="field"><label>Varianten</label>
+    <div id="variantList"></div>
+    <button class="add-link" onclick="addVariant()">+ Variante hinzufügen</button></div>
+  <div class="row2">
+    <div class="field"><label>Ziel</label><textarea id="f_goal" placeholder="Was soll der Post erreichen?">${esc(draft.goal)}</textarea></div>
+    <div class="field"><label>Call-to-Action</label><textarea id="f_cta" placeholder="Handlungsaufforderung">${esc(draft.cta)}</textarea></div>
+  </div>
+  <div class="field"><label>📍 Drehort</label><input id="f_location" value="${esc(draft.location)}" placeholder="Realistischer Drehort"></div>
+  <div class="row3">
+    <div class="field"><label>Aufwand (h)</label><input id="f_hours" value="${esc(String(draft.hours))}" placeholder="z.B. 5"></div>
+    <div class="field"><label>Team (Personen)</label><input id="f_team" value="${esc(String(draft.team))}" placeholder="z.B. 3"></div>
+    <div class="field"><label>&nbsp;</label><input id="f_equipdummy" value="" style="visibility:hidden"></div>
+  </div>
+  <div class="field"><label>🎥 Equipment (Komma-getrennt)</label>
+    <input id="f_equipment" value="${esc((draft.equipment||[]).join(', '))}" placeholder="Sony A7 IV, Drohne, LED-Panel"></div>
+  <div class="field"><label>⚠ Besondere Anforderungen / Notizen</label>
+    <textarea id="f_notes" placeholder="Genehmigungen, Vorlaufzeiten, Risiken">${esc(draft.notes)}</textarea></div>
+  <div class="task-block">
+    <div class="task-block-head">
+      <span class="tbh-title">✅ Aufgaben in diesem Termin</span>
+      <span class="task-prog" id="taskProg">${done}/${total} erledigt</span>
     </div>
-    <div class="field"><label>🎥 Equipment (Komma-getrennt)</label>
-      <input id="f_equipment" value="${esc((draft.equipment||[]).join(', '))}" placeholder="Sony A7 IV, Drohne, LED-Panel"></div>
-    <div class="field"><label>⚠ Besondere Anforderungen / Notizen</label>
-      <textarea id="f_notes" placeholder="Genehmigungen, Vorlaufzeiten, Risiken">${esc(draft.notes)}</textarea></div>
+    <div id="taskList"></div>
+    <button class="add-link" onclick="addTask()">+ Aufgabe hinzufügen</button>
+  </div>`;
 
-    <div class="task-block">
-      <div class="task-block-head">
-        <span class="tbh-title">✅ Aufgaben in diesem Termin</span>
-        <span class="task-prog" id="taskProg">${done}/${total} erledigt</span>
-      </div>
-      <div id="taskList"></div>
-      <button class="add-link" onclick="addTask()">+ Aufgabe hinzufügen</button>
-    </div>
-  `;
+  document.getElementById("modalBody").innerHTML=html;
   renderVariants(); renderTasks();
   document.getElementById("f_pillar").addEventListener("change",e=>{
     draft.pillar=e.target.value;
@@ -916,6 +921,7 @@ function switchImportTab(tab){
   });
 }
 document.getElementById("importOverlay").addEventListener("click",e=>{ if(e.target.id==="importOverlay") closeImport(); });
+document.getElementById("genOverlay").addEventListener("click",e=>{ if(e.target.id==="genOverlay") closeGenModal(); });
 document.addEventListener("keydown",e=>{ if(e.key==="Escape") closeImport(); });
 
 // ── .ics (iCalendar) für Outlook & Apple ──
