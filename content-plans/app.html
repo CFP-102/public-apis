@@ -42,11 +42,17 @@
   .pill.active{color:var(--text);border-color:currentColor}
   .pill.inactive{opacity:.4}
 
+  /* Phase colors (Konzept→Dreh→Schnitt→Veröffentlichung) – das EINE Farbsystem */
+  :root{
+    --ph-concept:#e8910a; --ph-shoot:#e0533f; --ph-review:#3f7fd0; --ph-publish:#2faa5e;
+    --pillar-neutral:#4a5170;
+  }
+
   /* Calendar */
   .cal-wrap{padding:20px 24px}
-  .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+  .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:8px}
   .cal-head{font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;text-align:center;padding:6px 0;font-weight:600}
-  .cal-cell{background:var(--bg2);border:1px solid var(--border);border-radius:8px;min-height:118px;padding:6px;cursor:pointer;transition:border-color .15s;display:flex;flex-direction:column;gap:4px;overflow:hidden}
+  .cal-cell{background:var(--bg2);border:1px solid var(--border);border-radius:10px;min-height:158px;padding:7px;cursor:pointer;transition:border-color .15s;display:flex;flex-direction:column;gap:5px;overflow:hidden}
   .cal-cell:hover{border-color:var(--accent)}
   .cal-cell.other-month{opacity:.35}
   .cal-cell.today{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
@@ -54,12 +60,20 @@
   .cal-cell.today .cell-date{color:var(--accent)}
   .cell-add{opacity:0;font-size:14px;color:var(--accent);transition:opacity .15s}
   .cal-cell:hover .cell-add{opacity:1}
-  .evt{font-size:11px;padding:3px 7px;border-radius:5px;color:#fff;line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;border-left:3px solid rgba(0,0,0,.3);position:relative}
-  .evt:hover{filter:brightness(1.15)}
-  .evt.done-evt{opacity:.55;text-decoration:line-through}
-  .evt-task-badge{position:absolute;right:4px;top:2px;font-size:9px;background:rgba(0,0,0,.35);border-radius:8px;padding:0 5px}
-  .ev-P1{background:#3a6ea5} .ev-P2{background:#3a8c63} .ev-P3{background:#bd7d1a;color:#1a1a1a}
-  .ev-P4{background:#7a55a8} .ev-P5{background:#2f928c} .ev-custom{background:#566080}
+
+  /* Rich event card: linke Phasen-Farbleiste, Titel (2 Zeilen), Pillar-Tag + Meta */
+  .evt{position:relative;background:var(--bg3);border:1px solid var(--border);border-left:4px solid var(--pillar-neutral);border-radius:6px;padding:5px 7px;display:flex;flex-direction:column;gap:3px;overflow:hidden;transition:transform .1s}
+  .evt:hover{transform:translateX(1px);filter:brightness(1.08)}
+  .evt.done-evt{opacity:.5}
+  .evt.done-evt .evt-title{text-decoration:line-through}
+  .evt-top{display:flex;align-items:center;gap:5px}
+  .evt-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+  .evt-phase{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .evt-title{font-size:11.5px;font-weight:600;color:var(--text);line-height:1.25;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .evt-meta{display:flex;align-items:center;gap:5px;flex-wrap:wrap;font-size:9px;color:var(--text2)}
+  .evt-tag{background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:6px;padding:0 5px;line-height:15px;white-space:nowrap}
+  .evt-prog{margin-left:auto;background:rgba(0,0,0,.3);border-radius:8px;padding:0 6px;line-height:15px}
+  .evt-prog.done{background:var(--ph-publish);color:#06140c;font-weight:700}
 
   /* Mini info bar */
   .infobar{display:flex;gap:20px;padding:8px 24px;background:var(--bg);border-bottom:1px solid var(--border);font-size:12px;color:var(--text2);flex-wrap:wrap}
@@ -178,11 +192,32 @@
   .drange input{background:var(--bg2);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:5px 8px;font-size:12px;outline:none}
   .drange input:focus{border-color:var(--accent)}
   /* Task milestone badges */
-  .task-milestone{display:inline-block;padding:3px 8px;border-radius:6px;font-size:10px;font-weight:600;margin-right:6px;margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px}
-  .tm-concept{background:#f5a623;color:#1a1a1a}
-  .tm-shoot{background:#e05c5c;color:#fff}
-  .tm-review{background:#3dbfb8;color:#fff}
-  .tm-publish{background:#4caf7d;color:#fff}
+  .task-milestone{display:inline-block;padding:3px 8px;border-radius:6px;font-size:10px;font-weight:700;margin-right:6px;margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px}
+  .tm-concept{background:var(--ph-concept);color:#1a1a1a}
+  .tm-shoot{background:var(--ph-shoot);color:#fff}
+  .tm-review{background:var(--ph-review);color:#fff}
+  .tm-publish{background:var(--ph-publish);color:#06140c}
+
+  /* Phase legend */
+  .phase-legend{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+  .phase-item{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2)}
+  .phase-item .pdot{width:11px;height:11px;border-radius:3px}
+  .phase-arrow{color:var(--text2);opacity:.5;font-size:13px}
+
+  /* Wizard */
+  .wiz-steps{display:flex;gap:6px;margin-bottom:18px}
+  .wiz-step{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;font-size:11px;color:var(--text2);position:relative}
+  .wiz-step .wiz-num{width:26px;height:26px;border-radius:50%;background:var(--bg3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px}
+  .wiz-step.active{color:var(--accent)}
+  .wiz-step.active .wiz-num{background:var(--accent);border-color:var(--accent);color:#000}
+  .wiz-step.done .wiz-num{background:var(--ph-publish);border-color:var(--ph-publish);color:#06140c}
+  .wiz-card{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:10px}
+  .wiz-card .wc-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+  .wiz-card input,.wiz-card textarea{width:100%;background:var(--bg2);border:1px solid var(--border);color:var(--text);border-radius:7px;padding:7px 9px;font-size:12px;outline:none;margin-bottom:6px}
+  .wiz-card input:focus,.wiz-card textarea:focus{border-color:var(--accent)}
+  .wiz-card textarea{min-height:42px;resize:vertical}
+  .wiz-card .wc-name{font-weight:700;font-size:13px}
+  .wiz-intro{font-size:12px;color:var(--text2);line-height:1.6;background:var(--bg3);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:8px;padding:11px 13px;margin-bottom:14px}
   /* Gen modal */
   .gen-option{display:flex;align-items:center;gap:12px;padding:12px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;margin-bottom:8px;cursor:pointer;transition:all .15s}
   .gen-option:hover{border-color:var(--accent);background:var(--bg2)}
@@ -365,53 +400,10 @@ Schnell-Modus: einfach pro Zeile eine Idee (nur Titel, keine Doppelpunkte)
       <button class="modal-close" onclick="closeGenModal()">×</button>
     </div>
     <div class="modal-body">
-      <div class="help" style="margin-bottom:14px">Erstelle einen Kalender aus dem Seed-Plan mit automatischen Produktion-Milestones (Konzept 🟠, Dreh 🔴, Veröffentlichung 🟢).</div>
-
-      <div class="field"><label>Dauer</label>
-        <div class="gen-option">
-          <input type="radio" id="gen-months" name="genType" value="months" checked>
-          <label for="gen-months">Anzahl Monate</label>
-          <input class="gen-control" id="genMonths" type="number" value="3" min="1" max="12" style="width:50px">
-        </div>
-        <div class="gen-option">
-          <input type="radio" id="gen-until" name="genType" value="until">
-          <label for="gen-until">Bis zu einem Datum</label>
-          <input class="gen-control" id="genUntil" type="date" style="width:120px">
-        </div>
-      </div>
-
-      <div class="field"><label>Milestones generieren</label>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
-          <label style="display:flex;gap:6px;align-items:center;cursor:pointer;font-size:12px">
-            <input type="checkbox" id="genConcept" checked>
-            <span class="task-milestone tm-concept">Konzept</span>
-          </label>
-          <label style="display:flex;gap:6px;align-items:center;cursor:pointer;font-size:12px">
-            <input type="checkbox" id="genShoot" checked>
-            <span class="task-milestone tm-shoot">Dreh</span>
-          </label>
-          <label style="display:flex;gap:6px;align-items:center;cursor:pointer;font-size:12px">
-            <input type="checkbox" id="genReview" checked>
-            <span class="task-milestone tm-review">Review</span>
-          </label>
-          <label style="display:flex;gap:6px;align-items:center;cursor:pointer;font-size:12px">
-            <input type="checkbox" id="genPublish" checked>
-            <span class="task-milestone tm-publish">Veröff.</span>
-          </label>
-        </div>
-      </div>
-
-      <div class="field"><label>Einstellungen</label>
-        <label style="display:flex;gap:8px;align-items:center;cursor:pointer;font-size:12px;margin-bottom:6px">
-          <input type="checkbox" id="genClearFirst" checked>
-          <span>Bestehende Termine zuerst löschen</span>
-        </label>
-      </div>
+      <div class="wiz-steps" id="wizSteps"></div>
+      <div id="wizBody"></div>
     </div>
-    <div class="modal-foot">
-      <button class="btn btn-primary" onclick="generateCalendar()">Generieren</button>
-      <button class="btn" onclick="closeGenModal()">Abbrechen</button>
-    </div>
+    <div class="modal-foot" id="wizFoot"></div>
   </div>
 </div>
 
@@ -510,8 +502,29 @@ let viewYear, viewMonth;  // current calendar month
 let activePillars = new Set();
 let editingId = null;
 
+// Phasen-Farbsystem: EINE durchgehende Pipeline – auf einen Blick erkennbar.
+const PHASES={
+  concept:{label:"Konzept",color:"#e8910a",icon:"🟠"},
+  shoot:  {label:"Dreh",color:"#e0533f",icon:"🔴"},
+  review: {label:"Schnitt / Review",color:"#3f7fd0",icon:"🔵"},
+  publish:{label:"Veröffentlichung",color:"#2faa5e",icon:"🟢"}
+};
+const PILLAR_NEUTRAL="#4a5170";
+// Farbe eines Events = seine Produktionsphase. Normaler Post = Veröffentlichung (grün).
+function eventColor(e){
+  if(e&&e.milestone&&PHASES[e.milestone]) return PHASES[e.milestone].color;
+  if(e&&e.color) return e.color;
+  return PHASES.publish.color;
+}
+function eventPhase(e){
+  if(e&&e.milestone&&PHASES[e.milestone]) return e.milestone;
+  return "publish";
+}
+function eventPhaseLabel(e){ const p=PHASES[eventPhase(e)]; return p?p.label:"Veröffentlichung"; }
+
 function getPillar(id){ return pillars.find(p=>p.id===id) || null; }
-function pillarColor(id){ const p=getPillar(id); return p?p.color:CUSTOM_COLOR; }
+// Säulen sind farblich neutral – die Farbe steht jetzt für die Phase, nicht die Säule.
+function pillarColor(id){ return PILLAR_NEUTRAL; }
 function pillarName(id){ const p=getPillar(id); return p?p.name:(id==='custom'?'Eigener Termin':id); }
 function pillarExists(id){ return id==='custom' || !!getPillar(id); }
 function legendIds(){ return pillars.map(p=>p.id).concat(['custom']); }
@@ -566,13 +579,20 @@ function save(){ try{ localStorage.setItem(LS_KEY,JSON.stringify({events,pillars
 // ════════════════════════════════════════════════════════════════════════════
 function renderLegend(){
   const el=document.getElementById("legend");
-  el.innerHTML='<span class="legend-label">Säulen:</span>'+
+  const phaseLeg=`<div class="phase-legend">
+    <span class="legend-label">Phase:</span>
+    ${["concept","shoot","review","publish"].map((k,i)=>{
+      const p=PHASES[k];
+      return `${i>0?'<span class="phase-arrow">→</span>':''}<span class="phase-item"><span class="pdot" style="background:${p.color}"></span>${esc(p.label)}</span>`;
+    }).join('')}
+  </div>`;
+  const pillarFilters=`<span class="legend-label" style="margin-left:6px">Säulen:</span>`+
     legendIds().map(p=>{
-      const col=pillarColor(p);
-      return `<span class="pill ${activePillars.has(p)?'active':'inactive'}" style="color:${col}" onclick="togglePillar('${p}')">
-        <span class="dot" style="background:${col}"></span>${p==='custom'?'Eigene':p+' '+esc(pillarName(p))}
+      return `<span class="pill ${activePillars.has(p)?'active':'inactive'}" onclick="togglePillar('${p}')">
+        ${p==='custom'?'Eigene':esc(p+' '+pillarName(p))}
       </span>`;
     }).join('');
+  el.innerHTML=phaseLeg+pillarFilters;
 }
 function togglePillar(p){
   if(activePillars.has(p)) activePillars.delete(p); else activePillars.add(p);
@@ -601,10 +621,24 @@ function renderCalendar(){
       ${dayEvents.map(e=>{
         const total=e.tasks.length, done=e.tasks.filter(t=>t.done).length;
         const allDone=total>0&&done===total;
-        const col=e.color||pillarColor(e.pillar);
-        const isMilestone=!!e.milestone;
-        return `<div class="evt ${allDone?'done-evt':''}" style="background:${col};color:${textOn(col)};${isMilestone?'opacity:.85;':''}" onclick="event.stopPropagation();openEvent('${e.id}')" title="${esc(e.title)}${e.parent?' ← '+esc((events.find(x=>x.id===e.parent)||{}).title||''):''}" style="cursor:pointer">
-          ${esc(e.title).slice(0,18)}${isMilestone?'<span class="evt-task-badge" style="background:rgba(0,0,0,.3);border-radius:3px">⊳</span>':''}${e.series?`<span class="evt-task-badge" style="background:rgba(0,0,0,.4)" title="${esc(e.series)}">📺</span>`:''}${total&&!e.series&&!isMilestone?`<span class="evt-task-badge">${done}/${total}</span>`:''}
+        const col=eventColor(e);
+        const phase=PHASES[eventPhase(e)];
+        const cleanTitle=(e.milestone&&e.parent)?((events.find(x=>x.id===e.parent)||{}).title||e.title.replace(/^[^·]*·\s*/,'')):e.title;
+        const len=e.notes&&/L[äa]nge:/i.test(e.notes)?e.notes.replace(/.*L[äa]nge:\s*/i,'').slice(0,14):"";
+        const parentTip=e.parent?' ← '+((events.find(x=>x.id===e.parent)||{}).title||''):'';
+        return `<div class="evt ${allDone?'done-evt':''}" style="border-left-color:${col}" onclick="event.stopPropagation();openEvent('${e.id}')" title="${esc(phase.label)} · ${esc(cleanTitle)}${esc(parentTip)}">
+          <div class="evt-top">
+            <span class="evt-dot" style="background:${col}"></span>
+            <span class="evt-phase" style="color:${col}">${phase.icon} ${esc(phase.label)}</span>
+          </div>
+          <div class="evt-title">${esc(cleanTitle)}</div>
+          <div class="evt-meta">
+            <span class="evt-tag">${esc(e.pillar==='custom'?'Eigene':e.pillar)}</span>
+            ${e.format?`<span class="evt-tag">${esc(e.format)}</span>`:''}
+            ${len?`<span class="evt-tag">⏱ ${esc(len)}</span>`:''}
+            ${e.series?`<span class="evt-tag">📺</span>`:''}
+            ${(total&&!e.milestone)?`<span class="evt-prog ${allDone?'done':''}">${done}/${total}</span>`:''}
+          </div>
         </div>`;
       }).join('')}
     </div>`;
@@ -652,8 +686,8 @@ function openNewEvent(date){
 function renderModal(isNew){
   const isMilestone=!!draft.milestone;
   const parentEvent=draft.parent?events.find(e=>e.id===draft.parent):null;
-  document.getElementById("modalTitle").innerHTML=(isMilestone?`<span style="font-size:12px;opacity:.7">${esc(draft.milestone.toUpperCase())} von</span> `:"")+esc(isNew?"Neuer Termin":draft.title||"Termin bearbeiten");
-  document.getElementById("mhColor").style.background=draft.color||pillarColor(draft.pillar);
+  document.getElementById("modalTitle").innerHTML=(isMilestone?`<span style="font-size:12px;opacity:.7">${esc((PHASES[draft.milestone]||{}).label||draft.milestone)} von</span> `:"")+esc(isNew?"Neuer Termin":draft.title||"Termin bearbeiten");
+  document.getElementById("mhColor").style.background=eventColor(draft);
   document.getElementById("deleteBtn").style.display=isNew?"none":"";
 
   const total=draft.tasks.length, done=draft.tasks.filter(t=>t.done).length;
@@ -723,7 +757,7 @@ function renderModal(isNew){
   renderVariants(); renderTasks();
   document.getElementById("f_pillar").addEventListener("change",e=>{
     draft.pillar=e.target.value;
-    document.getElementById("mhColor").style.background=pillarColor(draft.pillar);
+    document.getElementById("mhColor").style.background=eventColor(draft);
   });
   document.getElementById("overlay").classList.add("open");
 }
@@ -812,10 +846,9 @@ function renderDrawer(){
       const cnt=evtCountByPillar[p.id]||0;
       const bid='bulk_'+p.id.replace(/\W/g,'_');
       return `
-      <div class="edit-card" style="border-left:4px solid ${p.color}">
+      <div class="edit-card" style="border-left:4px solid var(--pillar-neutral)">
         <div class="edit-row">
           <span class="edit-id">${esc(p.id)}</span>
-          <input class="edit-color" type="color" value="${p.color}" oninput="updPillar(${i},'color',this.value)" title="Farbe">
           <span style="font-size:11px;color:var(--text2);margin-left:4px">${cnt} Termine</span>
           <button class="mini-del" style="margin-left:auto" onclick="delPillar(${i})">×</button>
         </div>
@@ -859,7 +892,7 @@ function renderDrawer(){
       + `<button class="add-link" onclick="addFormat()">+ Format hinzufügen</button>`;
   }
 }
-function updPillar(i,k,v){ pillars[i][k]=v; save(); renderLegend(); if(k==='color'||k==='name') renderCalendar(); }
+function updPillar(i,k,v){ pillars[i][k]=v; save(); renderLegend(); if(k==='name') renderCalendar(); }
 function updPillarTypes(i,v){ pillars[i].types=v.split(',').map(s=>s.trim()).filter(Boolean); save(); }
 function delPillar(i){
   if(!confirm('Säule „'+pillars[i].name+'“ löschen? Bestehende Termine dieser Säule bleiben erhalten, werden aber grau dargestellt.')) return;
@@ -868,8 +901,7 @@ function delPillar(i){
 }
 function addPillar(){
   const id=nextId('P',x=>!!getPillar(x));
-  const palette=['#d4675a','#5aa9d4','#8e7ad4','#5ac4a0','#d4a55a','#c45a9b'];
-  pillars.push({id,name:'Neue Säule',goal:'',types:[],kpi:'',color:palette[pillars.length%palette.length]});
+  pillars.push({id,name:'Neue Säule',goal:'',types:[],kpi:'',color:PILLAR_NEUTRAL});
   activePillars.add(id); save(); renderDrawer(); renderLegend();
 }
 function updFormat(i,k,v){ formats[i][k]=v; save(); if(k==='pillar') renderDrawer(); }
@@ -1383,6 +1415,9 @@ function exportPDF(){
   const sorted=[...events].sort((a,b)=>(a.date||"").localeCompare(b.date||""));
   const evts=filterByRange(sorted);
   if(!evts.length){ toast("Keine Termine im gewählten Zeitraum"); return; }
+  // Nur echte Posts als Blöcke; Milestone-Termine werden unter ihrem Post gruppiert.
+  const posts=evts.filter(e=>!e.milestone);
+  const childrenOf=id=>events.filter(c=>c.parent===id&&c.milestone).sort((a,b)=>(a.date||"").localeCompare(b.date||""));
   const rangeNote=(val("exportFrom")||val("exportTo"))?` · Zeitraum: ${val("exportFrom")||"Anfang"} bis ${val("exportTo")||"Ende"}`:"";
   const html=`<!DOCTYPE html>
 <html lang="de">
@@ -1392,16 +1427,24 @@ function exportPDF(){
 <style>
   *{box-sizing:border-box;margin:0;padding:0}
   body{font-family:Arial,Helvetica,sans-serif;font-size:11px;color:#222;margin:0;padding:15mm 18mm}
-  h1{font-size:18px;color:#e89520;border-bottom:2px solid #e89520;padding-bottom:8px;margin-bottom:4px}
-  .meta{font-size:10px;color:#888;margin-bottom:18px}
-  .event{border:1px solid #ddd;border-radius:6px;padding:10px 14px;margin-bottom:12px;break-inside:avoid;page-break-inside:avoid}
+  h1{font-size:18px;color:#2faa5e;border-bottom:2px solid #2faa5e;padding-bottom:8px;margin-bottom:4px}
+  .meta{font-size:10px;color:#888;margin-bottom:14px}
+  .legend{font-size:10px;color:#555;margin-bottom:16px}
+  .legend span{display:inline-block;margin-right:12px}
+  .legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:4px;vertical-align:middle}
+  .event{border:1px solid #ddd;border-left:5px solid #2faa5e;border-radius:6px;padding:10px 14px;margin-bottom:12px;break-inside:avoid;page-break-inside:avoid}
   .event-head{display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap}
   .event-date{font-weight:bold;font-size:12px;color:#333;min-width:90px}
   .badge{border-radius:4px;padding:2px 7px;font-size:10px;font-weight:bold;color:#fff;white-space:nowrap}
+  .badge-tag{border-radius:4px;padding:2px 7px;font-size:10px;font-weight:bold;color:#444;background:#eee;border:1px solid #ddd;white-space:nowrap}
   .event-title{font-size:14px;font-weight:bold;margin-bottom:5px;color:#111}
-  .event-hook{font-style:italic;color:#555;font-size:11px;margin-bottom:5px;border-left:3px solid #e89520;padding-left:8px}
+  .event-hook{font-style:italic;color:#555;font-size:11px;margin-bottom:5px;border-left:3px solid #2faa5e;padding-left:8px}
   .event-row{font-size:10.5px;color:#444;margin:3px 0;line-height:1.4}
   .event-row b{color:#222}
+  .prod{margin-top:7px;padding-top:7px;border-top:1px solid #eee}
+  .prod-line{display:flex;gap:8px;align-items:center;font-size:10px;color:#333;padding:2px 0}
+  .prod-dot{display:inline-block;width:9px;height:9px;border-radius:50%}
+  .prod-ph{font-weight:bold;min-width:120px}
   .task-list{margin-top:7px;padding-top:7px;border-top:1px solid #eee}
   .task-item{padding:2px 0;font-size:10px;color:#444}
   @page{margin:12mm 15mm}
@@ -1410,16 +1453,20 @@ function exportPDF(){
 </head>
 <body>
 <h1>Content Kalender · SolarTech B2B Video Plan</h1>
-<div class="meta">Exportiert am ${new Date().toLocaleDateString("de-DE")} · ${evts.length} Termine${rangeNote}</div>
-${evts.map(e=>{
-  const col=pillarColor(e.pillar);
+<div class="meta">Exportiert am ${new Date().toLocaleDateString("de-DE")} · ${posts.length} Posts${rangeNote}</div>
+<div class="legend">
+  ${["concept","shoot","review","publish"].map(k=>`<span><i style="background:${PHASES[k].color}"></i>${esc(PHASES[k].label)}</span>`).join("")}
+</div>
+${posts.map(e=>{
   const tasks=e.tasks||[];
+  const kids=childrenOf(e.id);
   return `<div class="event">
   <div class="event-head">
     <span class="event-date">${e.date||"(kein Datum)"}</span>
-    <span class="badge" style="background:${col}">${esc(e.pillar)} · ${esc(pillarName(e.pillar))}</span>
-    ${e.format?`<span class="badge" style="background:#5a6080">${esc(e.format)}</span>`:""}
-    ${e.series?`<span class="badge" style="background:#404866">📺 ${esc(e.series)}</span>`:""}
+    <span class="badge" style="background:${PHASES.publish.color}">${PHASES.publish.icon} Veröffentlichung</span>
+    <span class="badge-tag">${esc(e.pillar)} · ${esc(pillarName(e.pillar))}</span>
+    ${e.format?`<span class="badge-tag">${esc(e.format)}</span>`:""}
+    ${e.series?`<span class="badge-tag">📺 ${esc(e.series)}</span>`:""}
   </div>
   <div class="event-title">${esc(e.title)}</div>
   ${e.hook?`<div class="event-hook">${esc(e.hook)}</div>`:""}
@@ -1429,6 +1476,7 @@ ${evts.map(e=>{
   ${e.cta?`<div class="event-row"><b>CTA:</b> ${esc(e.cta)}</div>`:""}
   ${e.location?`<div class="event-row"><b>Drehort:</b> ${esc(e.location)}</div>`:""}
   ${(e.hours||e.team)?`<div class="event-row"><b>Aufwand:</b> ${e.hours?esc(String(e.hours))+"h":""}${(e.hours&&e.team)?" · ":""}${e.team?esc(String(e.team))+" Personen":""}</div>`:""}
+  ${kids.length?`<div class="prod"><b style="font-size:10px;color:#222">Produktions-Phasen:</b>${kids.map(k=>{const ph=PHASES[k.milestone]||{label:k.milestone,color:"#888"};return `<div class="prod-line"><span class="prod-dot" style="background:${ph.color}"></span><span class="prod-ph">${esc(ph.label)}</span><span>${k.date||"–"}</span></div>`;}).join("")}</div>`:""}
   ${tasks.length?`<div class="task-list"><b>Aufgaben:</b>${tasks.map(t=>`<div class="task-item">${t.done?"☑":"☐"} ${esc(t.text)}${t.date?" ("+t.date+")":""}</div>`).join("")}</div>`:""}
 </div>`;
 }).join("")}
@@ -1578,12 +1626,94 @@ function seriesBulkAddTask(sName,inputId){
 // ════════════════════════════════════════════════════════════════════════════
 //  CALENDAR GENERATION mit Milestones
 // ════════════════════════════════════════════════════════════════════════════
-function openGenModal(){
-  const today=new Date(); today.setDate(today.getDate()+90);
-  document.getElementById("genUntil").value=isoDate(today);
-  document.getElementById("genOverlay").classList.add("open");
-}
+let genStep=1;
+function openGenModal(){ genStep=1; document.getElementById("genOverlay").classList.add("open"); renderGenWizard(); }
 function closeGenModal(){ document.getElementById("genOverlay").classList.remove("open"); }
+function wizGo(s){ genStep=s; renderGenWizard(); }
+
+function renderGenWizard(){
+  const steps=[{n:1,label:"Säulen"},{n:2,label:"Formate"},{n:3,label:"Zeitraum"}];
+  document.getElementById("wizSteps").innerHTML=steps.map(s=>
+    `<div class="wiz-step ${genStep===s.n?'active':''} ${genStep>s.n?'done':''}">
+      <div class="wiz-num">${genStep>s.n?'✓':s.n}</div><span>${s.label}</span>
+    </div>`).join('');
+  const body=document.getElementById("wizBody");
+  const foot=document.getElementById("wizFoot");
+
+  if(genStep===1){
+    body.innerHTML=`<div class="wiz-intro"><b>Schritt 1 · Deine Content-Säulen.</b><br>Säulen sind die thematischen Kategorien deiner Videos (z.B. „Aufklärung", „Kundenstimmen"). Sie geben dem Plan Struktur. Passe die Vorlagen an, lösche oder ergänze sie.</div>
+      <div id="wizPillars"></div>
+      <button class="add-link" onclick="addPillar();renderGenWizard()">+ Säule hinzufügen</button>`;
+    renderWizPillars();
+    foot.innerHTML=`<button class="btn" onclick="closeGenModal()">Abbrechen</button><div class="spacer"></div><button class="btn btn-primary" onclick="wizGo(2)">Weiter →</button>`;
+  } else if(genStep===2){
+    body.innerHTML=`<div class="wiz-intro"><b>Schritt 2 · Deine Formate.</b><br>Formate sind wiederkehrende Sendungs-Typen (z.B. „Montags-Erklärer"). Jedes Format gehört zu einer Säule und legt Wochentag &amp; Länge fest.</div>
+      <div id="wizFormats"></div>
+      <button class="add-link" onclick="addFormat();renderGenWizard()">+ Format hinzufügen</button>`;
+    renderWizFormats();
+    foot.innerHTML=`<button class="btn" onclick="wizGo(1)">← Zurück</button><div class="spacer"></div><button class="btn btn-primary" onclick="wizGo(3)">Weiter →</button>`;
+  } else {
+    const today=new Date(); today.setDate(today.getDate()+90); const def=isoDate(today);
+    body.innerHTML=`<div class="wiz-intro"><b>Schritt 3 · Zeitraum &amp; Phasen.</b><br>Lege fest, wie weit der Kalender reicht und welche Produktions-Phasen als eigene, farbige Termine erzeugt werden – als Erinnerung, wann du anfangen musst.</div>
+      <div class="field"><label>Dauer</label>
+        <div class="gen-option">
+          <input type="radio" id="gen-months" name="genType" value="months" checked>
+          <label for="gen-months">Anzahl Monate</label>
+          <input class="gen-control" id="genMonths" type="number" value="3" min="1" max="24" style="width:54px">
+        </div>
+        <div class="gen-option">
+          <input type="radio" id="gen-until" name="genType" value="until">
+          <label for="gen-until">Bis zu einem Datum</label>
+          <input class="gen-control" id="genUntil" type="date" value="${def}" style="width:150px">
+        </div>
+      </div>
+      <div class="field"><label>Phasen als verlinkte Erinnerungs-Termine erzeugen</label>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
+          <label style="display:flex;gap:6px;align-items:center;cursor:pointer"><input type="checkbox" id="genConcept" checked><span class="task-milestone tm-concept">🟠 Konzept</span></label>
+          <label style="display:flex;gap:6px;align-items:center;cursor:pointer"><input type="checkbox" id="genShoot" checked><span class="task-milestone tm-shoot">🔴 Dreh</span></label>
+          <label style="display:flex;gap:6px;align-items:center;cursor:pointer"><input type="checkbox" id="genReview" checked><span class="task-milestone tm-review">🔵 Schnitt/Review</span></label>
+          <label style="display:flex;gap:6px;align-items:center;cursor:pointer"><input type="checkbox" id="genPublish" checked><span class="task-milestone tm-publish">🟢 Veröffentlichung</span></label>
+        </div>
+      </div>
+      <div class="field"><label>Einstellungen</label>
+        <label style="display:flex;gap:8px;align-items:center;cursor:pointer;font-size:12px">
+          <input type="checkbox" id="genClearFirst" checked>
+          <span>Bestehende Termine zuerst löschen</span>
+        </label>
+      </div>`;
+    foot.innerHTML=`<button class="btn" onclick="wizGo(2)">← Zurück</button><div class="spacer"></div><button class="btn btn-primary" onclick="generateCalendar()">✦ Kalender erstellen</button>`;
+  }
+}
+function renderWizPillars(){
+  const el=document.getElementById("wizPillars"); if(!el) return;
+  el.innerHTML=pillars.map((p,i)=>`
+    <div class="wiz-card">
+      <div class="wc-row"><span class="edit-id">${esc(p.id)}</span><button class="mini-del" style="margin-left:auto" onclick="delPillarWiz(${i})">×</button></div>
+      <input class="wc-name" value="${esc(p.name)}" placeholder="Name der Säule" oninput="pillars[${i}].name=this.value;save()">
+      <textarea placeholder="Ziel / Nutzen der Säule" oninput="pillars[${i}].goal=this.value;save()">${esc(p.goal)}</textarea>
+    </div>`).join('');
+}
+function delPillarWiz(i){ if(!confirm('Säule „'+pillars[i].name+'" löschen?')) return; const id=pillars[i].id; pillars.splice(i,1); activePillars.delete(id); save(); renderLegend(); renderGenWizard(); }
+function renderWizFormats(){
+  const el=document.getElementById("wizFormats"); if(!el) return;
+  if(!pillars.length){ el.innerHTML='<div class="help">Bitte zuerst mindestens eine Säule anlegen (Schritt 1).</div>'; return; }
+  el.innerHTML=formats.map((f,i)=>`
+    <div class="wiz-card">
+      <div class="wc-row"><span class="edit-id">${esc(f.id)}</span>
+        <select class="edit-sel" onchange="formats[${i}].pillar=this.value;save()">
+          ${pillars.map(p=>`<option value="${p.id}" ${f.pillar===p.id?'selected':''}>${esc(p.id)} · ${esc(p.name)}</option>`).join('')}
+          <option value="custom" ${f.pillar==='custom'?'selected':''}>– keine Säule</option>
+        </select>
+        <button class="mini-del" onclick="delFormatWiz(${i})">×</button>
+      </div>
+      <input class="wc-name" value="${esc(f.name)}" placeholder="Format-Name" oninput="formats[${i}].name=this.value;save()">
+      <div class="wc-row" style="margin-bottom:0">
+        <input value="${esc(f.day)}" placeholder="Wochentag" oninput="formats[${i}].day=this.value;save()" style="margin-bottom:0">
+        <input value="${esc(f.length)}" placeholder="Länge (z.B. 60 Sek)" oninput="formats[${i}].length=this.value;save()" style="margin-bottom:0">
+      </div>
+    </div>`).join('');
+}
+function delFormatWiz(i){ if(!confirm('Format löschen?')) return; formats.splice(i,1); save(); renderGenWizard(); }
 
 function generateCalendar(){
   const clearFirst=document.getElementById("genClearFirst").checked;
@@ -1624,9 +1754,9 @@ function generateCalendar(){
       if(p.milestones){
         const m=p.milestones;
         const milestones=[
-          {key:"concept",label:"Konzept",date:m.concept,color:"#f5a623",icon:"🟠",enabled:genConcept},
-          {key:"shoot",label:"Dreh",date:m.shoot,color:"#e05c5c",icon:"🔴",enabled:genShoot},
-          {key:"review",label:"Review",date:m.review,color:"#3dbfb8",icon:"🟢",enabled:genReview}
+          {key:"concept",label:PHASES.concept.label,date:m.concept,color:PHASES.concept.color,icon:PHASES.concept.icon,enabled:genConcept},
+          {key:"shoot",label:PHASES.shoot.label,date:m.shoot,color:PHASES.shoot.color,icon:PHASES.shoot.icon,enabled:genShoot},
+          {key:"review",label:PHASES.review.label,date:m.review,color:PHASES.review.color,icon:PHASES.review.icon,enabled:genReview}
         ];
         milestones.forEach(ms=>{
           if(ms.enabled && ms.date && /^\d{4}-\d{2}-\d{2}$/.test(ms.date)){
@@ -1649,11 +1779,11 @@ function generateCalendar(){
           const publev={
             id:p.id+"-publish", date:p.date, parent:p.id, milestone:"publish",
             pillar:p.pillar, format:p.format||"", series:"",
-            title:"🟢 Veröffentlichung · "+p.title,
+            title:PHASES.publish.icon+" "+PHASES.publish.label+" · "+p.title,
             hook:"", idea:"Post live: "+p.title,
             variants:[], goal:"", cta:"",
-            location:"", equipment:[], hours:"", team:"", notes:"Veröffentlichung",
-            color:"#4caf7d", tasks:[]
+            location:"", equipment:[], hours:"", team:"", notes:PHASES.publish.label,
+            color:PHASES.publish.color, tasks:[]
           };
           events.push(publev);
           milestoneCount++;
