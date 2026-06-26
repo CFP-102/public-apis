@@ -1,0 +1,1226 @@
+{
+  "_meta": {
+    "generated_by": "Claude Content Director",
+    "date": "2026-06-26",
+    "briefing_status": "ASSUMPTION – kein Briefing-JSON wurde übergeben. Alle Angaben basieren auf einem realistischen B2B-Szenario: gewerblicher Solaranlagen-Installateur (DE), Zielgruppe: Facility Manager, Betriebsleiter, CFOs mittelständischer Unternehmen.",
+    "company_assumed": "SolarTech GmbH – B2B Photovoltaik-Installateur",
+    "platforms": ["LinkedIn", "YouTube", "Instagram"],
+    "post_rhythm": "Mo / Mi / Fr",
+    "campaign_duration_weeks": 12
+  },
+  "strategy": {
+    "overview": "Positionierung als vertrauenswürdiger Experte für gewerbliche PV-Anlagen durch systematische Aufklärung, Beweis durch Projekte und Nähe durch Hinter-den-Kulissen-Einblicke.",
+    "pillars": [
+      {
+        "id": "P1",
+        "name": "Aufklärung & Bildung",
+        "goal": "Kaufbarrieren abbauen durch verständliche Erklärung komplexer Themen (ROI, Technik, Förderungen)",
+        "content_types": ["Erklärvideo", "Infografik-Reel", "FAQ-Format"],
+        "kpi": "Saves, Shares, Kommentare mit Fragen"
+      },
+      {
+        "id": "P2",
+        "name": "Projekt-Dokumentation",
+        "goal": "Sozialer Beweis durch reale Projekte – vom Dach bis zur Inbetriebnahme",
+        "content_types": ["Before/After", "Timelapse", "Projekt-Walkthrough"],
+        "kpi": "Profilaufrufe, DMs, Anfragen"
+      },
+      {
+        "id": "P3",
+        "name": "Hinter den Kulissen",
+        "goal": "Vertrauen durch Transparenz – Team, Prozesse, Qualitätsstandards zeigen",
+        "content_types": ["Day-in-the-Life", "Montageprozess", "Werkstattblick"],
+        "kpi": "Follower-Wachstum, Engagement-Rate"
+      },
+      {
+        "id": "P4",
+        "name": "Kundenstimmen & Erfolge",
+        "goal": "Referenzmarketing – Kunden erzählen, was SolarTech ihnen gebracht hat",
+        "content_types": ["Interview-Clip", "Testimonial-Reel", "ROI-Zahlen-Post"],
+        "kpi": "Direktanfragen, Lead-Qualität"
+      },
+      {
+        "id": "P5",
+        "name": "Branche & Zeitgeist",
+        "goal": "Relevanz durch Reaktion auf aktuelle Energiepolitik, Preise, Förderprogramme",
+        "content_types": ["Newsjacking-Clip", "Meinung zur Gesetzesänderung", "Trendkommentar"],
+        "kpi": "Reichweite, neue Follower, Teilen"
+      }
+    ]
+  },
+  "formats": [
+    {
+      "id": "F1",
+      "name": "SolarKlar – Der Erklärer",
+      "day": "Montag",
+      "pillar": "P1",
+      "goal": "Ein komplexes Thema in unter 90 Sek. erklären",
+      "typical_content": "ROI-Rechnung, Amortisation, Wechselrichter-Funktion, Netzeinspeisung, EEG-Förderung",
+      "style": "Talking Head + Motion Graphics, ruhige Atmosphäre",
+      "length": "60–90 Sekunden"
+    },
+    {
+      "id": "F2",
+      "name": "Projekt Live – Die Baustelle",
+      "day": "Mittwoch",
+      "pillar": "P2",
+      "goal": "Echte Projekte dokumentieren und als Beweis nutzen",
+      "typical_content": "Dachvermessung, Modullieferung, Montage, Inbetriebnahme, Kundengespräch",
+      "style": "Reportage-Stil, handheld, authentisch",
+      "length": "90–120 Sekunden"
+    },
+    {
+      "id": "F3",
+      "name": "Team & Technik – Freitag BTS",
+      "day": "Freitag",
+      "pillar": "P3",
+      "goal": "Menschlichkeit und Kompetenz zeigen",
+      "typical_content": "Morgenroutine Monteur, Werkzeug-Erklärung, Sicherheitscheck, Teamvorstellung",
+      "style": "Dokumentarisch, entspannt, nahbar",
+      "length": "45–75 Sekunden"
+    },
+    {
+      "id": "F4",
+      "name": "Kundenstory – Einmal pro Monat",
+      "day": "Mittwoch (Woche 4, 8, 12)",
+      "pillar": "P4",
+      "goal": "Testimonial als stärkstes Verkaufsargument positionieren",
+      "typical_content": "Kundeninterview vor Anlage, ROI-Zahlen eingeblendet, emotionaler Abschluss",
+      "style": "Interview-Format, professionell beleuchtet",
+      "length": "2–3 Minuten (YouTube full) + 60-Sek-Cut (LinkedIn/Instagram)"
+    },
+    {
+      "id": "F5",
+      "name": "EnergyPulse – Branchenkommentar",
+      "day": "Flexibel (bei aktuellem Anlass)",
+      "pillar": "P5",
+      "goal": "Thought Leadership durch schnelle, kluge Einordnung",
+      "typical_content": "Neue Förderrichtlinie, Strompreisanstieg, Gesetzesänderung EEG",
+      "style": "Spontan, direkt in die Kamera, wenig Schnitt",
+      "length": "30–60 Sekunden"
+    }
+  ],
+  "content_plan": [
+    {
+      "week": 1,
+      "theme": "Kampagnenstart: Was kostet eine Solaranlage wirklich?",
+      "posts": [
+        {
+          "id": "W1-Mo",
+          "format": "F1",
+          "day": "Montag",
+          "title": "\"Was kostet eine Gewerbe-Solaranlage wirklich?\"",
+          "hook": "Die meisten Unternehmer denken: zu teuer. Hier sind die echten Zahlen.",
+          "idea": "Aufschlüsselung der Kosten einer 100-kWp-Anlage: Module, Wechselrichter, Montage, Genehmigung, Netzanschluss",
+          "variants": [
+            "Variante A: Kostenaufstellung als Infografik-Overlay im Video",
+            "Variante B: Geschäftsführer erklärt live an einer echten Kalkulation",
+            "Variante C: Split-Screen: Erwartung vs. Realität (gängige Mythen brechen)"
+          ],
+          "goal": "Barriere brechen, erste Awareness schaffen",
+          "pillar": "P1",
+          "cta": "Frag uns nach deinem Angebot – Link in Bio"
+        },
+        {
+          "id": "W1-Mi",
+          "format": "F2",
+          "day": "Mittwoch",
+          "title": "\"So läuft eine Dachmessung ab\"",
+          "hook": "Bevor wir auch nur ein Modul bestellen, passiert das hier.",
+          "idea": "Kamerateam begleitet Dachdecker bei der Vorvermessung eines Logistikzentrums. GPS-Messung, Statikcheck, Ausrichtungsanalyse.",
+          "variants": [
+            "Variante A: POV vom Techniker auf dem Dach",
+            "Variante B: Techniker erklärt am Laptop die 3D-Planung nach der Messung",
+            "Variante C: Zeitraffer der gesamten Messkampagne (ca. 3 Stunden auf 60 Sek.)"
+          ],
+          "goal": "Professionalism zeigen, Prozess erklären",
+          "pillar": "P2",
+          "cta": "Kostenlose Dachanalyse anfragen"
+        },
+        {
+          "id": "W1-Fr",
+          "format": "F3",
+          "day": "Freitag",
+          "title": "\"Das ist unser Montageteam\"",
+          "hook": "6 Leute. 5 Jahre Erfahrung. Jeden Tag auf einem anderen Dach.",
+          "idea": "Kurzvorstellung des Montageteams, jeder sagt in einem Satz, warum er den Job macht.",
+          "variants": [
+            "Variante A: Einzelportraits nacheinander geschnitten, Namen und Funktion eingeblendet",
+            "Variante B: Teamfoto auf Baustelle + Voice-Over des Teamleiters",
+            "Variante C: Wer-bin-ich-Quiz: Zuschauer raten die Spezialität jedes Mitglieds"
+          ],
+          "goal": "Vertrauen und Sympathie aufbauen",
+          "pillar": "P3",
+          "cta": "Folgt uns für mehr Einblicke"
+        }
+      ]
+    },
+    {
+      "week": 2,
+      "theme": "ROI & Amortisation – die wichtigsten Zahlen",
+      "posts": [
+        {
+          "id": "W2-Mo",
+          "format": "F1",
+          "day": "Montag",
+          "title": "\"Wann amortisiert sich eine Gewerbe-PV-Anlage?\"",
+          "hook": "Unsere Kunden brauchen im Schnitt 6,3 Jahre. So rechnen wir das.",
+          "idea": "Schritt-für-Schritt ROI-Rechnung: Investition, Eigenverbrauchsquote, Strompreis, Einspeisevergütung, Steuereffekte",
+          "variants": [
+            "Variante A: Whiteboard-Erklärung mit echten Zahlen eines anonymisierten Projekts",
+            "Variante B: Interaktives Rechenbeispiel – Zuschauer-Betrieb als fiktiver Case",
+            "Variante C: Grafik-Overlay: Wie verändert sich die Amortisationszeit bei steigendem Strompreis?"
+          ],
+          "goal": "Kaufentscheidung datenbasiert erleichtern",
+          "pillar": "P1",
+          "cta": "Eigene Amortisationsrechnung anfordern"
+        },
+        {
+          "id": "W2-Mi",
+          "format": "F2",
+          "day": "Mittwoch",
+          "title": "\"Tag 1 der Montage – was wirklich passiert\"",
+          "hook": "Um 6:30 Uhr. Das Dach ist frei. Die Arbeit beginnt.",
+          "idea": "Erster Montage-Tag auf Baustelle: Sicherheitssystem, erste Schienen, erste Module – authentischer Reportage-Stil",
+          "variants": [
+            "Variante A: Chronologischer Tagesablauf 6:30–17:00 Uhr als 90-Sek-Cut",
+            "Variante B: Techniker kommentiert jeden Arbeitsschritt direkt in die Kamera",
+            "Variante C: Drohnenaufnahme Beginn vs. Drohne Ende des Tages – Fortschritt sichtbar machen"
+          ],
+          "goal": "Qualität und Zuverlässigkeit beweisen",
+          "pillar": "P2",
+          "cta": "Projekt anfragen – wir planen kostenlos"
+        },
+        {
+          "id": "W2-Fr",
+          "format": "F3",
+          "day": "Freitag",
+          "title": "\"Das Equipment unserer Monteure\"",
+          "hook": "Ohne dieses Werkzeug würden wir niemals auf ein Firmendach steigen.",
+          "idea": "Techniker öffnet seinen Werkzeugkoffer und erklärt jedes wichtige Teil: Sicherheitsgeschirr, Torqueschlüssel, Kabelziehwerkzeug, Messgerät",
+          "variants": [
+            "Variante A: Flat Lay der Tools + kurze Erklärung jedes Geräts",
+            "Variante B: \"Darf ich das anfassen?\"-Format: Azubi hält Tools, Meister erklärt",
+            "Variante C: Before/After: So sah der Koffer vor 5 Jahren aus vs. heute"
+          ],
+          "goal": "Fachkompetenz zeigen, Qualitätsversprechen untermauern",
+          "pillar": "P3",
+          "cta": "Jetzt Kontakt aufnehmen"
+        }
+      ]
+    },
+    {
+      "week": 3,
+      "theme": "Förderungen & Finanzierung",
+      "posts": [
+        {
+          "id": "W3-Mo",
+          "format": "F1",
+          "day": "Montag",
+          "title": "\"Diese Förderungen kennen die meisten Unternehmer nicht\"",
+          "hook": "KfW, BAFA, EEG – drei Abkürzungen, die deine Investition deutlich günstiger machen.",
+          "idea": "Überblick über aktuell relevante Förderprogramme: KfW 270, direkte Zuschüsse der Bundesländer, steuerliche Absetzbarkeit",
+          "variants": [
+            "Variante A: Tabelle der Top-3-Förderungen mit Konditionen, live erklärt",
+            "Variante B: Fiktives Unternehmen rechnet vor, wie viel Förderung es bekäme",
+            "Variante C: Interview mit Steuerberater-Partner zum Thema steuerliche Vorteile"
+          ],
+          "goal": "Kaufbarriere Finanzierung auflösen",
+          "pillar": "P1",
+          "cta": "Wir helfen beim Förderantrag – kostenlos"
+        },
+        {
+          "id": "W3-Mi",
+          "format": "F2",
+          "day": "Mittwoch",
+          "title": "\"Inbetriebnahme: Der Moment, auf den wir hinarbeiten\"",
+          "hook": "Nach 4 Tagen Montage. Der Schalter wird umgelegt.",
+          "idea": "Inbetriebnahme einer 150-kWp-Anlage auf einem Produktionsbetrieb: letzter Kabelanschluss, Übergabe-Checkliste, erster Ertragswert auf dem Monitoring-Display",
+          "variants": [
+            "Variante A: Slow-Motion-Clip beim Einschalten + Reaktion des Kunden",
+            "Variante B: Techniker erklärt Monitoring-App live am Tablet",
+            "Variante C: Zeitraffer: 0% zu 100% Systemcheck in 60 Sekunden"
+          ],
+          "goal": "Emotionalen Höhepunkt zeigen, Kundenbeziehung demonstrieren",
+          "pillar": "P2",
+          "cta": "Eigenes Projekt starten"
+        },
+        {
+          "id": "W3-Fr",
+          "format": "F3",
+          "day": "Freitag",
+          "title": "\"Sicherheit zuerst – unser Protokoll vor jedem Dachstieg\"",
+          "hook": "Wir steigen nicht aufs Dach, ohne das hier gecheckt zu haben.",
+          "idea": "Sicherheits-Briefing vor Montagebeginn: PSA-Check, Wetterprotokoll, Kommunikationskette, Notfallplan",
+          "variants": [
+            "Variante A: Checkliste wird abgehakt, jeder Punkt kurz erklärt",
+            "Variante B: Teamleiter erklärt, was passiert, wenn ein Punkt nicht erfüllt ist",
+            "Variante C: Versicherungsperspektive – warum Protokoll auch für den Kunden wichtig ist"
+          ],
+          "goal": "Professionalität und Verantwortungsbewusstsein zeigen",
+          "pillar": "P3",
+          "cta": "Anfragen – wir arbeiten nach höchsten Standards"
+        }
+      ]
+    },
+    {
+      "week": 4,
+      "theme": "Kundenstory #1 + Technik-Deep-Dive",
+      "posts": [
+        {
+          "id": "W4-Mo",
+          "format": "F1",
+          "day": "Montag",
+          "title": "\"Wechselrichter: Das Herz deiner Anlage\"",
+          "hook": "Ohne dieses Gerät ist eine Solaranlage nutzlos. So funktioniert es.",
+          "idea": "Erklärung Wechselrichter-Funktion: DC → AC, MPP-Tracker, Monitoring-Interface, Dimensionierung nach Anlagengröße",
+          "variants": [
+            "Variante A: Animation zeigt Energiefluss, Techniker erklärt im Voice-Over",
+            "Variante B: Live-Demontage eines Wechselrichters in der Werkstatt",
+            "Variante C: Vergleich: String-WR vs. Mikro-WR – wann was sinnvoll ist"
+          ],
+          "goal": "Fachkompetenz demonstrieren, Entscheider informieren",
+          "pillar": "P1",
+          "cta": "Fachberatung anfragen"
+        },
+        {
+          "id": "W4-Mi",
+          "format": "F4",
+          "day": "Mittwoch",
+          "title": "\"Kundenstory: Metzgerei Gruber – 40% weniger Stromkosten\"",
+          "hook": "Familie Gruber hat gezweifelt. Heute würden sie es sofort wieder machen.",
+          "idea": "Interview mit Inhaber der Metzgerei Gruber (100kWp-Anlage, 18 Monate in Betrieb). Echte Zahlen: vorher/nachher Stromkosten, Amortisationsziel, Zufriedenheit.",
+          "variants": [
+            "Variante A: Interview vor der Anlage auf dem Dach der Metzgerei",
+            "Variante B: Split-Screen: Stromrechnung alt vs. neu + Interviewausschnitte",
+            "Variante C: 3-Minuten-Doku für YouTube + 60-Sek-Cut für LinkedIn"
+          ],
+          "goal": "Stärkstes Vertrauenssignal: echter Kunde, echte Zahlen",
+          "pillar": "P4",
+          "cta": "Kontakt aufnehmen – Referenzprojekte besichtigen"
+        },
+        {
+          "id": "W4-Fr",
+          "format": "F3",
+          "day": "Freitag",
+          "title": "\"Ein Freitag auf der Baustelle – ungeskriptet\"",
+          "hook": "Was passiert, wenn wir die Kamera einfach mitlaufen lassen?",
+          "idea": "Ungeplanter Tagesbegleiter auf aktiver Baustelle – ungeskriptet, authentisch, mit kleinen Problemen und ihrer Lösung",
+          "variants": [
+            "Variante A: Handheld-Vlog-Stil, Monteur kommentiert",
+            "Variante B: GoPro-Perspektive vom Dach den ganzen Tag",
+            "Variante C: \"Was ist heute schiefgelaufen?\" – ehrliche Reflexion am Abend"
+          ],
+          "goal": "Authentizität und Menschlichkeit zeigen",
+          "pillar": "P3",
+          "cta": "Folgt uns für mehr"
+        }
+      ]
+    },
+    {
+      "week": 5,
+      "theme": "Planungsphase & Genehmigungen",
+      "posts": [
+        {
+          "id": "W5-Mo",
+          "format": "F1",
+          "day": "Montag",
+          "title": "\"Von der Idee bis zum Baubeginn: Die 5 Schritte\"",
+          "hook": "Die meisten Unternehmer wissen nicht, wie viel vor dem ersten Modul passiert.",
+          "idea": "Prozessübersicht: Erstgespräch → Dachanalyse → Planung → Genehmigung → Montage. Timeline typisch 6–12 Wochen.",
+          "variants": [
+            "Variante A: Infografik-Animation der 5 Schritte, live erklärt",
+            "Variante B: Projektleiterin erklärt jede Phase anhand eines echten Projekts",
+            "Variante C: \"Was dauert am längsten?\" – Netzanschluss als oft unterschätzter Faktor"
+          ],
+          "goal": "Erwartungsmanagement, Vertrauen aufbauen",
+          "pillar": "P1",
+          "cta": "Erstgespräch vereinbaren"
+        },
+        {
+          "id": "W5-Mi",
+          "format": "F2",
+          "day": "Mittwoch",
+          "title": "\"Drohnenplanung: So entsteht der Lageplan\"",
+          "hook": "Bevor wir planen, fliegen wir.",
+          "idea": "Drohnenbefliegung eines Betriebs-Dachs: Aufmaß, 3D-Modell, Verschattungsanalyse, Ertragsprognose – alles in 90 Sekunden",
+          "variants": [
+            "Variante A: Drohnenflug-Footage + Overlay der Planungssoftware-Ansicht",
+            "Variante B: Zeitraffer: Drohne fliegt, am Laptop entsteht in Echtzeit der Plan",
+            "Variante C: \"Was sehen wir, was ihr nicht seht\" – Techniker erklärt versteckte Planergebnisse"
+          ],
+          "goal": "Technologie und Sorgfalt demonstrieren",
+          "pillar": "P2",
+          "cta": "Kostenlose Drohnenanalyse anfragen"
+        },
+        {
+          "id": "W5-Fr",
+          "format": "F3",
+          "day": "Freitag",
+          "title": "\"Ausbildung bei SolarTech – so werden unsere Techniker\"",
+          "hook": "Wir bilden selbst aus. Das ist unser Qualitätsstandard.",
+          "idea": "Einblick in die Ausbildung: Azubi-Vorstellung, Lernphasen, erste Montage mit Mentor",
+          "variants": [
+            "Variante A: Azubi erzählt, warum er diesen Beruf gewählt hat",
+            "Variante B: Meister erklärt, was gute Azubis von schlechten unterscheidet",
+            "Variante C: \"Erster Tag auf dem Dach\" – Erinnerung des ältesten Technikers"
+          ],
+          "goal": "Employer Branding + Kompetenzversprechen",
+          "pillar": "P3",
+          "cta": "Wir suchen Azubis und Fachkräfte – Info im Profil"
+        }
+      ]
+    },
+    {
+      "week": 6,
+      "theme": "Energiespeicher & Eigenverbrauch",
+      "posts": [
+        {
+          "id": "W6-Mo",
+          "format": "F1",
+          "day": "Montag",
+          "title": "\"Brauche ich einen Batteriespeicher?\"",
+          "hook": "Kurze Antwort: kommt drauf an. Lange Antwort: dieser Post.",
+          "idea": "Entscheidungsbaum: Wann lohnt sich Speicher für Gewerbe? Eigenverbrauchsquote ohne Speicher vs. mit, Lastprofile, Wirtschaftlichkeit",
+          "variants": [
+            "Variante A: Geschäftsführer erklärt an echter Lastgangkurve",
+            "Variante B: Animation des Energieflusses: PV → Betrieb → Speicher → Netz",
+            "Variante C: \"3 Typen von Betrieben – wer braucht Speicher, wer nicht\""
+          ],
+          "goal": "Beratungskompetenz zeigen, Vertrauen durch Ehrlichkeit",
+          "pillar": "P1",
+          "cta": "Lastprofil-Analyse anfragen"
+        },
+        {
+          "id": "W6-Mi",
+          "format": "F2",
+          "day": "Mittwoch",
+          "title": "\"Großspeicher-Montage: 200 kWh in 2 Tagen\"",
+          "hook": "Das ist kein Heimspeicher. Das ist industrielle Energieinfrastruktur.",
+          "idea": "Dokumentation der Installation eines 200-kWh-Gewerbe-Batteriespeichers: Aufstellungsplan, Verkabelung, BMS-Konfiguration, Abnahme",
+          "variants": [
+            "Variante A: Zeitraffer der 2-tägigen Montage auf 90 Sek. komprimiert",
+            "Variante B: Techniker erklärt BMS (Battery Management System) live am Gerät",
+            "Variante C: Vorher/Nachher der Energieeffizienz mit echten Monitoring-Daten"
+          ],
+          "goal": "Referenzprojekt dokumentieren, Premiumkunden ansprechen",
+          "pillar": "P2",
+          "cta": "Speicherlösung anfragen"
+        },
+        {
+          "id": "W6-Fr",
+          "format": "F3",
+          "day": "Freitag",
+          "title": "\"Unser Büro läuft auch solar – hier ist der Beweis\"",
+          "hook": "Wir predigen nicht nur – wir leben es.",
+          "idea": "Rundgang durch das eigene Büro/Betrieb mit Solaranlage: Monitoring-Dashboard live, Eigenverbrauchsquote heute, Reflexion nach 2 Jahren",
+          "variants": [
+            "Variante A: Geschäftsführer zeigt Monitoring-App live auf dem Smartphone",
+            "Variante B: \"Was haben wir nach 2 Jahren gelernt?\" – ehrlicher Rückblick",
+            "Variante C: Live-Vergleich: Ertrag heute vs. gleicher Tag im Vorjahr"
+          ],
+          "goal": "Glaubwürdigkeit durch gelebte Überzeugung",
+          "pillar": "P3",
+          "cta": "Folgt uns – wir teilen alles"
+        }
+      ]
+    },
+    {
+      "week": 7,
+      "theme": "Wartung & Betrieb",
+      "posts": [
+        {
+          "id": "W7-Mo",
+          "format": "F1",
+          "day": "Montag",
+          "title": "\"Was passiert, wenn eine Solaranlage ausfällt?\"",
+          "hook": "Spoiler: meistens nichts Dramatisches. Aber ihr solltet das wissen.",
+          "idea": "Häufigste Fehlerquellen: Wechselrichter-Alarm, verschmutzte Module, Schatten durch Neubau, Kabeldefekt. Was bedeutet das für den Ertrag?",
+          "variants": [
+            "Variante A: Live-Demo im Monitoring-System: Fehlercode lesen und deuten",
+            "Variante B: \"Die 3 häufigsten Serviceanrufe\" – Techniker erzählt",
+            "Variante C: Vergleich: Anlage mit Wartungsvertrag vs. ohne – Ertragsunterschied"
+          ],
+          "goal": "After-Sales-Vertrauen und Wartungsvertrag-Lead",
+          "pillar": "P1",
+          "cta": "Wartungsvertrag anfragen"
+        },
+        {
+          "id": "W7-Mi",
+          "format": "F2",
+          "day": "Mittwoch",
+          "title": "\"Jahresinspektion: So checken wir 500 Module in 4 Stunden\"",
+          "hook": "Einmal pro Jahr. Systematisch. Mit Thermokamera.",
+          "idea": "Wartungseinsatz dokumentieren: Thermografie-Kamera findet Hotspots, Reinigung, elektrische Messung, Bericht-Erstellung",
+          "variants": [
+            "Variante A: Thermografie-Aufnahmen live erklären – was sehen wir?",
+            "Variante B: Zeitraffer: Komplette Inspektion von Anfang bis Wartungsbericht",
+            "Variante C: \"Dieses Modul hätte ohne Prüfung Feuer gefangen\" – echter Fall anonymisiert"
+          ],
+          "goal": "Wartungsvertrag-Abschlüsse generieren",
+          "pillar": "P2",
+          "cta": "Wartungsinspektion buchen"
+        },
+        {
+          "id": "W7-Fr",
+          "format": "F3",
+          "day": "Freitag",
+          "title": "\"So sieht unser Lager aus – 3.000 Module auf Abruf\"",
+          "hook": "Lieferzeit ist das größte Problem der Branche. Unsere Antwort darauf.",
+          "idea": "Lager-Tour: Modulbestand, Wechselrichter-Typen, Kabelware, Logistikprozess. Warum Lager = Kundenvorteil.",
+          "variants": [
+            "Variante A: Lagerleiter gibt Führung mit Erklärung jeder Zone",
+            "Variante B: \"Von Lager bis Dach in 72 Stunden\" – Prozess erklärt",
+            "Variante C: Lieferkettenproblem 2022 vs. heute – was hat sich verändert?"
+          ],
+          "goal": "Lieferfähigkeit als Differenzierungsmerkmal",
+          "pillar": "P3",
+          "cta": "Angebot einholen – schnelle Lieferung inklusive"
+        }
+      ]
+    },
+    {
+      "week": 8,
+      "theme": "Kundenstory #2 + Dachtypen",
+      "posts": [
+        {
+          "id": "W8-Mo",
+          "format": "F1",
+          "day": "Montag",
+          "title": "\"Flachdach vs. Schrägdach – was ist besser für PV?\"",
+          "hook": "Beide funktionieren. Aber nicht auf die gleiche Art.",
+          "idea": "Technischer Vergleich: Aufständerung Flachdach, Winkeloptimierung, Reinigungsaufwand, Statikanforderungen, Ertrag pro qm",
+          "variants": [
+            "Variante A: Animation zeigt beide Dachtypen mit Einstrahlungswinkel",
+            "Variante B: Techniker erklärt an echtem Flachdachprojekt die Besonderheiten",
+            "Variante C: \"Was war das schwierigste Dach, das ihr je hattet?\" – Teamrunde"
+          ],
+          "goal": "Breite Zielgruppe ansprechen, alle Dachtypen abdecken",
+          "pillar": "P1",
+          "cta": "Dach analysieren lassen"
+        },
+        {
+          "id": "W8-Mi",
+          "format": "F4",
+          "day": "Mittwoch",
+          "title": "\"Kundenstory: Autohaus Schmitt – 60 kWp auf dem Showroom\"",
+          "hook": "Ein Autohaus, das zeigt, dass Nachhaltigkeit und Geschäft zusammenpassen.",
+          "idea": "Interview mit Geschäftsführer des Autohauses: Motivation, Ablauf, erste Erfahrungen nach 6 Monaten. Besonderheit: E-Auto-Ladeinfrastruktur kombiniert.",
+          "variants": [
+            "Variante A: Interview vor Showroom mit PV-Dach im Hintergrund",
+            "Variante B: Walkthrough mit Kunde: Module auf Dach + Ladeinfrastruktur unten erklärt",
+            "Variante C: \"Was haben Ihre Kunden gesagt?\" – Außenwahrnehmung als Thema"
+          ],
+          "goal": "Referenz für Gewerbeimmobilien mit Kombilösungen",
+          "pillar": "P4",
+          "cta": "Kombilösung PV + E-Mobilität anfragen"
+        },
+        {
+          "id": "W8-Fr",
+          "format": "F3",
+          "day": "Freitag",
+          "title": "\"So feiern wir Projektabschlüsse\"",
+          "hook": "300 Projekte in 5 Jahren. Jedes einzelne hat gezählt.",
+          "idea": "Meilenstein-Post: 300. Projekt abgeschlossen. Team-Foto, kurze Reflexion, Dank an Kunden und Team.",
+          "variants": [
+            "Variante A: Slideshow der schönsten Projektfotos mit Texten",
+            "Variante B: Jedes Teammitglied sagt seinen Lieblingsprojekt-Moment",
+            "Variante C: \"Was hat uns das 300. Projekt gelehrt?\" – Geschäftsführer reflektiert"
+          ],
+          "goal": "Community building, Stolz und Zugehörigkeit",
+          "pillar": "P3",
+          "cta": "Wir suchen Projekt Nr. 301 – anfragen"
+        }
+      ]
+    },
+    {
+      "week": 9,
+      "theme": "Nachhaltigkeit & Unternehmensverantwortung",
+      "posts": [
+        {
+          "id": "W9-Mo",
+          "format": "F1",
+          "day": "Montag",
+          "title": "\"CO₂-Bilanz einer Gewerbe-Solaranlage – die echten Zahlen\"",
+          "hook": "Wie viel CO₂ spart eine 100-kWp-Anlage wirklich? Wir rechnen es durch.",
+          "idea": "CO₂-Äquivalente: Tonnen pro Jahr, Vergleich Autofahrten, Flüge, Rindersteaks. Amortisationszeit der Herstellungs-CO₂.",
+          "variants": [
+            "Variante A: Infografik-Overlay mit konkreten Vergleichszahlen",
+            "Variante B: \"Ihr Nachhaltigkeitsbericht schreibt sich fast von selbst\" – ESG-Kontext",
+            "Variante C: CO₂ als Finanzargument: EU-Taxonomie, Bankkredite, Lieferantenaudits"
+          ],
+          "goal": "ESG-Argument für B2B-Entscheider schärfen",
+          "pillar": "P1",
+          "cta": "CO₂-Bilanz für Ihr Unternehmen berechnen"
+        },
+        {
+          "id": "W9-Mi",
+          "format": "F2",
+          "day": "Mittwoch",
+          "title": "\"Solarpark-Montage: 500 kWp auf einem Logistikzentrum\"",
+          "hook": "Das größte Projekt unserer Geschichte. Hier ist die Dokumentation.",
+          "idea": "Großprojekt-Dokumentation: 4-Wochen-Montage auf 10.000 qm Dach, 1.200 Module, 3 Wechselrichter, Erdungsanlage, komplexe Statik",
+          "variants": [
+            "Variante A: 4-Wochen-Zeitraffer in 90 Sekunden",
+            "Variante B: Projektleiter zieht Bilanz: Was lief gut, was war schwierig?",
+            "Variante C: Drohnen-Abschlussflug über fertiger Anlage"
+          ],
+          "goal": "Großkunden-Referenz, Kompetenz bei Großprojekten zeigen",
+          "pillar": "P2",
+          "cta": "Großprojekt anfragen"
+        },
+        {
+          "id": "W9-Fr",
+          "format": "F3",
+          "day": "Freitag",
+          "title": "\"Unsere eigene Nachhaltigkeitsbilanz 2025\"",
+          "hook": "Wir verkaufen Nachhaltigkeit – aber wie nachhaltig sind wir selbst?",
+          "idea": "Transparenz-Post: CO₂-Fußabdruck der Firma, Firmenfahrzeuge, Büroenergie, Modulentsorgung, soziales Engagement",
+          "variants": [
+            "Variante A: Jahresbericht-Highlights als kurzes Video",
+            "Variante B: Geschäftsführer bewertet Fortschritte und benennt Schwachstellen ehrlich",
+            "Variante C: Mitarbeiter berichten, was sie persönlich für Nachhaltigkeit tun"
+          ],
+          "goal": "Glaubwürdigkeit durch Transparenz, Employer Branding",
+          "pillar": "P3",
+          "cta": "Werte teilen? Dann folgt uns."
+        }
+      ]
+    },
+    {
+      "week": 10,
+      "theme": "Markt & Zukunft der Solarenergie",
+      "posts": [
+        {
+          "id": "W10-Mo",
+          "format": "F1",
+          "day": "Montag",
+          "title": "\"Wohin entwickeln sich Solarmodulpreise 2026?\"",
+          "hook": "Die Preise sind gefallen. Aber wie tief gehen sie noch – und was bedeutet das für Sie?",
+          "idea": "Marktanalyse: Preisverfall der letzten 10 Jahre, aktuelle Chinesische Überproduktion, Auswirkung auf Investitionstiming",
+          "variants": [
+            "Variante A: Kurvendiagramm erklärt + Empfehlung: jetzt oder warten?",
+            "Variante B: \"3 Szenarien für 2026\" – Experte spekuliert offen",
+            "Variante C: Kundenveranstaltungs-Zusammenfassung: Was Unternehmer bewegt"
+          ],
+          "goal": "Thought Leadership, Investitionsentscheidung beschleunigen",
+          "pillar": "P5",
+          "cta": "Aktuelles Angebot einholen – Preise jetzt sichern"
+        },
+        {
+          "id": "W10-Mi",
+          "format": "F2",
+          "day": "Mittwoch",
+          "title": "\"Agri-PV: Wenn Landwirtschaft und Solar verschmelzen\"",
+          "hook": "Das nächste große Ding – und wir sind dabei.",
+          "idea": "Dokumentation eines Agri-PV-Pilotprojekts: Module über Beeten, Doppelnutzung der Fläche, Messungen Pflanzenwachstum vs. konventionell",
+          "variants": [
+            "Variante A: Drohnenaufnahme Agri-PV-Anlage + Erläuterung",
+            "Variante B: Landwirt erklärt, warum er mitgemacht hat",
+            "Variante C: Wissenschaftler erklärt erste Messergebnisse"
+          ],
+          "goal": "Innovationsimage aufbauen, neue Kundengruppe ansprechen",
+          "pillar": "P2",
+          "cta": "Agri-PV-Potenzial prüfen lassen"
+        },
+        {
+          "id": "W10-Fr",
+          "format": "F5",
+          "day": "Freitag",
+          "title": "\"Was bedeutet die neue Solarstrategie der EU für Ihr Unternehmen?\"",
+          "hook": "Brüssel hat entschieden. Was das für deutsche Betriebe bedeutet.",
+          "idea": "Schnellkommentar zur aktuellen EU-Energiepolitik: neue Ausschreibungsregeln, geplante Netzausbau-Beschleunigung, Auswirkung auf Genehmigungszeiten",
+          "variants": [
+            "Variante A: Geschäftsführer kommentiert spontan nach Pressemitteilung",
+            "Variante B: \"Was bedeutet das in der Praxis?\" – 3 konkrete Punkte",
+            "Variante C: Branchenverband-Zitat als Aufhänger für eigene Einordnung"
+          ],
+          "goal": "Schnelle Reaktion auf News = Reichweite und Vertrauen",
+          "pillar": "P5",
+          "cta": "Für Updates folgen"
+        }
+      ]
+    },
+    {
+      "week": 11,
+      "theme": "Vertiefung: Netzanschluss & Bürokratie",
+      "posts": [
+        {
+          "id": "W11-Mo",
+          "format": "F1",
+          "day": "Montag",
+          "title": "\"Der Netzanschluss: Warum er 6 Monate dauern kann\"",
+          "hook": "Das größte Problem bei der Solarplanung ist nicht das Dach. Es ist das Amt.",
+          "idea": "Detailblick Netzanschluss: Antragstellung beim Netzbetreiber, Wartezeiten, technische Anforderungen, was man selbst beschleunigen kann",
+          "variants": [
+            "Variante A: Projektleiterin erklärt Schritt für Schritt den Antragsprozess",
+            "Variante B: \"Unser schlimmstes Bürokratie-Erlebnis\" – ehrliche Anekdote",
+            "Variante C: Infografik: Durchschnittliche Wartezeiten nach Netzbetreiber-Region"
+          ],
+          "goal": "Glaubwürdigkeit durch ehrliche Einschätzung, Vertrauen stärken",
+          "pillar": "P1",
+          "cta": "Wir übernehmen die Genehmigung für Sie"
+        },
+        {
+          "id": "W11-Mi",
+          "format": "F2",
+          "day": "Mittwoch",
+          "title": "\"Übergabe: Das letzte Gespräch auf der Baustelle\"",
+          "hook": "Jedes Projekt endet mit diesem Moment. Und der sagt alles.",
+          "idea": "Dokumentation der Übergabe-Besprechung: Techniker erklärt dem Kunden das Monitoring, übergibt Dokumentationsmappe, Handschlag-Moment",
+          "variants": [
+            "Variante A: Authentischer Übergabe-Clip ohne Skript",
+            "Variante B: Kunde erzählt im Interview, wie der Prozess war",
+            "Variante C: \"Was jetzt noch passiert\" – After-Sales-Prozess erklärt"
+          ],
+          "goal": "Kundenzufriedenheit beweisen, Serviceversprechen zeigen",
+          "pillar": "P2",
+          "cta": "So arbeiten wir – Erstgespräch anfragen"
+        },
+        {
+          "id": "W11-Fr",
+          "format": "F3",
+          "day": "Freitag",
+          "title": "\"11 Wochen, 11 Posts, 11 Dinge die wir gelernt haben\"",
+          "hook": "Wir machen das jetzt 11 Wochen. Was hat funktioniert, was nicht?",
+          "idea": "Meta-Reflexion über die Content-Kampagne: Transparenter Einblick in die Social-Media-Strategie, was die Community bewegt hat, echte Zahlen",
+          "variants": [
+            "Variante A: Geschäftsführer zieht persönliches Fazit",
+            "Variante B: Community-Fragen wurden gestellt – Antworten kommen jetzt",
+            "Variante C: \"Was werden wir im nächsten Quartal anders machen?\""
+          ],
+          "goal": "Community-Bindung, Transparenz, Vorschau",
+          "pillar": "P3",
+          "cta": "Bleibt dabei – nächste Phase kommt"
+        }
+      ]
+    },
+    {
+      "week": 12,
+      "theme": "Finale: Kundenstory #3 + Kampagnenabschluss",
+      "posts": [
+        {
+          "id": "W12-Mo",
+          "format": "F1",
+          "day": "Montag",
+          "title": "\"12 Wochen Solar-Content: Was wir Ihnen sagen wollten\"",
+          "hook": "Wenn Sie nur einen Post aus dieser Kampagne mitnehmen, dann diesen.",
+          "idea": "Synthese aller Themen: Warum jetzt der richtige Zeitpunkt für gewerbliche PV ist. Die 3 wichtigsten Argumente, die wirklich zählen.",
+          "variants": [
+            "Variante A: Geschäftsführer hält bewegenden Abschluss-Monolog",
+            "Variante B: Schnitt aller wichtigsten Clips aus 12 Wochen",
+            "Variante C: \"3 Sätze, die alles zusammenfassen\" – prägnant und mutig"
+          ],
+          "goal": "Kampagnen-Abschluss, Conversion-Push",
+          "pillar": "P1",
+          "cta": "Letzter Aufruf: Jetzt Projekt anfragen"
+        },
+        {
+          "id": "W12-Mi",
+          "format": "F4",
+          "day": "Mittwoch",
+          "title": "\"Kundenstory: Brauerei Hoffmann – Solar als Markenversprechen\"",
+          "hook": "Bier brauen mit Solarstrom. Die Hoffmanns machen es vor.",
+          "idea": "Interview mit der Inhaberfamilie der Traditionsbrauerei: 200 kWp auf historischem Gebäude, Herausforderungen Denkmalschutz, Stolz auf Nachhaltigkeit als Marketingargument",
+          "variants": [
+            "Variante A: Interview vor Brauerei-Gebäude mit Anlage sichtbar",
+            "Variante B: Prozess: Bier brauen mit Solarstrom – emotionale Verknüpfung",
+            "Variante C: \"Unsere Kunden fragen jetzt immer, ob wir solar sind\" – Markeneffekt"
+          ],
+          "goal": "Abschluss-Testimonial mit emotionalem Storytelling",
+          "pillar": "P4",
+          "cta": "Ihre Erfolgsgeschichte anfragen"
+        },
+        {
+          "id": "W12-Fr",
+          "format": "F3",
+          "day": "Freitag",
+          "title": "\"Danke – und was als nächstes kommt\"",
+          "hook": "12 Wochen. 36 Posts. Eine Community.",
+          "idea": "Aufrichtiger Dank an Follower und Kunden, Ankündigung nächste Content-Phase, Einladung zum persönlichen Gespräch",
+          "variants": [
+            "Variante A: Persönliches Video des Geschäftsführers, aufgenommen zu Hause",
+            "Variante B: Team-Video: Alle bedanken sich kurz",
+            "Variante C: \"Was wünscht ihr euch für das nächste Quartal?\" – Community-Frage"
+          ],
+          "goal": "Beziehung stärken, Community-Loyalität sichern",
+          "pillar": "P3",
+          "cta": "Folgt uns weiter – die Reise geht weiter"
+        }
+      ]
+    }
+  ],
+  "production": [
+    {
+      "post_id": "W1-Mo",
+      "location": "Büro/Konferenzraum SolarTech – Whiteboard oder Monitor als Hintergrund",
+      "equipment": ["Sony A7 IV oder ähnlich", "50mm Objektiv", "2x Softbox LED-Panel", "Rode Wireless GO II Mikrofon", "Laptop mit Kalkulations-Mockup"],
+      "effort_hours": 3,
+      "team_size": 2,
+      "notes": "Infografik-Overlays müssen vorab in After Effects oder CapCut erstellt werden"
+    },
+    {
+      "post_id": "W1-Mi",
+      "location": "Aktive Baustelle – Logistikzentrum oder ähnliches Gewerbe-Dach",
+      "equipment": ["Sony A7 IV", "24-70mm Zoom", "GoPro Hero 12 als B-Cam auf Helm", "DJI Mini 4 Pro Drohne", "Sicherheitsgeschirr für Kameraoperator"],
+      "effort_hours": 5,
+      "team_size": 3,
+      "notes": "Sicherheitseinweisung vor Drehbeginn; Drohne braucht NOTAM-Freigabe falls in Kontrollzone"
+    },
+    {
+      "post_id": "W1-Fr",
+      "location": "Firmenparkplatz oder Baustelle – Team steht zusammen",
+      "equipment": ["Sony A7 IV", "35mm Objektiv", "1x LED-Panel als Aufheller", "Rode Wireless GO II"],
+      "effort_hours": 2,
+      "team_size": 2,
+      "notes": "Termine mit allen 6 Teammitgliedern koordinieren – Freitag 16:00 Uhr nach Bau ideal"
+    },
+    {
+      "post_id": "W4-Mi",
+      "location": "Metzgerei Gruber – Kundenstandort mit Anlage auf dem Dach",
+      "equipment": ["Sony A7 IV", "24-70mm + 85mm Portrait-Optik", "2x LED-Panel für Interview", "Rode Wireless GO II", "DJI Mini 4 für Luftaufnahme der Anlage"],
+      "effort_hours": 6,
+      "team_size": 3,
+      "notes": "Einverständniserklärung Kunde vorab einholen; Backup-Dreh planen falls Wetter schlecht"
+    },
+    {
+      "post_id": "W7-Mi",
+      "location": "Wartungsobjekt – Bestandsanlage, Flachdach bevorzugt",
+      "equipment": ["Flir-Thermografiekamera (Leihgerät möglich)", "Sony A7 IV", "Drohne mit Thermalaufsatz", "Messkoffer Techniker"],
+      "effort_hours": 8,
+      "team_size": 3,
+      "notes": "Thermografie bei bewölktem Himmel oder morgens für beste Kontraste; Thermalkamera ggf. mieten ~150€/Tag"
+    },
+    {
+      "post_id": "W8-Mi",
+      "location": "Autohaus Schmitt – Showroom mit Dachanlage",
+      "equipment": ["Sony A7 IV", "24-70mm + 85mm", "2x LED-Panel", "DJI Mini 4", "Rode Wireless GO II"],
+      "effort_hours": 5,
+      "team_size": 3,
+      "notes": "Sonntagsdrehs können schöne leere Parkplatz-Shots liefern; E-Auto-Ladesäule unbedingt ins Bild"
+    },
+    {
+      "post_id": "W9-Mi",
+      "location": "Logistikzentrum – Großanlagen-Baustelle",
+      "equipment": ["Sony A7 IV", "DJI Mini 4 Pro", "Zeitraffer-Rig (Intervalometer)", "GoPro für BTS"],
+      "effort_hours": 40,
+      "team_size": 2,
+      "notes": "ASSUMPTION: Großprojekt muss vorab identifiziert sein; Zeitraffer über 4 Wochen muss Kamera-Setup auf Dach bedeuten"
+    },
+    {
+      "post_id": "W12-Mi",
+      "location": "Brauerei Hoffmann – historisches Brauereigebäude",
+      "equipment": ["Sony A7 IV", "24-70mm + 85mm", "2x LED-Panel", "DJI Mini 4", "Rode Wireless GO II"],
+      "effort_hours": 6,
+      "team_size": 3,
+      "notes": "Denkmalschutz-Fassade bietet visuell starkes Setting; Brauerei-Prozess als B-Roll nutzen"
+    }
+  ],
+  "timeline": [
+    {
+      "post_id": "W1-Mo",
+      "publish_date": "2026-07-06",
+      "milestones": {
+        "concept": "2026-06-22",
+        "shoot": "2026-06-26",
+        "edit": "2026-06-29",
+        "review": "2026-07-03"
+      }
+    },
+    {
+      "post_id": "W1-Mi",
+      "publish_date": "2026-07-08",
+      "milestones": {
+        "concept": "2026-06-24",
+        "shoot": "2026-06-28",
+        "edit": "2026-07-01",
+        "review": "2026-07-05"
+      }
+    },
+    {
+      "post_id": "W1-Fr",
+      "publish_date": "2026-07-10",
+      "milestones": {
+        "concept": "2026-06-26",
+        "shoot": "2026-06-30",
+        "edit": "2026-07-03",
+        "review": "2026-07-07"
+      }
+    },
+    {
+      "post_id": "W2-Mo",
+      "publish_date": "2026-07-13",
+      "milestones": {
+        "concept": "2026-06-29",
+        "shoot": "2026-07-03",
+        "edit": "2026-07-06",
+        "review": "2026-07-10"
+      }
+    },
+    {
+      "post_id": "W2-Mi",
+      "publish_date": "2026-07-15",
+      "milestones": {
+        "concept": "2026-07-01",
+        "shoot": "2026-07-05",
+        "edit": "2026-07-08",
+        "review": "2026-07-12"
+      }
+    },
+    {
+      "post_id": "W2-Fr",
+      "publish_date": "2026-07-17",
+      "milestones": {
+        "concept": "2026-07-03",
+        "shoot": "2026-07-07",
+        "edit": "2026-07-10",
+        "review": "2026-07-14"
+      }
+    },
+    {
+      "post_id": "W3-Mo",
+      "publish_date": "2026-07-20",
+      "milestones": {
+        "concept": "2026-07-06",
+        "shoot": "2026-07-10",
+        "edit": "2026-07-13",
+        "review": "2026-07-17"
+      }
+    },
+    {
+      "post_id": "W3-Mi",
+      "publish_date": "2026-07-22",
+      "milestones": {
+        "concept": "2026-07-08",
+        "shoot": "2026-07-12",
+        "edit": "2026-07-15",
+        "review": "2026-07-19"
+      }
+    },
+    {
+      "post_id": "W3-Fr",
+      "publish_date": "2026-07-24",
+      "milestones": {
+        "concept": "2026-07-10",
+        "shoot": "2026-07-14",
+        "edit": "2026-07-17",
+        "review": "2026-07-21"
+      }
+    },
+    {
+      "post_id": "W4-Mo",
+      "publish_date": "2026-07-27",
+      "milestones": {
+        "concept": "2026-07-13",
+        "shoot": "2026-07-17",
+        "edit": "2026-07-20",
+        "review": "2026-07-24"
+      }
+    },
+    {
+      "post_id": "W4-Mi",
+      "publish_date": "2026-07-29",
+      "milestones": {
+        "concept": "2026-07-06",
+        "shoot": "2026-07-13",
+        "edit": "2026-07-20",
+        "review": "2026-07-26"
+      }
+    },
+    {
+      "post_id": "W4-Fr",
+      "publish_date": "2026-07-31",
+      "milestones": {
+        "concept": "2026-07-17",
+        "shoot": "2026-07-21",
+        "edit": "2026-07-24",
+        "review": "2026-07-28"
+      }
+    },
+    {
+      "post_id": "W5-Mo",
+      "publish_date": "2026-08-03",
+      "milestones": {
+        "concept": "2026-07-20",
+        "shoot": "2026-07-24",
+        "edit": "2026-07-27",
+        "review": "2026-07-31"
+      }
+    },
+    {
+      "post_id": "W5-Mi",
+      "publish_date": "2026-08-05",
+      "milestones": {
+        "concept": "2026-07-22",
+        "shoot": "2026-07-26",
+        "edit": "2026-07-29",
+        "review": "2026-08-02"
+      }
+    },
+    {
+      "post_id": "W5-Fr",
+      "publish_date": "2026-08-07",
+      "milestones": {
+        "concept": "2026-07-24",
+        "shoot": "2026-07-28",
+        "edit": "2026-07-31",
+        "review": "2026-08-04"
+      }
+    },
+    {
+      "post_id": "W6-Mo",
+      "publish_date": "2026-08-10",
+      "milestones": {
+        "concept": "2026-07-27",
+        "shoot": "2026-07-31",
+        "edit": "2026-08-03",
+        "review": "2026-08-07"
+      }
+    },
+    {
+      "post_id": "W6-Mi",
+      "publish_date": "2026-08-12",
+      "milestones": {
+        "concept": "2026-07-29",
+        "shoot": "2026-08-02",
+        "edit": "2026-08-05",
+        "review": "2026-08-09"
+      }
+    },
+    {
+      "post_id": "W6-Fr",
+      "publish_date": "2026-08-14",
+      "milestones": {
+        "concept": "2026-07-31",
+        "shoot": "2026-08-04",
+        "edit": "2026-08-07",
+        "review": "2026-08-11"
+      }
+    },
+    {
+      "post_id": "W7-Mo",
+      "publish_date": "2026-08-17",
+      "milestones": {
+        "concept": "2026-08-03",
+        "shoot": "2026-08-07",
+        "edit": "2026-08-10",
+        "review": "2026-08-14"
+      }
+    },
+    {
+      "post_id": "W7-Mi",
+      "publish_date": "2026-08-19",
+      "milestones": {
+        "concept": "2026-08-03",
+        "shoot": "2026-08-07",
+        "edit": "2026-08-12",
+        "review": "2026-08-16"
+      }
+    },
+    {
+      "post_id": "W7-Fr",
+      "publish_date": "2026-08-21",
+      "milestones": {
+        "concept": "2026-08-07",
+        "shoot": "2026-08-11",
+        "edit": "2026-08-14",
+        "review": "2026-08-18"
+      }
+    },
+    {
+      "post_id": "W8-Mo",
+      "publish_date": "2026-08-24",
+      "milestones": {
+        "concept": "2026-08-10",
+        "shoot": "2026-08-14",
+        "edit": "2026-08-17",
+        "review": "2026-08-21"
+      }
+    },
+    {
+      "post_id": "W8-Mi",
+      "publish_date": "2026-08-26",
+      "milestones": {
+        "concept": "2026-08-05",
+        "shoot": "2026-08-10",
+        "edit": "2026-08-17",
+        "review": "2026-08-23"
+      }
+    },
+    {
+      "post_id": "W8-Fr",
+      "publish_date": "2026-08-28",
+      "milestones": {
+        "concept": "2026-08-14",
+        "shoot": "2026-08-18",
+        "edit": "2026-08-21",
+        "review": "2026-08-25"
+      }
+    },
+    {
+      "post_id": "W9-Mo",
+      "publish_date": "2026-08-31",
+      "milestones": {
+        "concept": "2026-08-17",
+        "shoot": "2026-08-21",
+        "edit": "2026-08-24",
+        "review": "2026-08-28"
+      }
+    },
+    {
+      "post_id": "W9-Mi",
+      "publish_date": "2026-09-02",
+      "milestones": {
+        "concept": "2026-07-20",
+        "shoot": "2026-07-27",
+        "edit": "2026-08-26",
+        "review": "2026-08-30"
+      }
+    },
+    {
+      "post_id": "W9-Fr",
+      "publish_date": "2026-09-04",
+      "milestones": {
+        "concept": "2026-08-21",
+        "shoot": "2026-08-25",
+        "edit": "2026-08-28",
+        "review": "2026-09-01"
+      }
+    },
+    {
+      "post_id": "W10-Mo",
+      "publish_date": "2026-09-07",
+      "milestones": {
+        "concept": "2026-08-24",
+        "shoot": "2026-08-28",
+        "edit": "2026-08-31",
+        "review": "2026-09-04"
+      }
+    },
+    {
+      "post_id": "W10-Mi",
+      "publish_date": "2026-09-09",
+      "milestones": {
+        "concept": "2026-08-26",
+        "shoot": "2026-08-30",
+        "edit": "2026-09-02",
+        "review": "2026-09-06"
+      }
+    },
+    {
+      "post_id": "W10-Fr",
+      "publish_date": "2026-09-11",
+      "milestones": {
+        "concept": "reaktiv – innerhalb 24h nach Newsanlass",
+        "shoot": "reaktiv – innerhalb 24h nach Newsanlass",
+        "edit": "reaktiv – max. 4h Turnaround",
+        "review": "reaktiv – 1h vor Publish"
+      }
+    },
+    {
+      "post_id": "W11-Mo",
+      "publish_date": "2026-09-14",
+      "milestones": {
+        "concept": "2026-08-31",
+        "shoot": "2026-09-04",
+        "edit": "2026-09-07",
+        "review": "2026-09-11"
+      }
+    },
+    {
+      "post_id": "W11-Mi",
+      "publish_date": "2026-09-16",
+      "milestones": {
+        "concept": "2026-09-02",
+        "shoot": "2026-09-06",
+        "edit": "2026-09-09",
+        "review": "2026-09-13"
+      }
+    },
+    {
+      "post_id": "W11-Fr",
+      "publish_date": "2026-09-18",
+      "milestones": {
+        "concept": "2026-09-04",
+        "shoot": "keine (nur Auswertung)",
+        "edit": "2026-09-11",
+        "review": "2026-09-15"
+      }
+    },
+    {
+      "post_id": "W12-Mo",
+      "publish_date": "2026-09-21",
+      "milestones": {
+        "concept": "2026-09-07",
+        "shoot": "2026-09-11",
+        "edit": "2026-09-14",
+        "review": "2026-09-18"
+      }
+    },
+    {
+      "post_id": "W12-Mi",
+      "publish_date": "2026-09-23",
+      "milestones": {
+        "concept": "2026-08-26",
+        "shoot": "2026-09-02",
+        "edit": "2026-09-14",
+        "review": "2026-09-20"
+      }
+    },
+    {
+      "post_id": "W12-Fr",
+      "publish_date": "2026-09-25",
+      "milestones": {
+        "concept": "2026-09-11",
+        "shoot": "2026-09-15",
+        "edit": "2026-09-18",
+        "review": "2026-09-22"
+      }
+    }
+  ],
+  "tasks": [
+    {
+      "priority": "SOFORT",
+      "category": "Setup",
+      "tasks": [
+        "Equipment-Liste finalisieren und Equipment-Verfügbarkeit prüfen (Kamera, Drohne, Mikrofone, Licht)",
+        "Drehorte für Wochen 1–4 bestätigen (Büro, aktive Baustelle, Teamstandort)",
+        "Einverständniserklärungen für Kunden-Features vorbereiten (Metzgerei Gruber, Autohaus Schmitt, Brauerei Hoffmann)",
+        "Content-Kalender in Projektmanagement-Tool (Notion / Trello) anlegen",
+        "Drohnen-NOTAM-Prozess klären – wer beantragt, wie lange dauert es?"
+      ]
+    },
+    {
+      "priority": "DIESE WOCHE",
+      "category": "Konzept & Dreh",
+      "tasks": [
+        "Konzept W1-Mo (Kosten-Erklärer) schreiben und Infografik beauftragen",
+        "Konzept W1-Mi (Dachmessung) schreiben, Baustelle für Drehtermin koordinieren",
+        "Konzept W1-Fr (Teamvorstellung) schreiben, Teamtermin Freitag 16 Uhr fixieren",
+        "Drehtermin W1-Mo (Büro-Dreh) in Kalender eintragen: KW27, Mittwoch oder Donnerstag"
+      ]
+    },
+    {
+      "priority": "PARALLEL",
+      "category": "Langfristig koordinieren",
+      "tasks": [
+        "Metzgerei Gruber (W4): Kundenfreigabe bis Woche 2 einholen",
+        "Autohaus Schmitt (W8): Kundenfreigabe bis Woche 5 einholen",
+        "Brauerei Hoffmann (W12): Kundenfreigabe bis Woche 8 einholen",
+        "Großprojekt-Zeitraffer (W9): Drehstart muss in KW29 sein – Projekt identifizieren",
+        "Thermalkamera für W7 reservieren: Leih-Anfrage mind. 3 Wochen vorher"
+      ]
+    },
+    {
+      "priority": "ENGPÄSSE",
+      "category": "Risikoanalyse",
+      "tasks": [
+        "ENGPASS #1: Drohnen-NOTAM – Genehmigung kann 2–4 Wochen dauern. Sofort beginnen.",
+        "ENGPASS #2: Kundentermine (Testimonial-Videos) – Kunden haben eigene Kalender. Mindestens 4 Wochen Vorlauf einplanen.",
+        "ENGPASS #3: Großprojekt für Zeitraffer (W9) muss aktiv sein – falls kein Projekt startet, Fallback-Clip aus Archivmaterial planen.",
+        "ENGPASS #4: News-Reaktion (W10-Fr) erfordert schnellen Workflow – Dreh-to-Publish in 24h muss geübt sein.",
+        "ENGPASS #5: Schnittkapazität – bei 3 Posts/Woche braucht man ~6–8h Schnittzeit. Freelance-Editor-Option prüfen."
+      ]
+    }
+  ]
+}
