@@ -159,6 +159,24 @@
   .ai-idea{font-size:12px;margin-bottom:6px}
   .ai-meta{font-size:11px;color:var(--text2);margin-top:4px}
   .ai-meta b{color:var(--text)}
+
+  /* Series */
+  .series-badge{display:inline-block;font-size:10px;background:rgba(255,255,255,.08);border:1px solid var(--border);border-radius:8px;padding:1px 8px;color:var(--text2);margin-left:4px}
+  /* Quality check */
+  .q-item{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin-bottom:8px;font-size:12px;line-height:1.5}
+  .q-warn{border-color:#e09a3a;background:rgba(224,154,58,.07)}
+  .q-err{border-color:var(--red);background:rgba(224,92,92,.07)}
+  .q-ok{border-color:var(--green);background:rgba(76,175,125,.07)}
+  /* Bulk edit */
+  .bulk-box{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px;margin-top:8px}
+  .bulk-box h5{font-size:11px;text-transform:uppercase;letter-spacing:.6px;color:var(--text2);margin-bottom:8px;font-weight:600}
+  .bulk-input{background:var(--bg2);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:5px 8px;font-size:12px;outline:none;flex:1}
+  .bulk-input:focus{border-color:var(--accent)}
+  /* Date range */
+  .drange{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:10px;padding:10px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:8px}
+  .drange label{font-size:11px;color:var(--text2);white-space:nowrap;font-weight:600;text-transform:uppercase;letter-spacing:.4px}
+  .drange input{background:var(--bg2);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:5px 8px;font-size:12px;outline:none}
+  .drange input:focus{border-color:var(--accent)}
 </style>
 </head>
 <body>
@@ -228,6 +246,7 @@
       <div class="drawer-tabs">
         <button class="drawer-tab active" id="itab-ideas" onclick="switchImportTab('ideas')">✍️ Ideen (Text)</button>
         <button class="drawer-tab" id="itab-json" onclick="switchImportTab('json')">🔁 JSON &amp; Export</button>
+        <button class="drawer-tab" id="itab-quality" onclick="switchImportTab('quality')">🔍 Fehlerprüfung</button>
       </div>
 
       <div id="tabIdeas">
@@ -293,12 +312,27 @@ Schnell-Modus: einfach pro Zeile eine Idee (nur Titel, keine Doppelpunkte)
           <button class="btn" onclick="importJSON(true)">Komplett ersetzen</button>
         </div>
         <hr style="border:none;border-top:1px solid var(--border);margin:18px 0">
+        <div class="help" style="margin-bottom:10px"><b style="color:var(--text)">Zeitraum für Export</b> – optional filtern:</div>
+        <div class="drange">
+          <label>Von</label><input type="date" id="exportFrom">
+          <label>Bis</label><input type="date" id="exportTo">
+          <button class="btn" onclick="document.getElementById('exportFrom').value='';document.getElementById('exportTo').value=''">Zurücksetzen</button>
+        </div>
         <div class="help" style="margin-bottom:10px"><b style="color:var(--text)">Exportieren</b> – für Outlook &amp; Apple Kalender die .ics-Datei:</div>
         <div class="btn-row" style="margin-top:0">
           <button class="btn" onclick="exportICS(false)">📅 .ics – nur Posts</button>
           <button class="btn" onclick="exportICS(true)">📅 .ics – Posts + Produktionstermine</button>
           <button class="btn" onclick="exportData()">⬇ JSON sichern</button>
+          <button class="btn btn-primary" onclick="exportPDF()">📄 PDF-Übersicht</button>
         </div>
+      </div>
+
+      <div id="tabQuality" style="display:none">
+        <div class="help" style="margin-bottom:12px">Prüft alle Termine auf <b>Doppelbuchungen</b>, <b>doppelte Titel</b> und <b>fehlende Pflichtfelder</b>.</div>
+        <div class="btn-row" style="margin-bottom:14px">
+          <button class="btn btn-primary" onclick="checkQuality()">🔍 Jetzt prüfen</button>
+        </div>
+        <div id="qualityResults"></div>
       </div>
     </div>
     <div class="modal-foot">
@@ -316,8 +350,9 @@ Schnell-Modus: einfach pro Zeile eine Idee (nur Titel, keine Doppelpunkte)
   <div class="drawer-body">
     <div class="help" style="margin-bottom:14px">Säulen &amp; Formate sind editierbar. Änderungen an Farbe/Name wirken sofort im Kalender. Neue Säulen stehen danach in jedem Termin zur Auswahl.</div>
     <div class="drawer-tabs">
-      <button class="drawer-tab active" onclick="switchDrawerTab('strategy',this)">Säulen</button>
-      <button class="drawer-tab" onclick="switchDrawerTab('formats',this)">Formate</button>
+      <button class="drawer-tab active" id="dtab-strategy" onclick="switchDrawerTab('strategy',this)">Säulen</button>
+      <button class="drawer-tab" id="dtab-formats" onclick="switchDrawerTab('formats',this)">Formate</button>
+      <button class="drawer-tab" id="dtab-series" onclick="switchDrawerTab('series',this)">📺 Serien</button>
     </div>
     <div id="drawerContent"></div>
   </div>
@@ -424,7 +459,7 @@ function seedToEvent(p){
     tasks.push({id:uid(),text:"Produktion: "+p.prod.notes,date:"",note:"Anforderung",done:false});
   }
   return {
-    id:p.id, date:p.date, pillar:p.pillar, format:p.format||"",
+    id:p.id, date:p.date, pillar:p.pillar, format:p.format||"", series:"",
     title:p.title, hook:p.hook||"", idea:p.idea||"",
     variants:(p.variants||[]).slice(), goal:p.goal||"", cta:p.cta||"",
     location:p.prod?p.prod.location:"", equipment:p.prod?p.prod.equipment.slice():[],
@@ -493,8 +528,8 @@ function renderCalendar(){
         const total=e.tasks.length, done=e.tasks.filter(t=>t.done).length;
         const allDone=total>0&&done===total;
         const col=pillarColor(e.pillar);
-        return `<div class="evt ${allDone?'done-evt':''}" style="background:${col};color:${textOn(col)}" onclick="event.stopPropagation();openEvent('${e.id}')" title="${esc(e.title)}">
-          ${esc(e.title)}${total?`<span class="evt-task-badge">${done}/${total}</span>`:''}
+        return `<div class="evt ${allDone?'done-evt':''}" style="background:${col};color:${textOn(col)}" onclick="event.stopPropagation();openEvent('${e.id}')" title="${esc(e.title)}${e.series?' · 📺 '+esc(e.series):''}">
+          ${esc(e.title)}${e.series?`<span class="evt-task-badge" style="background:rgba(0,0,0,.4)" title="${esc(e.series)}">📺</span>`:''}${total&&!e.series?`<span class="evt-task-badge">${done}/${total}</span>`:''}
         </div>`;
       }).join('')}
     </div>`;
@@ -533,7 +568,7 @@ function openEvent(id){
 }
 function openNewEvent(date){
   editingId=null;
-  draft={id:uid(),date:(typeof date==="string"?date:isoDate(new Date())),pillar:"custom",format:"",
+  draft={id:uid(),date:(typeof date==="string"?date:isoDate(new Date())),pillar:"custom",format:"",series:"",
     title:"",hook:"",idea:"",variants:[],goal:"",cta:"",location:"",equipment:[],hours:"",team:"",notes:"",tasks:[]};
   renderModal(true);
 }
@@ -556,6 +591,8 @@ function renderModal(isNew){
         </select></div>
       <div class="field"><label>Format</label><input id="f_format" value="${esc(draft.format)}" placeholder="z.B. F1"></div>
     </div>
+    <div class="field"><label>📺 Serie (optional – für einheitliche Videoserien)</label>
+      <input id="f_series" value="${esc(draft.series||'')}" placeholder="z.B. Solar-Basics-Reihe, Kundenstory-Serie, Behind-the-Scenes"></div>
     <div class="field"><label>Hook (Aufhänger)</label>
       <textarea id="f_hook" placeholder="Der erste Satz, der Aufmerksamkeit erzeugt">${esc(draft.hook)}</textarea></div>
     <div class="field"><label>Idee / Beschreibung</label>
@@ -631,6 +668,7 @@ function collectDraft(){
   draft.hook=val("f_hook"); draft.idea=val("f_idea"); draft.goal=val("f_goal"); draft.cta=val("f_cta");
   draft.location=val("f_location"); draft.hours=val("f_hours"); draft.team=val("f_team"); draft.notes=val("f_notes");
   draft.equipment=val("f_equipment").split(",").map(s=>s.trim()).filter(Boolean);
+  draft.series=val("f_series").trim();
   // pillar already synced via change handler; ensure:
   draft.pillar=val("f_pillar");
 }
@@ -671,19 +709,40 @@ function switchDrawerTab(tab,btn){
 }
 function renderDrawer(){
   const el=document.getElementById("drawerContent");
+  if(drawerTab==='series'){ renderSeriesTab(); return; }
   if(drawerTab==='strategy'){
-    el.innerHTML=pillars.map((p,i)=>`
+    const evtCountByPillar={};
+    events.forEach(e=>{ evtCountByPillar[e.pillar]=(evtCountByPillar[e.pillar]||0)+1; });
+    el.innerHTML=pillars.map((p,i)=>{
+      const cnt=evtCountByPillar[p.id]||0;
+      const bid='bulk_'+p.id.replace(/\W/g,'_');
+      return `
       <div class="edit-card" style="border-left:4px solid ${p.color}">
         <div class="edit-row">
           <span class="edit-id">${esc(p.id)}</span>
           <input class="edit-color" type="color" value="${p.color}" oninput="updPillar(${i},'color',this.value)" title="Farbe">
+          <span style="font-size:11px;color:var(--text2);margin-left:4px">${cnt} Termine</span>
           <button class="mini-del" style="margin-left:auto" onclick="delPillar(${i})">×</button>
         </div>
         <input class="edit-name" value="${esc(p.name)}" placeholder="Name der Säule" oninput="updPillar(${i},'name',this.value)">
         <textarea placeholder="Ziel / Nutzen" oninput="updPillar(${i},'goal',this.value)">${esc(p.goal)}</textarea>
         <input value="${esc((p.types||[]).join(', '))}" placeholder="Content-Typen (Komma-getrennt)" oninput="updPillarTypes(${i},this.value)">
         <input value="${esc(p.kpi)}" placeholder="KPI" oninput="updPillar(${i},'kpi',this.value)">
-      </div>`).join('')
+        <button class="add-link" onclick="toggleBulkPanel('${esc(p.id)}')" style="margin-top:6px">⚙ Alle ${cnt} Termine dieser Säule bearbeiten</button>
+        <div class="bulk-box" id="${bid}" style="display:none">
+          <h5>Bulk-Bearbeitung · ${esc(p.id)}</h5>
+          <div class="field" style="margin-bottom:8px"><label>Format für alle setzen</label>
+            <div style="display:flex;gap:6px"><input class="bulk-input" id="bulkFmt_${esc(p.id)}" placeholder="z.B. F1"><button class="btn" onclick="bulkSetFormat('${esc(p.id)}')">Setzen</button></div>
+          </div>
+          <div class="field" style="margin-bottom:8px"><label>Aufgabe zu allen hinzufügen</label>
+            <div style="display:flex;gap:6px"><input class="bulk-input" id="bulkTask_${esc(p.id)}" placeholder="Aufgabentext…"><button class="btn" onclick="bulkAddTask('${esc(p.id)}')">Hinzufügen</button></div>
+          </div>
+          <div class="field" style="margin-bottom:0"><label>Alle Termine verschieben (Tage, negativ = früher)</label>
+            <div style="display:flex;gap:6px"><input class="bulk-input" id="bulkShift_${esc(p.id)}" type="number" placeholder="z.B. 7 oder -3"><button class="btn" onclick="bulkShiftDates('${esc(p.id)}')">Verschieben</button></div>
+          </div>
+        </div>
+      </div>`;
+    }).join('')
       + `<button class="add-link" onclick="addPillar()">+ Säule hinzufügen</button>`;
   } else {
     el.innerHTML=formats.map((f,i)=>`
@@ -730,11 +789,12 @@ function addFormat(){
 //  EXPORT / RESET / HELPERS
 // ════════════════════════════════════════════════════════════════════════════
 function exportData(){
-  const blob=new Blob([JSON.stringify(events,null,2)],{type:"application/json"});
+  const filtered=filterByRange([...events].sort((a,b)=>(a.date||"").localeCompare(b.date||"")));
+  const blob=new Blob([JSON.stringify(filtered,null,2)],{type:"application/json"});
   const url=URL.createObjectURL(blob);
   const a=document.createElement("a");
   a.href=url; a.download="content-kalender-export.json"; a.click();
-  URL.revokeObjectURL(url); toast("Export gestartet");
+  URL.revokeObjectURL(url); toast("JSON exportiert – "+filtered.length+" Termine");
 }
 function resetData(){
   if(!confirm("Alle Änderungen verwerfen und auf den Original-Plan zurücksetzen?")) return;
@@ -758,11 +818,12 @@ document.addEventListener("keydown",e=>{ if(e.key==="Escape"){ closeModal(); clo
 function openImport(){ document.getElementById("importOverlay").classList.add("open"); switchImportTab("ideas"); const k=localStorage.getItem(AI_KEY_LS); const e=document.getElementById("aiKey"); if(e&&k) e.value=k; refreshKeyState(); }
 function closeImport(){ document.getElementById("importOverlay").classList.remove("open"); }
 function switchImportTab(tab){
-  const ideas=tab==="ideas";
-  document.getElementById("tabIdeas").style.display=ideas?"":"none";
-  document.getElementById("tabJson").style.display=ideas?"none":"";
-  document.getElementById("itab-ideas").classList.toggle("active",ideas);
-  document.getElementById("itab-json").classList.toggle("active",!ideas);
+  ["ideas","json","quality"].forEach(t=>{
+    const tEl=document.getElementById("tab"+t.charAt(0).toUpperCase()+t.slice(1));
+    const bEl=document.getElementById("itab-"+t);
+    if(tEl) tEl.style.display=(t===tab)?"":"none";
+    if(bEl) bEl.classList.toggle("active",t===tab);
+  });
 }
 document.getElementById("importOverlay").addEventListener("click",e=>{ if(e.target.id==="importOverlay") closeImport(); });
 document.addEventListener("keydown",e=>{ if(e.key==="Escape") closeImport(); });
@@ -801,10 +862,10 @@ function postDescription(e){
   if(e.tasks&&e.tasks.length){ L.push("Aufgaben:"); e.tasks.forEach(t=>L.push("  "+(t.done?"☑":"☐")+" "+t.text+(t.date?" ("+t.date+")":"")+(t.note?" ["+t.note+"]":""))); }
   return L.join("\n");
 }
-function buildICS(includeTasks){
+function buildICS(includeTasks, evtsParam){
   const stamp=new Date().toISOString().replace(/[-:]/g,"").replace(/\.\d+/,"");
   const lines=["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//SolarTech//Content Kalender//DE","CALSCALE:GREGORIAN","METHOD:PUBLISH","X-WR-CALNAME:SolarTech Content Plan"];
-  const sorted=[...events].sort((a,b)=>(a.date||"").localeCompare(b.date||""));
+  const sorted=evtsParam||[...events].sort((a,b)=>(a.date||"").localeCompare(b.date||""));
   sorted.forEach(e=>{
     if(!e.date) return;
     lines.push("BEGIN:VEVENT");
@@ -836,8 +897,10 @@ function buildICS(includeTasks){
   return lines.join("\r\n");
 }
 function exportICS(includeTasks){
-  downloadFile("solartech-content"+(includeTasks?"-mit-produktionsterminen":"")+".ics", buildICS(includeTasks), "text/calendar");
-  toast(".ics exportiert – in Outlook/Apple importieren");
+  const sorted=[...events].sort((a,b)=>(a.date||"").localeCompare(b.date||""));
+  const filtered=filterByRange(sorted);
+  downloadFile("solartech-content"+(includeTasks?"-mit-produktionsterminen":"")+".ics", buildICS(includeTasks,filtered), "text/calendar");
+  toast(".ics exportiert – "+filtered.length+" Termine");
 }
 function downloadFile(name,text,mime){
   const blob=new Blob([text],{type:mime||"text/plain"});
@@ -864,7 +927,7 @@ const KEYMAP={
 };
 let _newIdeaCounter=0;
 function defaultDate(){ const b=new Date(viewYear,viewMonth,1); b.setDate(b.getDate()+_newIdeaCounter*2); _newIdeaCounter++; return isoDate(b); }
-function newEventFrom(o){ return Object.assign({id:uid(),date:defaultDate(),pillar:"custom",format:"",title:"(Ohne Titel)",hook:"",idea:"",variants:[],goal:"",cta:"",location:"",equipment:[],hours:"",team:"",notes:"",tasks:[]}, o); }
+function newEventFrom(o){ return Object.assign({id:uid(),date:defaultDate(),pillar:"custom",format:"",series:"",title:"(Ohne Titel)",hook:"",idea:"",variants:[],goal:"",cta:"",location:"",equipment:[],hours:"",team:"",notes:"",tasks:[]}, o); }
 function parseHeader(line){
   const parts=line.split("|").map(s=>s.trim());
   let date="",pillar="",id="",titleParts=[];
@@ -989,7 +1052,7 @@ function fallbackCopy(t){
 function normalizeEvent(e){
   if(!e||typeof e!=="object") return null;
   return {
-    id:e.id||uid(), date:e.date||"", pillar:e.pillar||"custom", format:e.format||"",
+    id:e.id||uid(), date:e.date||"", pillar:e.pillar||"custom", format:e.format||"", series:e.series||"",
     title:e.title||"(Ohne Titel)", hook:e.hook||"", idea:e.idea||"",
     variants:Array.isArray(e.variants)?e.variants:[], goal:e.goal||"", cta:e.cta||"",
     location:e.location||"", equipment:Array.isArray(e.equipment)?e.equipment:[],
@@ -1133,6 +1196,287 @@ function suggestionToEvent(s){
 }
 function adoptOne(i,btn){ events.push(suggestionToEvent(aiSuggestions[i])); save(); renderCalendar(); if(btn){ btn.textContent="✓ Übernommen"; btn.disabled=true; btn.style.opacity=".55"; } toast("Als Termin angelegt – Datum im Kalender anpassen"); }
 function adoptAll(){ _newIdeaCounter=0; aiSuggestions.forEach(s=>events.push(suggestionToEvent(s))); save(); renderCalendar(); closeImport(); toast(aiSuggestions.length+" Termine angelegt – Daten im Kalender anpassen"); }
+
+// ════════════════════════════════════════════════════════════════════════════
+//  EXPORT DATE RANGE
+// ════════════════════════════════════════════════════════════════════════════
+function filterByRange(evts){
+  const from=val("exportFrom"), to=val("exportTo");
+  return evts.filter(e=>{
+    if(from && e.date && e.date<from) return false;
+    if(to && e.date && e.date>to) return false;
+    return true;
+  });
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+//  QUALITY CHECK – Doppelbuchungen & Datenredundanz
+// ════════════════════════════════════════════════════════════════════════════
+function checkQuality(){
+  const issues=[];
+  // Doppelbuchung: gleicher Tag + gleiche Säule
+  const byDP={};
+  events.forEach(e=>{
+    if(!e.date) return;
+    const k=e.date+"|"+e.pillar;
+    if(!byDP[k]) byDP[k]=[];
+    byDP[k].push(e);
+  });
+  Object.entries(byDP).forEach(([k,evts])=>{
+    if(evts.length>1){
+      const [date,pillar]=k.split("|");
+      issues.push({type:"warn",label:"Doppelbuchung",
+        msg:`${evts.length} Termine am ${date} in Säule ${pillar}: ${evts.map(e=>'"'+esc(e.title)+'"').join(", ")}`});
+    }
+  });
+  // Gleicher Wochentag mehrfach selbe Säule (nur warnen wenn >3)
+  const byWeekdayPillar={};
+  events.forEach(e=>{
+    if(!e.date) return;
+    const d=new Date(e.date+"T00:00:00");
+    const k=d.getDay()+"|"+e.pillar;
+    if(!byWeekdayPillar[k]) byWeekdayPillar[k]=[];
+    byWeekdayPillar[k].push(e);
+  });
+  // Doppelte Titel (Redundanz)
+  const byTitle={};
+  events.forEach(e=>{
+    const t=(e.title||"").toLowerCase().trim();
+    if(t&&t!=="(ohne titel)"){
+      if(!byTitle[t]) byTitle[t]=[];
+      byTitle[t].push(e);
+    }
+  });
+  Object.entries(byTitle).forEach(([t,evts])=>{
+    if(evts.length>1){
+      issues.push({type:"err",label:"Doppelter Titel",
+        msg:`"${esc(evts[0].title)}" erscheint ${evts.length}× (Daten: ${evts.map(e=>e.date||"–").join(", ")})`});
+    }
+  });
+  // Fehlende Pflichtfelder
+  events.forEach(e=>{
+    if(!e.date) issues.push({type:"err",label:"Fehlendes Datum",msg:`"${esc(e.title)}" (${e.id}) hat kein Datum`});
+    if(!e.title||e.title==="(Ohne Titel)") issues.push({type:"warn",label:"Fehlender Titel",msg:`Termin ${e.id} am ${e.date||"–"} hat keinen Titel`});
+  });
+  // Termine ohne Säulen-Zuordnung (custom und keine Pillar)
+  const orphans=events.filter(e=>e.pillar==="custom"&&!e.format);
+  if(orphans.length>0) issues.push({type:"warn",label:"Nicht kategorisiert",
+    msg:`${orphans.length} Termin(e) ohne Säule und Format (z.B.: ${orphans.slice(0,3).map(e=>'"'+esc(e.title)+'"').join(", ")}${orphans.length>3?"…":""}) – Säule setzen empfohlen`});
+
+  renderQualityResults(issues);
+}
+
+function renderQualityResults(issues){
+  const box=document.getElementById("qualityResults");
+  if(!box) return;
+  if(!issues.length){
+    box.innerHTML=`<div class="q-item q-ok">✅ Keine Probleme gefunden – alle ${events.length} Termine sind in Ordnung.</div>`;
+    return;
+  }
+  const summary=issues.filter(i=>i.type==="err").length;
+  box.innerHTML=`<div class="q-item" style="margin-bottom:12px"><b>${issues.length} Hinweis${issues.length!==1?"e":""}</b> · ${summary} Fehler, ${issues.length-summary} Warnungen</div>`+
+    issues.map(iss=>`<div class="q-item ${iss.type==="err"?"q-err":"q-warn"}">
+      <b>${iss.type==="err"?"❌":"⚠️"} ${esc(iss.label)}</b><br>${iss.msg}</div>`).join("");
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+//  PDF EXPORT
+// ════════════════════════════════════════════════════════════════════════════
+function exportPDF(){
+  const sorted=[...events].sort((a,b)=>(a.date||"").localeCompare(b.date||""));
+  const evts=filterByRange(sorted);
+  if(!evts.length){ toast("Keine Termine im gewählten Zeitraum"); return; }
+  const rangeNote=(val("exportFrom")||val("exportTo"))?` · Zeitraum: ${val("exportFrom")||"Anfang"} bis ${val("exportTo")||"Ende"}`:"";
+  const html=`<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>Content Kalender Export</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:Arial,Helvetica,sans-serif;font-size:11px;color:#222;margin:0;padding:15mm 18mm}
+  h1{font-size:18px;color:#e89520;border-bottom:2px solid #e89520;padding-bottom:8px;margin-bottom:4px}
+  .meta{font-size:10px;color:#888;margin-bottom:18px}
+  .event{border:1px solid #ddd;border-radius:6px;padding:10px 14px;margin-bottom:12px;break-inside:avoid;page-break-inside:avoid}
+  .event-head{display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap}
+  .event-date{font-weight:bold;font-size:12px;color:#333;min-width:90px}
+  .badge{border-radius:4px;padding:2px 7px;font-size:10px;font-weight:bold;color:#fff;white-space:nowrap}
+  .event-title{font-size:14px;font-weight:bold;margin-bottom:5px;color:#111}
+  .event-hook{font-style:italic;color:#555;font-size:11px;margin-bottom:5px;border-left:3px solid #e89520;padding-left:8px}
+  .event-row{font-size:10.5px;color:#444;margin:3px 0;line-height:1.4}
+  .event-row b{color:#222}
+  .task-list{margin-top:7px;padding-top:7px;border-top:1px solid #eee}
+  .task-item{padding:2px 0;font-size:10px;color:#444}
+  @page{margin:12mm 15mm}
+  @media print{body{margin:0;padding:8mm 10mm}}
+</style>
+</head>
+<body>
+<h1>Content Kalender · SolarTech B2B Video Plan</h1>
+<div class="meta">Exportiert am ${new Date().toLocaleDateString("de-DE")} · ${evts.length} Termine${rangeNote}</div>
+${evts.map(e=>{
+  const col=pillarColor(e.pillar);
+  const tasks=e.tasks||[];
+  return `<div class="event">
+  <div class="event-head">
+    <span class="event-date">${e.date||"(kein Datum)"}</span>
+    <span class="badge" style="background:${col}">${esc(e.pillar)} · ${esc(pillarName(e.pillar))}</span>
+    ${e.format?`<span class="badge" style="background:#5a6080">${esc(e.format)}</span>`:""}
+    ${e.series?`<span class="badge" style="background:#404866">📺 ${esc(e.series)}</span>`:""}
+  </div>
+  <div class="event-title">${esc(e.title)}</div>
+  ${e.hook?`<div class="event-hook">${esc(e.hook)}</div>`:""}
+  ${e.idea?`<div class="event-row"><b>Idee:</b> ${esc(e.idea)}</div>`:""}
+  ${(e.variants&&e.variants.length)?`<div class="event-row"><b>Varianten:</b> ${e.variants.map(esc).join(" · ")}</div>`:""}
+  ${e.goal?`<div class="event-row"><b>Ziel:</b> ${esc(e.goal)}</div>`:""}
+  ${e.cta?`<div class="event-row"><b>CTA:</b> ${esc(e.cta)}</div>`:""}
+  ${e.location?`<div class="event-row"><b>Drehort:</b> ${esc(e.location)}</div>`:""}
+  ${(e.hours||e.team)?`<div class="event-row"><b>Aufwand:</b> ${e.hours?esc(String(e.hours))+"h":""}${(e.hours&&e.team)?" · ":""}${e.team?esc(String(e.team))+" Personen":""}</div>`:""}
+  ${tasks.length?`<div class="task-list"><b>Aufgaben:</b>${tasks.map(t=>`<div class="task-item">${t.done?"☑":"☐"} ${esc(t.text)}${t.date?" ("+t.date+")":""}</div>`).join("")}</div>`:""}
+</div>`;
+}).join("")}
+</body>
+</html>`;
+  const w=window.open("","_blank");
+  if(!w){ toast("Pop-up blockiert – bitte im Browser erlauben"); return; }
+  w.document.write(html);
+  w.document.close();
+  w.focus();
+  setTimeout(()=>w.print(),600);
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+//  BULK CATEGORY EDIT
+// ════════════════════════════════════════════════════════════════════════════
+function toggleBulkPanel(pillarId){
+  const el=document.getElementById("bulk_"+pillarId.replace(/\W/g,"_"));
+  if(!el) return;
+  el.style.display=(el.style.display==="none"||!el.style.display)?"":"none";
+}
+function bulkSetFormat(pillarId){
+  const fid=val("bulkFmt_"+pillarId).trim();
+  if(!fid){ toast("Format-ID eingeben"); return; }
+  const evts=events.filter(e=>e.pillar===pillarId);
+  if(!evts.length){ toast("Keine Termine in dieser Säule"); return; }
+  if(!confirm(`Format "${fid}" für alle ${evts.length} Termine der Säule ${pillarId} setzen?`)) return;
+  evts.forEach(e=>{ e.format=fid; });
+  save(); renderCalendar(); toast(evts.length+" Termine aktualisiert");
+}
+function bulkAddTask(pillarId){
+  const text=val("bulkTask_"+pillarId).trim();
+  if(!text){ toast("Aufgabentext eingeben"); return; }
+  let count=0;
+  events.forEach(e=>{
+    if(e.pillar===pillarId&&!e.tasks.some(t=>t.text===text)){
+      e.tasks.push({id:uid(),text,date:"",note:"",done:false}); count++;
+    }
+  });
+  save(); renderCalendar(); toast("Aufgabe zu "+count+" Terminen hinzugefügt");
+}
+function bulkShiftDates(pillarId){
+  const days=parseInt(val("bulkShift_"+pillarId));
+  if(isNaN(days)){ toast("Anzahl Tage eingeben"); return; }
+  const evts=events.filter(e=>e.pillar===pillarId&&e.date);
+  if(!evts.length){ toast("Keine Termine mit Datum in dieser Säule"); return; }
+  if(!confirm(`Alle ${evts.length} Termine der Säule ${pillarId} um ${days} Tage verschieben?`)) return;
+  evts.forEach(e=>{ const d=new Date(e.date+"T00:00:00"); d.setDate(d.getDate()+days); e.date=isoDate(d); });
+  save(); renderCalendar(); toast(evts.length+" Termine verschoben");
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+//  VIDEO SERIES MANAGEMENT
+// ════════════════════════════════════════════════════════════════════════════
+function getAllSeries(){
+  const s=new Set();
+  events.forEach(e=>{ if(e.series&&e.series.trim()) s.add(e.series.trim()); });
+  return [...s].sort();
+}
+function getSeriesEvents(name){ return events.filter(e=>e.series&&e.series.trim()===name.trim()); }
+
+function renderSeriesTab(){
+  const el=document.getElementById("drawerContent");
+  const series=getAllSeries();
+  if(!series.length){
+    el.innerHTML=`<div class="help">Noch keine Serien angelegt.<br><br>Öffne einen Termin und trage im Feld <b>📺 Serie</b> einen Namen ein (z.B. "Solar-Basics-Reihe"). Alle Termine mit gleichem Seriennamen lassen sich hier gemeinsam bearbeiten.</div>`;
+    return;
+  }
+  el.innerHTML=series.map(name=>{
+    const evts=getSeriesEvents(name);
+    const sid="ser_"+name.replace(/\W/g,"_");
+    return `<div class="edit-card">
+  <div class="edit-row">
+    <b style="font-size:13px;flex:1">📺 ${esc(name)}</b>
+    <span style="font-size:11px;color:var(--text2)">${evts.length} Termine</span>
+    <button class="mini-del" onclick="if(confirm('Serie aus allen Terminen entfernen?')) clearSeries('${esc(name)}')" title="Serie entfernen">×</button>
+  </div>
+  <div style="font-size:11px;color:var(--text2);margin-bottom:10px;line-height:1.7">${evts.map(e=>`<span style="opacity:.7">${e.date}</span> · ${esc(e.title)}`).join("<br>")}</div>
+  <div class="bulk-box" id="${sid}">
+    <h5>Alle Termine dieser Serie bearbeiten</h5>
+    <div class="field" style="margin-bottom:8px"><label>Format für alle setzen</label>
+      <div style="display:flex;gap:6px">
+        <input class="bulk-input" id="serFmt_${sid}" placeholder="z.B. F2">
+        <button class="btn" onclick="seriesBulkSetFormat('${esc(name)}','serFmt_${sid}')">Setzen</button>
+      </div>
+    </div>
+    <div class="field" style="margin-bottom:8px"><label>Säule für alle setzen</label>
+      <div style="display:flex;gap:6px">
+        <select class="bulk-input" id="serPillar_${sid}">
+          ${pillars.map(p=>`<option value="${esc(p.id)}">${esc(p.id)} · ${esc(p.name)}</option>`).join("")}
+          <option value="custom">– Eigener Termin</option>
+        </select>
+        <button class="btn" onclick="seriesBulkSetPillar('${esc(name)}','serPillar_${sid}')">Setzen</button>
+      </div>
+    </div>
+    <div class="field" style="margin-bottom:8px"><label>Termine um N Tage verschieben</label>
+      <div style="display:flex;gap:6px">
+        <input class="bulk-input" id="serShift_${sid}" type="number" placeholder="z.B. 7 oder -3">
+        <button class="btn" onclick="seriesBulkShift('${esc(name)}','serShift_${sid}')">Verschieben</button>
+      </div>
+    </div>
+    <div class="field" style="margin-bottom:0"><label>Aufgabe zu allen hinzufügen</label>
+      <div style="display:flex;gap:6px">
+        <input class="bulk-input" id="serTask_${sid}" placeholder="z.B. Review, Schnitt…">
+        <button class="btn" onclick="seriesBulkAddTask('${esc(name)}','serTask_${sid}')">Hinzufügen</button>
+      </div>
+    </div>
+  </div>
+</div>`;
+  }).join("");
+}
+
+function clearSeries(name){
+  events.forEach(e=>{ if(e.series&&e.series.trim()===name) e.series=""; });
+  save(); renderSeriesTab(); toast("Serie entfernt");
+}
+function seriesBulkSetFormat(sName,inputId){
+  const fid=val(inputId).trim(); if(!fid){ toast("Format-ID eingeben"); return; }
+  const evts=getSeriesEvents(sName);
+  evts.forEach(e=>{ e.format=fid; });
+  save(); renderCalendar(); toast(evts.length+" Termine aktualisiert");
+}
+function seriesBulkSetPillar(sName,inputId){
+  const pid=val(inputId); if(!pid){ toast("Säule wählen"); return; }
+  const evts=getSeriesEvents(sName);
+  if(!confirm(`Säule für alle ${evts.length} Termine auf "${pid}" setzen?`)) return;
+  evts.forEach(e=>{ e.pillar=pid; });
+  save(); renderCalendar(); renderSeriesTab(); toast(evts.length+" Termine aktualisiert");
+}
+function seriesBulkShift(sName,inputId){
+  const days=parseInt(val(inputId)); if(isNaN(days)){ toast("Anzahl Tage eingeben"); return; }
+  const evts=getSeriesEvents(sName).filter(e=>e.date);
+  if(!evts.length){ toast("Keine Termine mit Datum"); return; }
+  if(!confirm(`Alle ${evts.length} Termine um ${days} Tage verschieben?`)) return;
+  evts.forEach(e=>{ const d=new Date(e.date+"T00:00:00"); d.setDate(d.getDate()+days); e.date=isoDate(d); });
+  save(); renderCalendar(); toast(evts.length+" Termine verschoben");
+}
+function seriesBulkAddTask(sName,inputId){
+  const text=val(inputId).trim(); if(!text){ toast("Aufgabe eingeben"); return; }
+  let count=0;
+  getSeriesEvents(sName).forEach(e=>{
+    if(!e.tasks.some(t=>t.text===text)){ e.tasks.push({id:uid(),text,date:"",note:"",done:false}); count++; }
+  });
+  save(); renderCalendar(); toast("Aufgabe zu "+count+" Terminen hinzugefügt");
+}
 
 // ── INIT ──
 (function init(){
