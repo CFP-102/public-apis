@@ -132,6 +132,15 @@
   .drawer-tabs{display:flex;gap:8px;margin-bottom:16px}
   .drawer-tab{flex:1;background:var(--bg3);border:1px solid var(--border);color:var(--text2);padding:7px;border-radius:7px;font-size:12px}
   .drawer-tab.active{border-color:var(--accent);color:var(--accent)}
+
+  /* Import / Export modal */
+  .big-ta{width:100%;background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:10px 12px;border-radius:8px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;line-height:1.55;min-height:240px;resize:vertical;outline:none}
+  .big-ta:focus{border-color:var(--accent)}
+  .help{font-size:12px;color:var(--text2);background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin-bottom:12px}
+  .help summary{cursor:pointer;color:var(--text);font-weight:600;font-size:12px}
+  .help code{color:var(--accent)}
+  .help pre{white-space:pre-wrap;margin:8px 0 0;font-family:ui-monospace,Menlo,monospace;font-size:11px;line-height:1.5;color:var(--text2)}
+  .btn-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
 </style>
 </head>
 <body>
@@ -150,8 +159,9 @@
   <div class="spacer"></div>
   <div class="toolbtns">
     <button class="btn btn-primary" onclick="openNewEvent()">+ Neuer Termin</button>
+    <button class="btn" onclick="openImport()">📥 Ideen / Import</button>
+    <button class="btn" onclick="exportICS(false)">📅 Export .ics</button>
     <button class="btn" onclick="openDrawer()">📋 Strategie & Formate</button>
-    <button class="btn" onclick="exportData()">⬇ Export</button>
     <button class="btn btn-danger" onclick="resetData()">↺ Zurücksetzen</button>
   </div>
 </div>
@@ -184,6 +194,79 @@
       <button class="btn" onclick="closeModal()">Abbrechen</button>
       <div class="spacer"></div>
       <button class="btn btn-danger" id="deleteBtn" onclick="deleteEvent()">Löschen</button>
+    </div>
+  </div>
+</div>
+
+<!-- Import / Export modal -->
+<div class="overlay" id="importOverlay">
+  <div class="modal" style="max-width:700px">
+    <div class="modal-head">
+      <div class="mh-color" style="background:var(--accent)"></div>
+      <h2>Ideen einpflegen &amp; Export</h2>
+      <button class="modal-close" onclick="closeImport()">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="drawer-tabs">
+        <button class="drawer-tab active" id="itab-ideas" onclick="switchImportTab('ideas')">✍️ Ideen (Text)</button>
+        <button class="drawer-tab" id="itab-json" onclick="switchImportTab('json')">🔁 JSON &amp; Export</button>
+      </div>
+
+      <div id="tabIdeas">
+        <details class="help">
+          <summary>Format-Hilfe (klicken zum Aufklappen)</summary>
+          <pre>Ein Block = ein Termin. Blöcke mit einer Zeile  ---  trennen.
+
+Erste Zeile = Kopf:   DATUM | SÄULE | TITEL      (nur Titel ist Pflicht)
+   z.B.   2026-10-05 | P1 | Mythen über Solarförderung
+
+Weitere Zeilen (alle optional, Reihenfolge egal):
+   Hook: ...
+   Idee: ...
+   Variante: ...            (mehrfach möglich)
+   Ziel: ...
+   CTA: ...
+   Ort: ...
+   Equipment: a, b, c
+   Aufgabe: Dreh @ 2026-10-01    (mehrfach; "@ Datum" optional)
+
+Bestehenden Termin AKTUALISIEREN: Kopf mit vorhandener ID,
+   z.B.   W10-Fr | Ergänzung ...    → angegebene Felder werden gemerged.
+
+Schnell-Modus: einfach pro Zeile eine Idee (nur Titel, keine Doppelpunkte)
+   → jede Zeile wird ein neuer Termin (Datum danach im Kalender anpassen).</pre>
+        </details>
+        <textarea id="ideasInput" class="big-ta" placeholder="Ideen hier einfügen … (siehe Format-Hilfe oben)"></textarea>
+        <div class="btn-row">
+          <button class="btn btn-primary" onclick="applyIdeas()">In Plan übernehmen</button>
+          <button class="btn" onclick="copyAIPrompt()">🤖 Als KI-Prompt kopieren</button>
+          <button class="btn" onclick="fillExample()">Beispiel einfügen</button>
+        </div>
+        <div class="help" style="margin-top:14px;margin-bottom:0">
+          <b style="color:var(--text)">KI-Workflow:</b> „KI-Prompt kopieren" legt deinen kompletten Plan + deine Ideen
+          als fertigen Prompt in die Zwischenablage. In Claude/ChatGPT einfügen → du bekommst aktualisiertes JSON
+          zurück → dieses im Tab „JSON &amp; Export" einfügen und übernehmen.
+        </div>
+      </div>
+
+      <div id="tabJson" style="display:none">
+        <div class="help" style="margin-bottom:10px">KI-Ergebnis (JSON-Array) hier einfügen und übernehmen:</div>
+        <textarea id="jsonInput" class="big-ta" placeholder='[ { "title": "...", "date": "2026-10-05", ... } ]'></textarea>
+        <div class="btn-row">
+          <button class="btn btn-primary" onclick="importJSON(false)">Zusammenführen (nach ID)</button>
+          <button class="btn" onclick="importJSON(true)">Komplett ersetzen</button>
+        </div>
+        <hr style="border:none;border-top:1px solid var(--border);margin:18px 0">
+        <div class="help" style="margin-bottom:10px"><b style="color:var(--text)">Exportieren</b> – für Outlook &amp; Apple Kalender die .ics-Datei:</div>
+        <div class="btn-row" style="margin-top:0">
+          <button class="btn" onclick="exportICS(false)">📅 .ics – nur Posts</button>
+          <button class="btn" onclick="exportICS(true)">📅 .ics – Posts + Produktionstermine</button>
+          <button class="btn" onclick="exportData()">⬇ JSON sichern</button>
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn" onclick="closeImport()">Schließen</button>
     </div>
   </div>
 </div>
@@ -574,6 +657,268 @@ function toast(msg){
   clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove("show"),1800);
 }
 document.addEventListener("keydown",e=>{ if(e.key==="Escape"){ closeModal(); closeDrawer(); }});
+
+// ════════════════════════════════════════════════════════════════════════════
+//  IMPORT / EXPORT  (.ics · Text-Ideen · KI-Workflow · JSON)
+// ════════════════════════════════════════════════════════════════════════════
+function openImport(){ document.getElementById("importOverlay").classList.add("open"); switchImportTab("ideas"); }
+function closeImport(){ document.getElementById("importOverlay").classList.remove("open"); }
+function switchImportTab(tab){
+  const ideas=tab==="ideas";
+  document.getElementById("tabIdeas").style.display=ideas?"":"none";
+  document.getElementById("tabJson").style.display=ideas?"none":"";
+  document.getElementById("itab-ideas").classList.toggle("active",ideas);
+  document.getElementById("itab-json").classList.toggle("active",!ideas);
+}
+document.getElementById("importOverlay").addEventListener("click",e=>{ if(e.target.id==="importOverlay") closeImport(); });
+document.addEventListener("keydown",e=>{ if(e.key==="Escape") closeImport(); });
+
+// ── .ics (iCalendar) für Outlook & Apple ──
+function pad2(n){return String(n).padStart(2,"0");}
+function icsDate(iso){ return iso.replace(/-/g,""); }                  // YYYY-MM-DD -> YYYYMMDD
+function icsDatePlus1(iso){ const d=new Date(iso+"T00:00:00"); d.setDate(d.getDate()+1); return icsDate(isoDate(d)); }
+function icsEscape(s){ return String(s==null?"":s).replace(/\\/g,"\\\\").replace(/;/g,"\\;").replace(/,/g,"\\,").replace(/\r?\n/g,"\\n"); }
+function byteLen(ch){ const c=ch.codePointAt(0); if(c<0x80)return 1; if(c<0x800)return 2; if(c<0x10000)return 3; return 4; }
+function fold(line){
+  // Faltung nach Oktetten (RFC 5545, max 75). for..of iteriert per Codepoint,
+  // dadurch bleiben Mehrbyte-Zeichen und Emoji-Surrogatpaare unzerschnitten.
+  const out=[]; let cur=""; let bytes=0;
+  for(const ch of line){
+    const b=byteLen(ch);
+    if(bytes+b>73){ out.push(cur); cur=" "; bytes=1; } // Fortsetzungszeile beginnt mit Space
+    cur+=ch; bytes+=b;
+  }
+  out.push(cur); return out.join("\r\n");
+}
+function pillarIcon(p){ return ({P1:"📘",P2:"🏗️",P3:"🎬",P4:"⭐",P5:"📰",custom:"📌"})[p]||"📌"; }
+function taskIcon(t){ const s=(t||"").toLowerCase(); if(s.includes("konzept"))return"📝"; if(s.includes("dreh"))return"🎬"; if(s.includes("schnitt"))return"✂️"; if(s.includes("review"))return"✅"; if(s.includes("produktion"))return"⚙️"; return"📌"; }
+
+function postDescription(e){
+  const L=[];
+  if(e.hook) L.push("Hook: "+e.hook);
+  if(e.idea) L.push("Idee: "+e.idea);
+  if(e.variants&&e.variants.length){ L.push("Varianten:"); e.variants.forEach((v,i)=>L.push("  "+(i+1)+". "+v)); }
+  if(e.goal) L.push("Ziel: "+e.goal);
+  if(e.cta) L.push("CTA: "+e.cta);
+  if(e.location) L.push("Drehort: "+e.location);
+  if(e.equipment&&e.equipment.length) L.push("Equipment: "+e.equipment.join(", "));
+  if(e.hours||e.team) L.push("Aufwand: "+(e.hours?e.hours+"h":"")+(e.team?" / "+e.team+" Personen":""));
+  if(e.notes) L.push("Notiz: "+e.notes);
+  if(e.tasks&&e.tasks.length){ L.push("Aufgaben:"); e.tasks.forEach(t=>L.push("  "+(t.done?"☑":"☐")+" "+t.text+(t.date?" ("+t.date+")":"")+(t.note?" ["+t.note+"]":""))); }
+  return L.join("\n");
+}
+function buildICS(includeTasks){
+  const stamp=new Date().toISOString().replace(/[-:]/g,"").replace(/\.\d+/,"");
+  const lines=["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//SolarTech//Content Kalender//DE","CALSCALE:GREGORIAN","METHOD:PUBLISH","X-WR-CALNAME:SolarTech Content Plan"];
+  const sorted=[...events].sort((a,b)=>(a.date||"").localeCompare(b.date||""));
+  sorted.forEach(e=>{
+    if(!e.date) return;
+    lines.push("BEGIN:VEVENT");
+    lines.push("UID:"+e.id+"@solartech-content");
+    lines.push("DTSTAMP:"+stamp);
+    lines.push("DTSTART;VALUE=DATE:"+icsDate(e.date));
+    lines.push("DTEND;VALUE=DATE:"+icsDatePlus1(e.date));
+    lines.push(fold("SUMMARY:"+icsEscape(pillarIcon(e.pillar)+" "+e.title)));
+    const desc=postDescription(e);
+    if(desc) lines.push(fold("DESCRIPTION:"+icsEscape(desc)));
+    lines.push(fold("CATEGORIES:"+icsEscape(PILLAR_NAMES[e.pillar]||"Termin")));
+    lines.push("END:VEVENT");
+    if(includeTasks && e.tasks){
+      e.tasks.forEach(t=>{
+        if(!t.date) return;
+        lines.push("BEGIN:VEVENT");
+        lines.push("UID:"+e.id+"-"+t.id+"@solartech-content");
+        lines.push("DTSTAMP:"+stamp);
+        lines.push("DTSTART;VALUE=DATE:"+icsDate(t.date));
+        lines.push("DTEND;VALUE=DATE:"+icsDatePlus1(t.date));
+        lines.push(fold("SUMMARY:"+icsEscape(taskIcon(t.text)+" "+t.text+" · "+e.title)));
+        lines.push(fold("DESCRIPTION:"+icsEscape("Produktionsschritt für: "+e.title)));
+        lines.push("CATEGORIES:Produktion");
+        lines.push("END:VEVENT");
+      });
+    }
+  });
+  lines.push("END:VCALENDAR");
+  return lines.join("\r\n");
+}
+function exportICS(includeTasks){
+  downloadFile("solartech-content"+(includeTasks?"-mit-produktionsterminen":"")+".ics", buildICS(includeTasks), "text/calendar");
+  toast(".ics exportiert – in Outlook/Apple importieren");
+}
+function downloadFile(name,text,mime){
+  const blob=new Blob([text],{type:mime||"text/plain"});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement("a"); a.href=url; a.download=name; a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ── Text-Ideen Parser ──
+const KEYMAP={
+  titel:"title",title:"title",
+  hook:"hook","aufhänger":"hook",aufhaenger:"hook",
+  idee:"idea",idea:"idea",beschreibung:"idea",
+  ziel:"goal",goal:"goal",
+  cta:"cta",call:"cta","call-to-action":"cta",
+  ort:"location",drehort:"location",location:"location",
+  equipment:"equipment","ausrüstung":"equipment",ausruestung:"equipment",
+  format:"format",
+  stunden:"hours",hours:"hours",aufwand:"hours",
+  team:"team",
+  notiz:"notes",notizen:"notes",notes:"notes",anforderung:"notes",
+  variante:"variant",variant:"variant",
+  aufgabe:"task",task:"task",todo:"task"
+};
+let _newIdeaCounter=0;
+function defaultDate(){ const b=new Date(viewYear,viewMonth,1); b.setDate(b.getDate()+_newIdeaCounter*2); _newIdeaCounter++; return isoDate(b); }
+function newEventFrom(o){ return Object.assign({id:uid(),date:defaultDate(),pillar:"custom",format:"",title:"(Ohne Titel)",hook:"",idea:"",variants:[],goal:"",cta:"",location:"",equipment:[],hours:"",team:"",notes:"",tasks:[]}, o); }
+function parseHeader(line){
+  const parts=line.split("|").map(s=>s.trim());
+  let date="",pillar="",id="",titleParts=[];
+  parts.forEach(tok=>{
+    if(/^\d{4}-\d{2}-\d{2}$/.test(tok)) date=tok;
+    else if(/^P[1-5]$/i.test(tok)) pillar=tok.toUpperCase();
+    else if(events.some(e=>e.id.toLowerCase()===tok.toLowerCase())) id=tok;
+    else if(tok) titleParts.push(tok);
+  });
+  return {date,pillar,id,title:titleParts.join(" | ")};
+}
+function parseTask(v){
+  let date=""; let text=v;
+  const m=v.match(/(\d{4}-\d{2}-\d{2})/);
+  if(m){ date=m[1]; text=v.replace(/[@(]?\s*\d{4}-\d{2}-\d{2}\s*\)?/,"").trim(); }
+  text=text.replace(/[@\-–]\s*$/,"").trim();
+  return {text,date};
+}
+function findEvent(idToken,title){
+  if(idToken){ const e=events.find(e=>e.id.toLowerCase()===idToken.toLowerCase()); if(e) return e; }
+  if(title){ const t=title.trim().toLowerCase(); const e=events.find(e=>e.title.trim().toLowerCase()===t); if(e) return e; }
+  return null;
+}
+function applyBlock(block){
+  const h=parseHeader(block.headerLine);
+  let ev=findEvent(h.id,h.title);
+  const isNew=!ev;
+  if(isNew){ ev=newEventFrom({date:h.date||defaultDate(),pillar:h.pillar||"custom",title:h.title||"(Ohne Titel)"}); }
+  else { if(h.date) ev.date=h.date; if(h.pillar) ev.pillar=h.pillar; }
+  block.fields.forEach(({key,value})=>{
+    if(!value) return;
+    switch(key){
+      case "variant": ev.variants.push(value); break;
+      case "equipment": ev.equipment=value.split(",").map(s=>s.trim()).filter(Boolean); break;
+      case "task": { const t=parseTask(value); ev.tasks.push({id:uid(),text:t.text||value,date:t.date,note:"",done:false}); break; }
+      case "idea": ev.idea=ev.idea?(ev.idea+" "+value):value; break;
+      case "title": ev.title=value; break;
+      case "hours": ev.hours=value; break;
+      default: ev[key]=value;
+    }
+  });
+  if(isNew) events.push(ev);
+  return isNew;
+}
+function applyIdeas(){
+  const text=val("ideasInput");
+  if(!text.trim()){ toast("Bitte Ideen eingeben"); return; }
+  _newIdeaCounter=0;
+  let created=0, updated=0;
+  const hasStructure=/(^|\n)\s*---\s*(\n|$)/.test(text) || /\|/.test(text) || /^[^\n:]{1,40}:\s*\S/m.test(text);
+  if(!hasStructure){
+    text.split(/\r?\n/).map(l=>l.trim()).filter(Boolean).forEach(line=>{ events.push(newEventFrom({title:line})); created++; });
+  } else {
+    text.split(/\r?\n\s*---\s*\r?\n/).forEach(b=>{
+      const lines=b.split(/\r?\n/).map(l=>l.replace(/\s+$/,"")).filter(l=>l.trim()!=="");
+      if(!lines.length) return;
+      const headerLine=lines[0];
+      const fields=[];
+      for(let i=1;i<lines.length;i++){
+        const line=lines[i]; const ci=line.indexOf(":");
+        if(ci>0){
+          const rawKey=line.slice(0,ci).trim().toLowerCase();
+          const value=line.slice(ci+1).trim();
+          const key=KEYMAP[rawKey];
+          if(key){ fields.push({key,value}); continue; }
+        }
+        fields.push({key:"idea",value:line.trim()});
+      }
+      if(applyBlock({headerLine,fields})) created++; else updated++;
+    });
+  }
+  save(); closeImport(); renderCalendar(); toast(created+" neu · "+updated+" aktualisiert");
+}
+function fillExample(){
+  document.getElementById("ideasInput").value=
+`2026-10-05 | P1 | Mythen über Solarförderung – entlarvt
+Hook: "Diese 3 Förder-Irrtümer kosten dich tausende Euro."
+Idee: Kurzformat, das gängige Missverständnisse zur EEG-Förderung aufklärt.
+Variante: Schnelle Cuts mit Text-Overlays
+Variante: Steuerberater im Interview
+Ziel: Reichweite + Lead-Gen
+CTA: Förder-Check anfragen
+Aufgabe: Konzept @ 2026-09-21
+Aufgabe: Dreh @ 2026-09-28
+---
+W10-Fr | Ergänzung: konkretes EU-Gesetz nennen
+Idee: Bezug auf die neue Netzanschluss-Verordnung 2026 aufnehmen.
+Aufgabe: Faktencheck @ 2026-09-08`;
+}
+
+// ── KI-Workflow ──
+function buildAIPrompt(ideasText){
+  const schema='Schema je Termin: { "id", "date" (YYYY-MM-DD), "pillar" (P1|P2|P3|P4|P5|custom), "format", "title", "hook", "idea", "variants":[…], "goal", "cta", "location", "equipment":[…], "hours", "team", "notes", "tasks":[ {"id","text","date","note","done"} ] }';
+  return [
+"Du bist ein erfahrener Creative Producer. Unten steht mein aktueller Video-Content-Plan als JSON-Array und darunter neue Ideen/Anmerkungen in Textform.",
+"Aufgabe: Arbeite die Ideen in den Plan ein – aktualisiere passende bestehende Termine (gleiche id/Titel) und lege neue an. Behalte das Schema exakt bei und vergib für neue Termine sinnvolle Daten (Rhythmus Mo/Mi/Fr).",
+"Gib AUSSCHLIESSLICH das vollständige, aktualisierte JSON-Array zurück – kein Markdown, keine Erklärung drumherum.",
+"",
+schema,
+"",
+"=== AKTUELLER PLAN (JSON) ===",
+JSON.stringify(events),
+"",
+"=== NEUE IDEEN (Text) ===",
+(ideasText||"").trim()||"(keine – bitte Plan unverändert zurückgeben)"
+].join("\n");
+}
+function copyAIPrompt(){
+  const p=buildAIPrompt(val("ideasInput"));
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(p).then(()=>toast("KI-Prompt kopiert ✓")).catch(()=>fallbackCopy(p));
+  } else fallbackCopy(p);
+}
+function fallbackCopy(t){
+  const ta=document.createElement("textarea"); ta.value=t; ta.style.position="fixed"; ta.style.opacity="0";
+  document.body.appendChild(ta); ta.select();
+  try{ document.execCommand("copy"); toast("KI-Prompt kopiert ✓"); }catch(e){ toast("Kopieren nicht möglich"); }
+  document.body.removeChild(ta);
+}
+
+// ── JSON-Import ──
+function normalizeEvent(e){
+  if(!e||typeof e!=="object") return null;
+  return {
+    id:e.id||uid(), date:e.date||"", pillar:e.pillar||"custom", format:e.format||"",
+    title:e.title||"(Ohne Titel)", hook:e.hook||"", idea:e.idea||"",
+    variants:Array.isArray(e.variants)?e.variants:[], goal:e.goal||"", cta:e.cta||"",
+    location:e.location||"", equipment:Array.isArray(e.equipment)?e.equipment:[],
+    hours:e.hours==null?"":e.hours, team:e.team==null?"":e.team, notes:e.notes||"",
+    tasks:Array.isArray(e.tasks)?e.tasks.map(t=>({id:t.id||uid(),text:t.text||"",date:t.date||"",note:t.note||"",done:!!t.done})):[]
+  };
+}
+function importJSON(replace){
+  const txt=val("jsonInput").trim();
+  if(!txt){ toast("Bitte JSON einfügen"); return; }
+  let arr;
+  try{ arr=JSON.parse(txt); }catch(e){ toast("Ungültiges JSON: "+e.message); return; }
+  if(!Array.isArray(arr)){ toast("Erwarte ein JSON-Array"); return; }
+  arr=arr.map(normalizeEvent).filter(Boolean);
+  if(!arr.length){ toast("Keine gültigen Termine gefunden"); return; }
+  if(replace){
+    if(!confirm("Gesamten Plan durch das eingefügte JSON ersetzen?")) return;
+    events=arr;
+  } else {
+    arr.forEach(ne=>{ const i=events.findIndex(e=>e.id===ne.id); if(i>=0) events[i]=ne; else events.push(ne); });
+  }
+  save(); closeImport(); renderCalendar(); toast((replace?"Ersetzt: ":"Zusammengeführt: ")+arr.length+" Termine");
+}
 
 // ── INIT ──
 (function init(){
