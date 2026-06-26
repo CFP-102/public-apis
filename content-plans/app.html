@@ -3,658 +3,586 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>B2B Video Content Plan</title>
+<title>Content Kalender · B2B Video Plan</title>
 <style>
   :root {
-    --bg: #0f1117;
-    --bg2: #1a1d27;
-    --bg3: #242837;
-    --border: #2e3347;
-    --text: #e8eaf0;
-    --text2: #9098b0;
-    --accent: #f5a623;
-    --accent2: #e8910a;
-    --blue: #4a90d9;
-    --green: #4caf7d;
-    --red: #e05c5c;
-    --purple: #9b6fd4;
-    --teal: #3dbfb8;
-    --radius: 10px;
-    --shadow: 0 2px 12px rgba(0,0,0,0.4);
+    --bg:#0f1117; --bg2:#1a1d27; --bg3:#242837; --border:#2e3347;
+    --text:#e8eaf0; --text2:#9098b0; --accent:#f5a623; --accent2:#e8910a;
+    --blue:#4a90d9; --green:#4caf7d; --red:#e05c5c; --purple:#9b6fd4; --teal:#3dbfb8;
+    --radius:10px; --shadow:0 8px 40px rgba(0,0,0,0.5);
   }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 14px; line-height: 1.6; }
-  a { color: var(--accent); text-decoration: none; }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:14px;line-height:1.5}
+  button{font-family:inherit;cursor:pointer}
+  input,textarea,select{font-family:inherit}
 
-  /* Layout */
-  .app { display: flex; min-height: 100vh; }
-  .sidebar { width: 220px; background: var(--bg2); border-right: 1px solid var(--border); padding: 24px 0; position: fixed; top: 0; left: 0; height: 100vh; overflow-y: auto; z-index: 100; }
-  .main { margin-left: 220px; flex: 1; padding: 32px; max-width: 1200px; }
-  @media (max-width: 768px) {
-    .sidebar { width: 100%; height: auto; position: relative; }
-    .app { flex-direction: column; }
-    .main { margin-left: 0; padding: 16px; }
-  }
+  /* Topbar */
+  .topbar{display:flex;align-items:center;gap:14px;padding:14px 24px;background:var(--bg2);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:50;flex-wrap:wrap}
+  .brand{display:flex;align-items:center;gap:10px;margin-right:8px}
+  .brand-icon{font-size:22px}
+  .brand h1{font-size:14px;font-weight:700;color:var(--accent)}
+  .brand p{font-size:11px;color:var(--text2)}
+  .month-nav{display:flex;align-items:center;gap:8px}
+  .month-label{font-size:16px;font-weight:700;min-width:160px;text-align:center}
+  .btn{background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:7px 12px;border-radius:8px;font-size:13px;transition:all .15s}
+  .btn:hover{border-color:var(--accent);color:var(--accent)}
+  .btn-icon{width:34px;height:34px;display:flex;align-items:center;justify-content:center;padding:0;font-size:16px}
+  .btn-primary{background:var(--accent);border-color:var(--accent);color:#000;font-weight:700}
+  .btn-primary:hover{background:var(--accent2);color:#000}
+  .btn-danger{color:var(--red);border-color:transparent}
+  .btn-danger:hover{border-color:var(--red);background:rgba(224,92,92,.1)}
+  .spacer{flex:1}
+  .toolbtns{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 
-  /* Sidebar */
-  .logo { padding: 0 20px 24px; border-bottom: 1px solid var(--border); margin-bottom: 16px; }
-  .logo-icon { font-size: 24px; margin-bottom: 4px; }
-  .logo h1 { font-size: 13px; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: 0.5px; }
-  .logo p { font-size: 11px; color: var(--text2); margin-top: 2px; }
-  .nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 20px; cursor: pointer; color: var(--text2); transition: all 0.15s; font-size: 13px; border-left: 3px solid transparent; }
-  .nav-item:hover { color: var(--text); background: var(--bg3); }
-  .nav-item.active { color: var(--accent); border-left-color: var(--accent); background: rgba(245,166,35,0.07); }
-  .nav-icon { font-size: 16px; width: 20px; text-align: center; }
-  .nav-badge { margin-left: auto; background: var(--bg3); color: var(--text2); font-size: 10px; padding: 1px 6px; border-radius: 10px; }
+  /* Legend / filters */
+  .legend{display:flex;gap:6px;align-items:center;flex-wrap:wrap;padding:10px 24px;background:var(--bg2);border-bottom:1px solid var(--border)}
+  .legend-label{font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;margin-right:4px}
+  .pill{font-size:11px;padding:3px 10px;border-radius:20px;border:1px solid var(--border);background:var(--bg3);color:var(--text2);cursor:pointer;display:flex;align-items:center;gap:6px}
+  .pill .dot{width:8px;height:8px;border-radius:50%}
+  .pill.active{color:var(--text);border-color:currentColor}
+  .pill.inactive{opacity:.4}
 
-  /* Sections */
-  .section { display: none; }
-  .section.active { display: block; }
-  .section-header { margin-bottom: 28px; }
-  .section-header h2 { font-size: 22px; font-weight: 700; margin-bottom: 6px; }
-  .section-header p { color: var(--text2); font-size: 13px; }
+  /* Calendar */
+  .cal-wrap{padding:20px 24px}
+  .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+  .cal-head{font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;text-align:center;padding:6px 0;font-weight:600}
+  .cal-cell{background:var(--bg2);border:1px solid var(--border);border-radius:8px;min-height:118px;padding:6px;cursor:pointer;transition:border-color .15s;display:flex;flex-direction:column;gap:4px;overflow:hidden}
+  .cal-cell:hover{border-color:var(--accent)}
+  .cal-cell.other-month{opacity:.35}
+  .cal-cell.today{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+  .cell-date{font-size:12px;font-weight:700;color:var(--text2);display:flex;justify-content:space-between;align-items:center}
+  .cal-cell.today .cell-date{color:var(--accent)}
+  .cell-add{opacity:0;font-size:14px;color:var(--accent);transition:opacity .15s}
+  .cal-cell:hover .cell-add{opacity:1}
+  .evt{font-size:11px;padding:3px 7px;border-radius:5px;color:#fff;line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;border-left:3px solid rgba(0,0,0,.3);position:relative}
+  .evt:hover{filter:brightness(1.15)}
+  .evt.done-evt{opacity:.55;text-decoration:line-through}
+  .evt-task-badge{position:absolute;right:4px;top:2px;font-size:9px;background:rgba(0,0,0,.35);border-radius:8px;padding:0 5px}
+  .ev-P1{background:#3a6ea5} .ev-P2{background:#3a8c63} .ev-P3{background:#bd7d1a;color:#1a1a1a}
+  .ev-P4{background:#7a55a8} .ev-P5{background:#2f928c} .ev-custom{background:#566080}
 
-  /* Cards */
-  .card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; }
-  .card-sm { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; }
+  /* Mini info bar */
+  .infobar{display:flex;gap:20px;padding:8px 24px;background:var(--bg);border-bottom:1px solid var(--border);font-size:12px;color:var(--text2);flex-wrap:wrap}
+  .infobar b{color:var(--text)}
 
-  /* Grid */
-  .grid-2 { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 16px; }
-  .grid-3 { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; }
-  .grid-5 { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-bottom: 24px; }
-  @media (max-width: 900px) { .grid-5 { grid-template-columns: repeat(3, 1fr); } }
-  @media (max-width: 600px) { .grid-5 { grid-template-columns: repeat(2, 1fr); } .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+  /* Modal */
+  .overlay{position:fixed;inset:0;background:rgba(0,0,0,.65);display:none;align-items:flex-start;justify-content:center;z-index:100;padding:40px 16px;overflow-y:auto}
+  .overlay.open{display:flex}
+  .modal{background:var(--bg2);border:1px solid var(--border);border-radius:14px;width:100%;max-width:640px;box-shadow:var(--shadow);overflow:hidden;margin-bottom:40px}
+  .modal-head{padding:18px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px}
+  .modal-head .mh-color{width:6px;height:34px;border-radius:3px}
+  .modal-head h2{font-size:16px;font-weight:700;flex:1}
+  .modal-close{background:none;border:none;color:var(--text2);font-size:22px;line-height:1;padding:4px}
+  .modal-close:hover{color:var(--text)}
+  .modal-body{padding:20px 22px;max-height:65vh;overflow-y:auto}
+  .modal-foot{padding:14px 22px;border-top:1px solid var(--border);display:flex;gap:10px;align-items:center}
 
-  /* Stat cards */
-  .stat { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 18px; }
-  .stat-val { font-size: 28px; font-weight: 800; color: var(--accent); }
-  .stat-label { font-size: 11px; color: var(--text2); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; }
+  .field{margin-bottom:16px}
+  .field label{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.6px;color:var(--text2);margin-bottom:5px;font-weight:600}
+  .field input,.field textarea,.field select{width:100%;background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:9px 12px;border-radius:8px;font-size:13px;outline:none;resize:vertical}
+  .field input:focus,.field textarea:focus,.field select:focus{border-color:var(--accent)}
+  .field textarea{min-height:64px}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+  @media(max-width:560px){.row2,.row3{grid-template-columns:1fr}}
 
-  /* Pillar cards */
-  .pillar { border-radius: var(--radius); padding: 18px; border: 1px solid var(--border); }
-  .pillar-id { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; opacity: 0.7; }
-  .pillar h3 { font-size: 15px; font-weight: 700; margin-bottom: 8px; }
-  .pillar p { font-size: 12px; color: var(--text2); margin-bottom: 10px; }
-  .pillar .tags { display: flex; flex-wrap: wrap; gap: 6px; }
-  .tag { font-size: 11px; padding: 2px 8px; border-radius: 20px; background: rgba(255,255,255,0.07); color: var(--text2); }
-  .kpi-badge { font-size: 11px; margin-top: 10px; color: var(--green); }
-  .p1 { background: linear-gradient(135deg, rgba(74,144,217,0.12), rgba(74,144,217,0.04)); border-color: rgba(74,144,217,0.3); }
-  .p2 { background: linear-gradient(135deg, rgba(76,175,125,0.12), rgba(76,175,125,0.04)); border-color: rgba(76,175,125,0.3); }
-  .p3 { background: linear-gradient(135deg, rgba(245,166,35,0.12), rgba(245,166,35,0.04)); border-color: rgba(245,166,35,0.3); }
-  .p4 { background: linear-gradient(135deg, rgba(155,111,212,0.12), rgba(155,111,212,0.04)); border-color: rgba(155,111,212,0.3); }
-  .p5 { background: linear-gradient(135deg, rgba(61,191,184,0.12), rgba(61,191,184,0.04)); border-color: rgba(61,191,184,0.3); }
+  /* Variants list */
+  .list-row{display:flex;gap:8px;margin-bottom:7px;align-items:center}
+  .list-row input{flex:1}
+  .mini-del{background:none;border:1px solid var(--border);color:var(--text2);border-radius:6px;width:30px;height:34px;flex-shrink:0;font-size:14px}
+  .mini-del:hover{border-color:var(--red);color:var(--red)}
+  .add-link{background:none;border:1px dashed var(--border);color:var(--text2);padding:7px;border-radius:7px;width:100%;font-size:12px;margin-top:2px}
+  .add-link:hover{border-color:var(--accent);color:var(--accent)}
 
-  /* Format cards */
-  .format-card { border-radius: var(--radius); padding: 18px; border: 1px solid var(--border); background: var(--bg2); position: relative; overflow: hidden; }
-  .format-day { position: absolute; top: 14px; right: 14px; font-size: 10px; background: var(--bg3); color: var(--text2); padding: 3px 8px; border-radius: 12px; font-weight: 600; }
-  .format-name { font-size: 14px; font-weight: 700; margin-bottom: 6px; padding-right: 70px; }
-  .format-goal { font-size: 12px; color: var(--text2); margin-bottom: 10px; }
-  .format-length { font-size: 11px; color: var(--accent); margin-top: 8px; }
-  .format-pillar { font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700; margin-bottom: 8px; }
+  /* Tasks inside event */
+  .task-block{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:14px}
+  .task-block-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+  .task-block-head .tbh-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text)}
+  .task-prog{font-size:11px;color:var(--green)}
+  .task-row{display:flex;gap:9px;align-items:center;padding:7px 8px;background:var(--bg2);border:1px solid var(--border);border-radius:7px;margin-bottom:6px}
+  .task-check{width:18px;height:18px;border-radius:4px;border:2px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:12px;color:#000}
+  .task-row.done .task-check{background:var(--green);border-color:var(--green)}
+  .task-row.done .task-text-in{text-decoration:line-through;color:var(--text2)}
+  .task-text-in{flex:1;background:none;border:none;color:var(--text);font-size:13px;outline:none;padding:2px}
+  .task-date-in{background:var(--bg3);border:1px solid var(--border);color:var(--text2);border-radius:6px;font-size:11px;padding:3px 6px;width:120px}
+  .task-tag{font-size:9px;text-transform:uppercase;letter-spacing:.5px;padding:1px 6px;border-radius:8px;background:var(--bg3);color:var(--text2)}
 
-  /* Week selector */
-  .week-nav { display: flex; align-items: center; gap: 8px; margin-bottom: 24px; flex-wrap: wrap; }
-  .week-btn { background: var(--bg2); border: 1px solid var(--border); color: var(--text2); padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; transition: all 0.15s; }
-  .week-btn:hover { border-color: var(--accent); color: var(--text); }
-  .week-btn.active { background: var(--accent); border-color: var(--accent); color: #000; font-weight: 700; }
-  .week-theme { font-size: 13px; color: var(--text2); margin-bottom: 16px; background: var(--bg2); border: 1px solid var(--border); padding: 10px 14px; border-radius: 8px; }
-  .week-theme strong { color: var(--text); }
+  .badge{font-size:10px;padding:2px 8px;border-radius:10px;font-weight:600}
+  .empty-cal{text-align:center;color:var(--text2);padding:40px;font-size:13px}
+  .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--bg3);border:1px solid var(--accent);color:var(--text);padding:10px 20px;border-radius:10px;font-size:13px;z-index:200;opacity:0;transition:opacity .25s;pointer-events:none;box-shadow:var(--shadow)}
+  .toast.show{opacity:1}
 
-  /* Post cards */
-  .post-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; margin-bottom: 14px; }
-  .post-header { padding: 16px 18px; cursor: pointer; display: flex; align-items: flex-start; gap: 14px; }
-  .post-day-badge { min-width: 44px; text-align: center; background: var(--bg3); border-radius: 7px; padding: 6px 4px; }
-  .post-day-badge .day { font-size: 10px; text-transform: uppercase; font-weight: 700; color: var(--text2); }
-  .post-day-badge .daynum { font-size: 16px; font-weight: 800; color: var(--accent); }
-  .post-info { flex: 1; }
-  .post-title { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
-  .post-hook { font-size: 12px; color: var(--text2); font-style: italic; }
-  .post-meta { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
-  .post-badge { font-size: 10px; padding: 2px 7px; border-radius: 10px; font-weight: 600; }
-  .pb-p1 { background: rgba(74,144,217,0.15); color: #7ab3e8; }
-  .pb-p2 { background: rgba(76,175,125,0.15); color: #7dd4a6; }
-  .pb-p3 { background: rgba(245,166,35,0.15); color: #f5a623; }
-  .pb-p4 { background: rgba(155,111,212,0.15); color: #c4a0e8; }
-  .pb-p5 { background: rgba(61,191,184,0.15); color: #7de0dc; }
-  .pb-format { background: rgba(255,255,255,0.07); color: var(--text2); }
-  .expand-icon { color: var(--text2); font-size: 18px; transition: transform 0.2s; margin-left: auto; align-self: center; }
-  .post-card.open .expand-icon { transform: rotate(180deg); }
-  .post-body { display: none; padding: 0 18px 18px; border-top: 1px solid var(--border); }
-  .post-card.open .post-body { display: block; padding-top: 16px; }
-  .body-section { margin-bottom: 14px; }
-  .body-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.8px; font-weight: 700; color: var(--text2); margin-bottom: 6px; }
-  .variant { background: var(--bg3); border-radius: 6px; padding: 8px 12px; margin-bottom: 6px; font-size: 12px; }
-  .variant span { color: var(--accent); font-weight: 700; margin-right: 6px; }
-  .goal-box { background: rgba(76,175,125,0.1); border: 1px solid rgba(76,175,125,0.25); border-radius: 6px; padding: 8px 12px; font-size: 12px; color: var(--green); }
-  .cta-box { background: rgba(245,166,35,0.1); border: 1px solid rgba(245,166,35,0.25); border-radius: 6px; padding: 8px 12px; font-size: 12px; color: var(--accent); }
-
-  /* Production */
-  .prod-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 18px; margin-bottom: 12px; }
-  .prod-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
-  .prod-id { font-size: 12px; font-weight: 700; color: var(--accent); }
-  .prod-meta { display: flex; gap: 16px; margin-bottom: 12px; }
-  .prod-meta-item { font-size: 12px; }
-  .prod-meta-item span { color: var(--text2); }
-  .prod-section { margin-bottom: 10px; }
-  .prod-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text2); margin-bottom: 4px; }
-  .equip-list { display: flex; flex-wrap: wrap; gap: 6px; }
-  .equip-tag { font-size: 11px; background: var(--bg3); border: 1px solid var(--border); padding: 2px 8px; border-radius: 12px; }
-  .prod-note { font-size: 12px; color: var(--text2); background: var(--bg3); border-radius: 6px; padding: 8px 12px; border-left: 3px solid var(--accent); }
-
-  /* Timeline */
-  .timeline-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 18px; margin-bottom: 10px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
-  .tl-id { font-size: 12px; font-weight: 700; color: var(--accent); min-width: 70px; }
-  .tl-publish { font-size: 12px; font-weight: 700; min-width: 100px; }
-  .tl-steps { display: flex; gap: 6px; flex: 1; flex-wrap: wrap; }
-  .tl-step { font-size: 11px; background: var(--bg3); border-radius: 6px; padding: 4px 10px; }
-  .tl-step .tl-step-label { color: var(--text2); font-size: 10px; text-transform: uppercase; }
-  .tl-step .tl-step-date { color: var(--text); }
-  .tl-step.urgent .tl-step-date { color: var(--red); }
-  .tl-week { font-size: 10px; color: var(--text2); background: var(--bg3); padding: 2px 8px; border-radius: 10px; }
-
-  /* Tasks */
-  .task-group { margin-bottom: 24px; }
-  .task-group-header { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
-  .task-group-header h3 { font-size: 14px; font-weight: 700; }
-  .priority-badge { font-size: 10px; padding: 3px 10px; border-radius: 10px; font-weight: 700; text-transform: uppercase; }
-  .priority-sofort { background: rgba(224,92,92,0.2); color: var(--red); }
-  .priority-diese { background: rgba(245,166,35,0.2); color: var(--accent); }
-  .priority-parallel { background: rgba(74,144,217,0.2); color: var(--blue); }
-  .priority-engpass { background: rgba(155,111,212,0.2); color: var(--purple); }
-  .task-item { display: flex; align-items: flex-start; gap: 12px; padding: 10px 14px; background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; margin-bottom: 8px; cursor: pointer; transition: all 0.15s; }
-  .task-item:hover { border-color: var(--accent); }
-  .task-item.done { opacity: 0.5; }
-  .task-item.done .task-text { text-decoration: line-through; color: var(--text2); }
-  .task-check { width: 18px; height: 18px; border-radius: 4px; border: 2px solid var(--border); flex-shrink: 0; margin-top: 1px; display: flex; align-items: center; justify-content: center; transition: all 0.15s; }
-  .task-item.done .task-check { background: var(--green); border-color: var(--green); }
-  .task-text { font-size: 13px; flex: 1; }
-  .task-cat { font-size: 10px; color: var(--text2); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; }
-
-  /* Misc */
-  .divider { border: none; border-top: 1px solid var(--border); margin: 24px 0; }
-  .assumption-banner { background: rgba(245,166,35,0.1); border: 1px solid rgba(245,166,35,0.3); border-radius: 8px; padding: 12px 16px; margin-bottom: 24px; font-size: 12px; color: var(--text2); }
-  .assumption-banner strong { color: var(--accent); }
-  .empty { color: var(--text2); font-size: 13px; padding: 32px; text-align: center; }
-  .search-box { width: 100%; background: var(--bg2); border: 1px solid var(--border); color: var(--text); padding: 9px 14px; border-radius: 8px; font-size: 13px; margin-bottom: 20px; outline: none; }
-  .search-box:focus { border-color: var(--accent); }
-  .filter-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
-  .filter-btn { background: var(--bg2); border: 1px solid var(--border); color: var(--text2); padding: 5px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; }
-  .filter-btn.active { border-color: var(--accent); color: var(--accent); }
-  .progress-bar { height: 4px; background: var(--bg3); border-radius: 2px; margin-top: 8px; }
-  .progress-fill { height: 100%; border-radius: 2px; background: linear-gradient(90deg, var(--accent), var(--accent2)); transition: width 0.3s; }
-  .tasks-progress { margin-bottom: 24px; }
-  .tasks-progress p { font-size: 12px; color: var(--text2); margin-bottom: 6px; }
-  #tasks-count { color: var(--accent); font-weight: 700; }
+  /* Reference drawer */
+  .drawer{position:fixed;top:0;right:0;height:100vh;width:380px;max-width:90vw;background:var(--bg2);border-left:1px solid var(--border);box-shadow:var(--shadow);transform:translateX(100%);transition:transform .25s;z-index:90;overflow-y:auto}
+  .drawer.open{transform:translateX(0)}
+  .drawer-head{padding:18px 20px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:var(--bg2)}
+  .drawer-head h3{font-size:15px}
+  .drawer-body{padding:18px 20px}
+  .ref-card{border-radius:10px;padding:14px;border:1px solid var(--border);margin-bottom:12px}
+  .ref-id{font-size:10px;font-weight:700;letter-spacing:1px;opacity:.7;text-transform:uppercase}
+  .ref-card h4{font-size:14px;margin:4px 0 6px}
+  .ref-card p{font-size:12px;color:var(--text2)}
+  .ref-tags{display:flex;gap:5px;flex-wrap:wrap;margin-top:8px}
+  .ref-tag{font-size:10px;padding:2px 7px;border-radius:10px;background:rgba(255,255,255,.07);color:var(--text2)}
+  .p1{background:linear-gradient(135deg,rgba(74,144,217,.12),rgba(74,144,217,.03));border-color:rgba(74,144,217,.3)}
+  .p2{background:linear-gradient(135deg,rgba(76,175,125,.12),rgba(76,175,125,.03));border-color:rgba(76,175,125,.3)}
+  .p3{background:linear-gradient(135deg,rgba(245,166,35,.12),rgba(245,166,35,.03));border-color:rgba(245,166,35,.3)}
+  .p4{background:linear-gradient(135deg,rgba(155,111,212,.12),rgba(155,111,212,.03));border-color:rgba(155,111,212,.3)}
+  .p5{background:linear-gradient(135deg,rgba(61,191,184,.12),rgba(61,191,184,.03));border-color:rgba(61,191,184,.3)}
+  .drawer-tabs{display:flex;gap:8px;margin-bottom:16px}
+  .drawer-tab{flex:1;background:var(--bg3);border:1px solid var(--border);color:var(--text2);padding:7px;border-radius:7px;font-size:12px}
+  .drawer-tab.active{border-color:var(--accent);color:var(--accent)}
 </style>
 </head>
 <body>
-<div class="app">
 
-  <!-- Sidebar -->
-  <nav class="sidebar">
-    <div class="logo">
-      <div class="logo-icon">☀️</div>
-      <h1>Content Director</h1>
-      <p>B2B Video Plan · 12 Wochen</p>
-    </div>
-    <div class="nav-item active" data-section="dashboard">
-      <span class="nav-icon">📊</span> Dashboard
-    </div>
-    <div class="nav-item" data-section="strategy">
-      <span class="nav-icon">🎯</span> Strategie
-      <span class="nav-badge">5</span>
-    </div>
-    <div class="nav-item" data-section="formats">
-      <span class="nav-icon">🎬</span> Formate
-      <span class="nav-badge">5</span>
-    </div>
-    <div class="nav-item" data-section="plan">
-      <span class="nav-icon">📅</span> Content Plan
-      <span class="nav-badge">36</span>
-    </div>
-    <div class="nav-item" data-section="production">
-      <span class="nav-icon">🎥</span> Produktion
-      <span class="nav-badge">8</span>
-    </div>
-    <div class="nav-item" data-section="timeline">
-      <span class="nav-icon">⏱</span> Timeline
-      <span class="nav-badge">36</span>
-    </div>
-    <div class="nav-item" data-section="tasks">
-      <span class="nav-icon">✅</span> Aufgaben
-    </div>
-  </nav>
-
-  <!-- Main -->
-  <main class="main">
-
-    <!-- Dashboard -->
-    <section class="section active" id="section-dashboard">
-      <div class="section-header">
-        <h2>Content Plan Dashboard</h2>
-        <p>Übersicht · SolarTech GmbH · B2B Photovoltaik-Installateur</p>
-      </div>
-      <div class="assumption-banner">
-        <strong>⚠ Hinweis:</strong> Kein Briefing-JSON wurde übergeben. Dieser Plan basiert auf einem realistischen B2B-Szenario: Gewerblicher Solaranlagen-Installateur (DE). Alle Annahmen sind intern gekennzeichnet.
-      </div>
-      <div class="grid-5">
-        <div class="stat"><div class="stat-val">12</div><div class="stat-label">Wochen</div></div>
-        <div class="stat"><div class="stat-val">36</div><div class="stat-label">Posts</div></div>
-        <div class="stat"><div class="stat-val">5</div><div class="stat-label">Säulen</div></div>
-        <div class="stat"><div class="stat-val">5</div><div class="stat-label">Formate</div></div>
-        <div class="stat"><div class="stat-val">3</div><div class="stat-label">Kundenstorys</div></div>
-      </div>
-      <div class="grid-2" style="margin-bottom:20px">
-        <div class="card">
-          <div style="font-size:12px;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px">Plattformen</div>
-          <div style="display:flex;gap:10px;flex-wrap:wrap">
-            <span class="tag" style="background:rgba(10,102,194,0.15);color:#5aacf0">LinkedIn</span>
-            <span class="tag" style="background:rgba(255,0,0,0.12);color:#f08080">YouTube</span>
-            <span class="tag" style="background:rgba(194,56,183,0.12);color:#d97de8">Instagram</span>
-          </div>
-          <div style="margin-top:14px;font-size:12px;color:var(--text2)">Posting-Rhythmus: <strong style="color:var(--text)">Mo / Mi / Fr</strong></div>
-          <div style="margin-top:6px;font-size:12px;color:var(--text2)">Kampagnenzeitraum: <strong style="color:var(--text)">Jul – Sep 2026</strong></div>
-        </div>
-        <div class="card">
-          <div style="font-size:12px;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px">Posts nach Säule</div>
-          <div id="pillar-breakdown"></div>
-        </div>
-      </div>
-      <div class="card">
-        <div style="font-size:12px;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:14px">12-Wochen Übersicht</div>
-        <div id="week-overview"></div>
-      </div>
-    </section>
-
-    <!-- Strategy -->
-    <section class="section" id="section-strategy">
-      <div class="section-header">
-        <h2>Content-Strategie</h2>
-        <p>5 Säulen · definiert nach Ziel, Nutzen und Content-Typ</p>
-      </div>
-      <div class="card" style="margin-bottom:20px">
-        <div style="font-size:13px;line-height:1.7" id="strategy-overview"></div>
-      </div>
-      <div class="grid-2" id="pillars-grid"></div>
-    </section>
-
-    <!-- Formats -->
-    <section class="section" id="section-formats">
-      <div class="section-header">
-        <h2>Format-System</h2>
-        <p>Wiederkehrende Formate für langfristige Content-Konsistenz</p>
-      </div>
-      <div class="grid-2" id="formats-grid"></div>
-    </section>
-
-    <!-- Content Plan -->
-    <section class="section" id="section-plan">
-      <div class="section-header">
-        <h2>Content Plan</h2>
-        <p>12 Wochen · 36 Posts · Mo/Mi/Fr</p>
-      </div>
-      <input class="search-box" id="plan-search" placeholder="Posts durchsuchen…" type="text">
-      <div class="filter-row" id="plan-filters">
-        <button class="filter-btn active" data-pillar="all">Alle Säulen</button>
-        <button class="filter-btn" data-pillar="P1">P1 Aufklärung</button>
-        <button class="filter-btn" data-pillar="P2">P2 Projekte</button>
-        <button class="filter-btn" data-pillar="P3">P3 BTS</button>
-        <button class="filter-btn" data-pillar="P4">P4 Kunden</button>
-        <button class="filter-btn" data-pillar="P5">P5 Branche</button>
-      </div>
-      <div class="week-nav" id="week-nav"></div>
-      <div class="week-theme" id="week-theme"></div>
-      <div id="posts-list"></div>
-    </section>
-
-    <!-- Production -->
-    <section class="section" id="section-production">
-      <div class="section-header">
-        <h2>Produktionsdetails</h2>
-        <p>Drehorte, Equipment, Aufwand und besondere Anforderungen</p>
-      </div>
-      <div id="production-list"></div>
-    </section>
-
-    <!-- Timeline -->
-    <section class="section" id="section-timeline">
-      <div class="section-header">
-        <h2>Produktions-Timeline</h2>
-        <p>Rückwärtsplanung: Konzept → Dreh → Schnitt → Review → Publish</p>
-      </div>
-      <div class="filter-row" id="timeline-week-filter"></div>
-      <div id="timeline-list"></div>
-    </section>
-
-    <!-- Tasks -->
-    <section class="section" id="section-tasks">
-      <div class="section-header">
-        <h2>Aufgaben & Engpässe</h2>
-        <p>Priorisierte Tasks — klicken zum Abhaken</p>
-      </div>
-      <div class="tasks-progress">
-        <p><span id="tasks-count">0 / 0</span> Aufgaben erledigt</p>
-        <div class="progress-bar"><div class="progress-fill" id="tasks-progress-fill" style="width:0%"></div></div>
-      </div>
-      <div id="tasks-list"></div>
-    </section>
-
-  </main>
+<div class="topbar">
+  <div class="brand">
+    <span class="brand-icon">☀️</span>
+    <div><h1>Content Kalender</h1><p>B2B Video Plan · SolarTech</p></div>
+  </div>
+  <div class="month-nav">
+    <button class="btn btn-icon" onclick="changeMonth(-1)">‹</button>
+    <div class="month-label" id="monthLabel"></div>
+    <button class="btn btn-icon" onclick="changeMonth(1)">›</button>
+    <button class="btn" onclick="goToday()">Heute</button>
+  </div>
+  <div class="spacer"></div>
+  <div class="toolbtns">
+    <button class="btn btn-primary" onclick="openNewEvent()">+ Neuer Termin</button>
+    <button class="btn" onclick="openDrawer()">📋 Strategie & Formate</button>
+    <button class="btn" onclick="exportData()">⬇ Export</button>
+    <button class="btn btn-danger" onclick="resetData()">↺ Zurücksetzen</button>
+  </div>
 </div>
 
+<div class="legend" id="legend"></div>
+
+<div class="infobar">
+  <span><b id="statTotal">0</b> Termine</span>
+  <span><b id="statTasks">0</b> Aufgaben gesamt</span>
+  <span><b id="statDone">0</b> erledigt</span>
+  <span style="color:var(--accent)">💡 Tag anklicken = neuer Termin · Termin anklicken = bearbeiten</span>
+</div>
+
+<div class="cal-wrap">
+  <div class="cal-grid" id="calHead"></div>
+  <div class="cal-grid" id="calGrid" style="margin-top:6px"></div>
+</div>
+
+<!-- Event modal -->
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="mh-color" id="mhColor"></div>
+      <h2 id="modalTitle">Termin</h2>
+      <button class="modal-close" onclick="closeModal()">×</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+    <div class="modal-foot">
+      <button class="btn btn-primary" onclick="saveEvent()">Speichern</button>
+      <button class="btn" onclick="closeModal()">Abbrechen</button>
+      <div class="spacer"></div>
+      <button class="btn btn-danger" id="deleteBtn" onclick="deleteEvent()">Löschen</button>
+    </div>
+  </div>
+</div>
+
+<!-- Reference drawer -->
+<div class="drawer" id="drawer">
+  <div class="drawer-head">
+    <h3>Referenz</h3>
+    <button class="modal-close" onclick="closeDrawer()">×</button>
+  </div>
+  <div class="drawer-body">
+    <div class="drawer-tabs">
+      <button class="drawer-tab active" onclick="switchDrawerTab('strategy',this)">5 Säulen</button>
+      <button class="drawer-tab" onclick="switchDrawerTab('formats',this)">5 Formate</button>
+    </div>
+    <div id="drawerContent"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
 <script>
-// ── DATA ──────────────────────────────────────────────────────────────────────
-const DATA = {"_meta":{"generated_by":"Claude Content Director","date":"2026-06-26","briefing_status":"ASSUMPTION – kein Briefing-JSON wurde übergeben. Alle Angaben basieren auf einem realistischen B2B-Szenario: gewerblicher Solaranlagen-Installateur (DE), Zielgruppe: Facility Manager, Betriebsleiter, CFOs mittelständischer Unternehmen.","company_assumed":"SolarTech GmbH – B2B Photovoltaik-Installateur","platforms":["LinkedIn","YouTube","Instagram"],"post_rhythm":"Mo / Mi / Fr","campaign_duration_weeks":12},"strategy":{"overview":"Positionierung als vertrauenswürdiger Experte für gewerbliche PV-Anlagen durch systematische Aufklärung, Beweis durch Projekte und Nähe durch Hinter-den-Kulissen-Einblicke.","pillars":[{"id":"P1","name":"Aufklärung & Bildung","goal":"Kaufbarrieren abbauen durch verständliche Erklärung komplexer Themen (ROI, Technik, Förderungen)","content_types":["Erklärvideo","Infografik-Reel","FAQ-Format"],"kpi":"Saves, Shares, Kommentare mit Fragen"},{"id":"P2","name":"Projekt-Dokumentation","goal":"Sozialer Beweis durch reale Projekte – vom Dach bis zur Inbetriebnahme","content_types":["Before/After","Timelapse","Projekt-Walkthrough"],"kpi":"Profilaufrufe, DMs, Anfragen"},{"id":"P3","name":"Hinter den Kulissen","goal":"Vertrauen durch Transparenz – Team, Prozesse, Qualitätsstandards zeigen","content_types":["Day-in-the-Life","Montageprozess","Werkstattblick"],"kpi":"Follower-Wachstum, Engagement-Rate"},{"id":"P4","name":"Kundenstimmen & Erfolge","goal":"Referenzmarketing – Kunden erzählen, was SolarTech ihnen gebracht hat","content_types":["Interview-Clip","Testimonial-Reel","ROI-Zahlen-Post"],"kpi":"Direktanfragen, Lead-Qualität"},{"id":"P5","name":"Branche & Zeitgeist","goal":"Relevanz durch Reaktion auf aktuelle Energiepolitik, Preise, Förderprogramme","content_types":["Newsjacking-Clip","Meinung zur Gesetzesänderung","Trendkommentar"],"kpi":"Reichweite, neue Follower, Teilen"}]},"formats":[{"id":"F1","name":"SolarKlar – Der Erklärer","day":"Montag","pillar":"P1","goal":"Ein komplexes Thema in unter 90 Sek. erklären","typical_content":"ROI-Rechnung, Amortisation, Wechselrichter-Funktion, Netzeinspeisung, EEG-Förderung","style":"Talking Head + Motion Graphics, ruhige Atmosphäre","length":"60–90 Sekunden"},{"id":"F2","name":"Projekt Live – Die Baustelle","day":"Mittwoch","pillar":"P2","goal":"Echte Projekte dokumentieren und als Beweis nutzen","typical_content":"Dachvermessung, Modullieferung, Montage, Inbetriebnahme, Kundengespräch","style":"Reportage-Stil, handheld, authentisch","length":"90–120 Sekunden"},{"id":"F3","name":"Team & Technik – Freitag BTS","day":"Freitag","pillar":"P3","goal":"Menschlichkeit und Kompetenz zeigen","typical_content":"Morgenroutine Monteur, Werkzeug-Erklärung, Sicherheitscheck, Teamvorstellung","style":"Dokumentarisch, entspannt, nahbar","length":"45–75 Sekunden"},{"id":"F4","name":"Kundenstory – Einmal pro Monat","day":"Mittwoch (Woche 4, 8, 12)","pillar":"P4","goal":"Testimonial als stärkstes Verkaufsargument positionieren","typical_content":"Kundeninterview vor Anlage, ROI-Zahlen eingeblendet, emotionaler Abschluss","style":"Interview-Format, professionell beleuchtet","length":"2–3 Minuten (YouTube full) + 60-Sek-Cut (LinkedIn/Instagram)"},{"id":"F5","name":"EnergyPulse – Branchenkommentar","day":"Flexibel (bei aktuellem Anlass)","pillar":"P5","goal":"Thought Leadership durch schnelle, kluge Einordnung","typical_content":"Neue Förderrichtlinie, Strompreisanstieg, Gesetzesänderung EEG","style":"Spontan, direkt in die Kamera, wenig Schnitt","length":"30–60 Sekunden"}],"content_plan":[{"week":1,"theme":"Kampagnenstart: Was kostet eine Solaranlage wirklich?","posts":[{"id":"W1-Mo","format":"F1","day":"Montag","title":"\"Was kostet eine Gewerbe-Solaranlage wirklich?\"","hook":"Die meisten Unternehmer denken: zu teuer. Hier sind die echten Zahlen.","idea":"Aufschlüsselung der Kosten einer 100-kWp-Anlage: Module, Wechselrichter, Montage, Genehmigung, Netzanschluss","variants":["Variante A: Kostenaufstellung als Infografik-Overlay im Video","Variante B: Geschäftsführer erklärt live an einer echten Kalkulation","Variante C: Split-Screen: Erwartung vs. Realität (gängige Mythen brechen)"],"goal":"Barriere brechen, erste Awareness schaffen","pillar":"P1","cta":"Frag uns nach deinem Angebot – Link in Bio"},{"id":"W1-Mi","format":"F2","day":"Mittwoch","title":"\"So läuft eine Dachmessung ab\"","hook":"Bevor wir auch nur ein Modul bestellen, passiert das hier.","idea":"Kamerateam begleitet Dachdecker bei der Vorvermessung eines Logistikzentrums. GPS-Messung, Statikcheck, Ausrichtungsanalyse.","variants":["Variante A: POV vom Techniker auf dem Dach","Variante B: Techniker erklärt am Laptop die 3D-Planung nach der Messung","Variante C: Zeitraffer der gesamten Messkampagne (ca. 3 Stunden auf 60 Sek.)"],"goal":"Professionalism zeigen, Prozess erklären","pillar":"P2","cta":"Kostenlose Dachanalyse anfragen"},{"id":"W1-Fr","format":"F3","day":"Freitag","title":"\"Das ist unser Montageteam\"","hook":"6 Leute. 5 Jahre Erfahrung. Jeden Tag auf einem anderen Dach.","idea":"Kurzvorstellung des Montageteams, jeder sagt in einem Satz, warum er den Job macht.","variants":["Variante A: Einzelportraits nacheinander geschnitten, Namen und Funktion eingeblendet","Variante B: Teamfoto auf Baustelle + Voice-Over des Teamleiters","Variante C: Wer-bin-ich-Quiz: Zuschauer raten die Spezialität jedes Mitglieds"],"goal":"Vertrauen und Sympathie aufbauen","pillar":"P3","cta":"Folgt uns für mehr Einblicke"}]},{"week":2,"theme":"ROI & Amortisation – die wichtigsten Zahlen","posts":[{"id":"W2-Mo","format":"F1","day":"Montag","title":"\"Wann amortisiert sich eine Gewerbe-PV-Anlage?\"","hook":"Unsere Kunden brauchen im Schnitt 6,3 Jahre. So rechnen wir das.","idea":"Schritt-für-Schritt ROI-Rechnung: Investition, Eigenverbrauchsquote, Strompreis, Einspeisevergütung, Steuereffekte","variants":["Variante A: Whiteboard-Erklärung mit echten Zahlen eines anonymisierten Projekts","Variante B: Interaktives Rechenbeispiel – Zuschauer-Betrieb als fiktiver Case","Variante C: Grafik-Overlay: Wie verändert sich die Amortisationszeit bei steigendem Strompreis?"],"goal":"Kaufentscheidung datenbasiert erleichtern","pillar":"P1","cta":"Eigene Amortisationsrechnung anfordern"},{"id":"W2-Mi","format":"F2","day":"Mittwoch","title":"\"Tag 1 der Montage – was wirklich passiert\"","hook":"Um 6:30 Uhr. Das Dach ist frei. Die Arbeit beginnt.","idea":"Erster Montage-Tag auf Baustelle: Sicherheitssystem, erste Schienen, erste Module – authentischer Reportage-Stil","variants":["Variante A: Chronologischer Tagesablauf 6:30–17:00 Uhr als 90-Sek-Cut","Variante B: Techniker kommentiert jeden Arbeitsschritt direkt in die Kamera","Variante C: Drohnenaufnahme Beginn vs. Drohne Ende des Tages – Fortschritt sichtbar machen"],"goal":"Qualität und Zuverlässigkeit beweisen","pillar":"P2","cta":"Projekt anfragen – wir planen kostenlos"},{"id":"W2-Fr","format":"F3","day":"Freitag","title":"\"Das Equipment unserer Monteure\"","hook":"Ohne dieses Werkzeug würden wir niemals auf ein Firmendach steigen.","idea":"Techniker öffnet seinen Werkzeugkoffer und erklärt jedes wichtige Teil: Sicherheitsgeschirr, Torqueschlüssel, Kabelziehwerkzeug, Messgerät","variants":["Variante A: Flat Lay der Tools + kurze Erklärung jedes Geräts","Variante B: \"Darf ich das anfassen?\"-Format: Azubi hält Tools, Meister erklärt","Variante C: Before/After: So sah der Koffer vor 5 Jahren aus vs. heute"],"goal":"Fachkompetenz zeigen, Qualitätsversprechen untermauern","pillar":"P3","cta":"Jetzt Kontakt aufnehmen"}]},{"week":3,"theme":"Förderungen & Finanzierung","posts":[{"id":"W3-Mo","format":"F1","day":"Montag","title":"\"Diese Förderungen kennen die meisten Unternehmer nicht\"","hook":"KfW, BAFA, EEG – drei Abkürzungen, die deine Investition deutlich günstiger machen.","idea":"Überblick über aktuell relevante Förderprogramme: KfW 270, direkte Zuschüsse der Bundesländer, steuerliche Absetzbarkeit","variants":["Variante A: Tabelle der Top-3-Förderungen mit Konditionen, live erklärt","Variante B: Fiktives Unternehmen rechnet vor, wie viel Förderung es bekäme","Variante C: Interview mit Steuerberater-Partner zum Thema steuerliche Vorteile"],"goal":"Kaufbarriere Finanzierung auflösen","pillar":"P1","cta":"Wir helfen beim Förderantrag – kostenlos"},{"id":"W3-Mi","format":"F2","day":"Mittwoch","title":"\"Inbetriebnahme: Der Moment, auf den wir hinarbeiten\"","hook":"Nach 4 Tagen Montage. Der Schalter wird umgelegt.","idea":"Inbetriebnahme einer 150-kWp-Anlage auf einem Produktionsbetrieb: letzter Kabelanschluss, Übergabe-Checkliste, erster Ertragswert auf dem Monitoring-Display","variants":["Variante A: Slow-Motion-Clip beim Einschalten + Reaktion des Kunden","Variante B: Techniker erklärt Monitoring-App live am Tablet","Variante C: Zeitraffer: 0% zu 100% Systemcheck in 60 Sekunden"],"goal":"Emotionalen Höhepunkt zeigen, Kundenbeziehung demonstrieren","pillar":"P2","cta":"Eigenes Projekt starten"},{"id":"W3-Fr","format":"F3","day":"Freitag","title":"\"Sicherheit zuerst – unser Protokoll vor jedem Dachstieg\"","hook":"Wir steigen nicht aufs Dach, ohne das hier gecheckt zu haben.","idea":"Sicherheits-Briefing vor Montagebeginn: PSA-Check, Wetterprotokoll, Kommunikationskette, Notfallplan","variants":["Variante A: Checkliste wird abgehakt, jeder Punkt kurz erklärt","Variante B: Teamleiter erklärt, was passiert, wenn ein Punkt nicht erfüllt ist","Variante C: Versicherungsperspektive – warum Protokoll auch für den Kunden wichtig ist"],"goal":"Professionalität und Verantwortungsbewusstsein zeigen","pillar":"P3","cta":"Anfragen – wir arbeiten nach höchsten Standards"}]},{"week":4,"theme":"Kundenstory #1 + Technik-Deep-Dive","posts":[{"id":"W4-Mo","format":"F1","day":"Montag","title":"\"Wechselrichter: Das Herz deiner Anlage\"","hook":"Ohne dieses Gerät ist eine Solaranlage nutzlos. So funktioniert es.","idea":"Erklärung Wechselrichter-Funktion: DC → AC, MPP-Tracker, Monitoring-Interface, Dimensionierung nach Anlagengröße","variants":["Variante A: Animation zeigt Energiefluss, Techniker erklärt im Voice-Over","Variante B: Live-Demontage eines Wechselrichters in der Werkstatt","Variante C: Vergleich: String-WR vs. Mikro-WR – wann was sinnvoll ist"],"goal":"Fachkompetenz demonstrieren, Entscheider informieren","pillar":"P1","cta":"Fachberatung anfragen"},{"id":"W4-Mi","format":"F4","day":"Mittwoch","title":"\"Kundenstory: Metzgerei Gruber – 40% weniger Stromkosten\"","hook":"Familie Gruber hat gezweifelt. Heute würden sie es sofort wieder machen.","idea":"Interview mit Inhaber der Metzgerei Gruber (100kWp-Anlage, 18 Monate in Betrieb). Echte Zahlen: vorher/nachher Stromkosten, Amortisationsziel, Zufriedenheit.","variants":["Variante A: Interview vor der Anlage auf dem Dach der Metzgerei","Variante B: Split-Screen: Stromrechnung alt vs. neu + Interviewausschnitte","Variante C: 3-Minuten-Doku für YouTube + 60-Sek-Cut für LinkedIn"],"goal":"Stärkstes Vertrauenssignal: echter Kunde, echte Zahlen","pillar":"P4","cta":"Kontakt aufnehmen – Referenzprojekte besichtigen"},{"id":"W4-Fr","format":"F3","day":"Freitag","title":"\"Ein Freitag auf der Baustelle – ungeskriptet\"","hook":"Was passiert, wenn wir die Kamera einfach mitlaufen lassen?","idea":"Ungeplanter Tagesbegleiter auf aktiver Baustelle – ungeskriptet, authentisch, mit kleinen Problemen und ihrer Lösung","variants":["Variante A: Handheld-Vlog-Stil, Monteur kommentiert","Variante B: GoPro-Perspektive vom Dach den ganzen Tag","Variante C: \"Was ist heute schiefgelaufen?\" – ehrliche Reflexion am Abend"],"goal":"Authentizität und Menschlichkeit zeigen","pillar":"P3","cta":"Folgt uns für mehr"}]},{"week":5,"theme":"Planungsphase & Genehmigungen","posts":[{"id":"W5-Mo","format":"F1","day":"Montag","title":"\"Von der Idee bis zum Baubeginn: Die 5 Schritte\"","hook":"Die meisten Unternehmer wissen nicht, wie viel vor dem ersten Modul passiert.","idea":"Prozessübersicht: Erstgespräch → Dachanalyse → Planung → Genehmigung → Montage. Timeline typisch 6–12 Wochen.","variants":["Variante A: Infografik-Animation der 5 Schritte, live erklärt","Variante B: Projektleiterin erklärt jede Phase anhand eines echten Projekts","Variante C: \"Was dauert am längsten?\" – Netzanschluss als oft unterschätzter Faktor"],"goal":"Erwartungsmanagement, Vertrauen aufbauen","pillar":"P1","cta":"Erstgespräch vereinbaren"},{"id":"W5-Mi","format":"F2","day":"Mittwoch","title":"\"Drohnenplanung: So entsteht der Lageplan\"","hook":"Bevor wir planen, fliegen wir.","idea":"Drohnenbefliegung eines Betriebs-Dachs: Aufmaß, 3D-Modell, Verschattungsanalyse, Ertragsprognose – alles in 90 Sekunden","variants":["Variante A: Drohnenflug-Footage + Overlay der Planungssoftware-Ansicht","Variante B: Zeitraffer: Drohne fliegt, am Laptop entsteht in Echtzeit der Plan","Variante C: \"Was sehen wir, was ihr nicht seht\" – Techniker erklärt versteckte Planergebnisse"],"goal":"Technologie und Sorgfalt demonstrieren","pillar":"P2","cta":"Kostenlose Drohnenanalyse anfragen"},{"id":"W5-Fr","format":"F3","day":"Freitag","title":"\"Ausbildung bei SolarTech – so werden unsere Techniker\"","hook":"Wir bilden selbst aus. Das ist unser Qualitätsstandard.","idea":"Einblick in die Ausbildung: Azubi-Vorstellung, Lernphasen, erste Montage mit Mentor","variants":["Variante A: Azubi erzählt, warum er diesen Beruf gewählt hat","Variante B: Meister erklärt, was gute Azubis von schlechten unterscheidet","Variante C: \"Erster Tag auf dem Dach\" – Erinnerung des ältesten Technikers"],"goal":"Employer Branding + Kompetenzversprechen","pillar":"P3","cta":"Wir suchen Azubis und Fachkräfte – Info im Profil"}]},{"week":6,"theme":"Energiespeicher & Eigenverbrauch","posts":[{"id":"W6-Mo","format":"F1","day":"Montag","title":"\"Brauche ich einen Batteriespeicher?\"","hook":"Kurze Antwort: kommt drauf an. Lange Antwort: dieser Post.","idea":"Entscheidungsbaum: Wann lohnt sich Speicher für Gewerbe? Eigenverbrauchsquote ohne Speicher vs. mit, Lastprofile, Wirtschaftlichkeit","variants":["Variante A: Geschäftsführer erklärt an echter Lastgangkurve","Variante B: Animation des Energieflusses: PV → Betrieb → Speicher → Netz","Variante C: \"3 Typen von Betrieben – wer braucht Speicher, wer nicht\""],"goal":"Beratungskompetenz zeigen, Vertrauen durch Ehrlichkeit","pillar":"P1","cta":"Lastprofil-Analyse anfragen"},{"id":"W6-Mi","format":"F2","day":"Mittwoch","title":"\"Großspeicher-Montage: 200 kWh in 2 Tagen\"","hook":"Das ist kein Heimspeicher. Das ist industrielle Energieinfrastruktur.","idea":"Dokumentation der Installation eines 200-kWh-Gewerbe-Batteriespeichers: Aufstellungsplan, Verkabelung, BMS-Konfiguration, Abnahme","variants":["Variante A: Zeitraffer der 2-tägigen Montage auf 90 Sek. komprimiert","Variante B: Techniker erklärt BMS (Battery Management System) live am Gerät","Variante C: Vorher/Nachher der Energieeffizienz mit echten Monitoring-Daten"],"goal":"Referenzprojekt dokumentieren, Premiumkunden ansprechen","pillar":"P2","cta":"Speicherlösung anfragen"},{"id":"W6-Fr","format":"F3","day":"Freitag","title":"\"Unser Büro läuft auch solar – hier ist der Beweis\"","hook":"Wir predigen nicht nur – wir leben es.","idea":"Rundgang durch das eigene Büro/Betrieb mit Solaranlage: Monitoring-Dashboard live, Eigenverbrauchsquote heute, Reflexion nach 2 Jahren","variants":["Variante A: Geschäftsführer zeigt Monitoring-App live auf dem Smartphone","Variante B: \"Was haben wir nach 2 Jahren gelernt?\" – ehrlicher Rückblick","Variante C: Live-Vergleich: Ertrag heute vs. gleicher Tag im Vorjahr"],"goal":"Glaubwürdigkeit durch gelebte Überzeugung","pillar":"P3","cta":"Folgt uns – wir teilen alles"}]},{"week":7,"theme":"Wartung & Betrieb","posts":[{"id":"W7-Mo","format":"F1","day":"Montag","title":"\"Was passiert, wenn eine Solaranlage ausfällt?\"","hook":"Spoiler: meistens nichts Dramatisches. Aber ihr solltet das wissen.","idea":"Häufigste Fehlerquellen: Wechselrichter-Alarm, verschmutzte Module, Schatten durch Neubau, Kabeldefekt. Was bedeutet das für den Ertrag?","variants":["Variante A: Live-Demo im Monitoring-System: Fehlercode lesen und deuten","Variante B: \"Die 3 häufigsten Serviceanrufe\" – Techniker erzählt","Variante C: Vergleich: Anlage mit Wartungsvertrag vs. ohne – Ertragsunterschied"],"goal":"After-Sales-Vertrauen und Wartungsvertrag-Lead","pillar":"P1","cta":"Wartungsvertrag anfragen"},{"id":"W7-Mi","format":"F2","day":"Mittwoch","title":"\"Jahresinspektion: So checken wir 500 Module in 4 Stunden\"","hook":"Einmal pro Jahr. Systematisch. Mit Thermokamera.","idea":"Wartungseinsatz dokumentieren: Thermografie-Kamera findet Hotspots, Reinigung, elektrische Messung, Bericht-Erstellung","variants":["Variante A: Thermografie-Aufnahmen live erklären – was sehen wir?","Variante B: Zeitraffer: Komplette Inspektion von Anfang bis Wartungsbericht","Variante C: \"Dieses Modul hätte ohne Prüfung Feuer gefangen\" – echter Fall anonymisiert"],"goal":"Wartungsvertrag-Abschlüsse generieren","pillar":"P2","cta":"Wartungsinspektion buchen"},{"id":"W7-Fr","format":"F3","day":"Freitag","title":"\"So sieht unser Lager aus – 3.000 Module auf Abruf\"","hook":"Lieferzeit ist das größte Problem der Branche. Unsere Antwort darauf.","idea":"Lager-Tour: Modulbestand, Wechselrichter-Typen, Kabelware, Logistikprozess. Warum Lager = Kundenvorteil.","variants":["Variante A: Lagerleiter gibt Führung mit Erklärung jeder Zone","Variante B: \"Von Lager bis Dach in 72 Stunden\" – Prozess erklärt","Variante C: Lieferkettenproblem 2022 vs. heute – was hat sich verändert?"],"goal":"Lieferfähigkeit als Differenzierungsmerkmal","pillar":"P3","cta":"Angebot einholen – schnelle Lieferung inklusive"}]},{"week":8,"theme":"Kundenstory #2 + Dachtypen","posts":[{"id":"W8-Mo","format":"F1","day":"Montag","title":"\"Flachdach vs. Schrägdach – was ist besser für PV?\"","hook":"Beide funktionieren. Aber nicht auf die gleiche Art.","idea":"Technischer Vergleich: Aufständerung Flachdach, Winkeloptimierung, Reinigungsaufwand, Statikanforderungen, Ertrag pro qm","variants":["Variante A: Animation zeigt beide Dachtypen mit Einstrahlungswinkel","Variante B: Techniker erklärt an echtem Flachdachprojekt die Besonderheiten","Variante C: \"Was war das schwierigste Dach, das ihr je hattet?\" – Teamrunde"],"goal":"Breite Zielgruppe ansprechen, alle Dachtypen abdecken","pillar":"P1","cta":"Dach analysieren lassen"},{"id":"W8-Mi","format":"F4","day":"Mittwoch","title":"\"Kundenstory: Autohaus Schmitt – 60 kWp auf dem Showroom\"","hook":"Ein Autohaus, das zeigt, dass Nachhaltigkeit und Geschäft zusammenpassen.","idea":"Interview mit Geschäftsführer des Autohauses: Motivation, Ablauf, erste Erfahrungen nach 6 Monaten. Besonderheit: E-Auto-Ladeinfrastruktur kombiniert.","variants":["Variante A: Interview vor Showroom mit PV-Dach im Hintergrund","Variante B: Walkthrough mit Kunde: Module auf Dach + Ladeinfrastruktur unten erklärt","Variante C: \"Was haben Ihre Kunden gesagt?\" – Außenwahrnehmung als Thema"],"goal":"Referenz für Gewerbeimmobilien mit Kombilösungen","pillar":"P4","cta":"Kombilösung PV + E-Mobilität anfragen"},{"id":"W8-Fr","format":"F3","day":"Freitag","title":"\"So feiern wir Projektabschlüsse\"","hook":"300 Projekte in 5 Jahren. Jedes einzelne hat gezählt.","idea":"Meilenstein-Post: 300. Projekt abgeschlossen. Team-Foto, kurze Reflexion, Dank an Kunden und Team.","variants":["Variante A: Slideshow der schönsten Projektfotos mit Texten","Variante B: Jedes Teammitglied sagt seinen Lieblingsprojekt-Moment","Variante C: \"Was hat uns das 300. Projekt gelehrt?\" – Geschäftsführer reflektiert"],"goal":"Community building, Stolz und Zugehörigkeit","pillar":"P3","cta":"Wir suchen Projekt Nr. 301 – anfragen"}]},{"week":9,"theme":"Nachhaltigkeit & Unternehmensverantwortung","posts":[{"id":"W9-Mo","format":"F1","day":"Montag","title":"\"CO₂-Bilanz einer Gewerbe-Solaranlage – die echten Zahlen\"","hook":"Wie viel CO₂ spart eine 100-kWp-Anlage wirklich? Wir rechnen es durch.","idea":"CO₂-Äquivalente: Tonnen pro Jahr, Vergleich Autofahrten, Flüge, Rindersteaks. Amortisationszeit der Herstellungs-CO₂.","variants":["Variante A: Infografik-Overlay mit konkreten Vergleichszahlen","Variante B: \"Ihr Nachhaltigkeitsbericht schreibt sich fast von selbst\" – ESG-Kontext","Variante C: CO₂ als Finanzargument: EU-Taxonomie, Bankkredite, Lieferantenaudits"],"goal":"ESG-Argument für B2B-Entscheider schärfen","pillar":"P1","cta":"CO₂-Bilanz für Ihr Unternehmen berechnen"},{"id":"W9-Mi","format":"F2","day":"Mittwoch","title":"\"Solarpark-Montage: 500 kWp auf einem Logistikzentrum\"","hook":"Das größte Projekt unserer Geschichte. Hier ist die Dokumentation.","idea":"Großprojekt-Dokumentation: 4-Wochen-Montage auf 10.000 qm Dach, 1.200 Module, 3 Wechselrichter, Erdungsanlage, komplexe Statik","variants":["Variante A: 4-Wochen-Zeitraffer in 90 Sekunden","Variante B: Projektleiter zieht Bilanz: Was lief gut, was war schwierig?","Variante C: Drohnen-Abschlussflug über fertiger Anlage"],"goal":"Großkunden-Referenz, Kompetenz bei Großprojekten zeigen","pillar":"P2","cta":"Großprojekt anfragen"},{"id":"W9-Fr","format":"F3","day":"Freitag","title":"\"Unsere eigene Nachhaltigkeitsbilanz 2025\"","hook":"Wir verkaufen Nachhaltigkeit – aber wie nachhaltig sind wir selbst?","idea":"Transparenz-Post: CO₂-Fußabdruck der Firma, Firmenfahrzeuge, Büroenergie, Modulentsorgung, soziales Engagement","variants":["Variante A: Jahresbericht-Highlights als kurzes Video","Variante B: Geschäftsführer bewertet Fortschritte und benennt Schwachstellen ehrlich","Variante C: Mitarbeiter berichten, was sie persönlich für Nachhaltigkeit tun"],"goal":"Glaubwürdigkeit durch Transparenz, Employer Branding","pillar":"P3","cta":"Werte teilen? Dann folgt uns."}]},{"week":10,"theme":"Markt & Zukunft der Solarenergie","posts":[{"id":"W10-Mo","format":"F1","day":"Montag","title":"\"Wohin entwickeln sich Solarmodulpreise 2026?\"","hook":"Die Preise sind gefallen. Aber wie tief gehen sie noch – und was bedeutet das für Sie?","idea":"Marktanalyse: Preisverfall der letzten 10 Jahre, aktuelle Chinesische Überproduktion, Auswirkung auf Investitionstiming","variants":["Variante A: Kurvendiagramm erklärt + Empfehlung: jetzt oder warten?","Variante B: \"3 Szenarien für 2026\" – Experte spekuliert offen","Variante C: Kundenveranstaltungs-Zusammenfassung: Was Unternehmer bewegt"],"goal":"Thought Leadership, Investitionsentscheidung beschleunigen","pillar":"P5","cta":"Aktuelles Angebot einholen – Preise jetzt sichern"},{"id":"W10-Mi","format":"F2","day":"Mittwoch","title":"\"Agri-PV: Wenn Landwirtschaft und Solar verschmelzen\"","hook":"Das nächste große Ding – und wir sind dabei.","idea":"Dokumentation eines Agri-PV-Pilotprojekts: Module über Beeten, Doppelnutzung der Fläche, Messungen Pflanzenwachstum vs. konventionell","variants":["Variante A: Drohnenaufnahme Agri-PV-Anlage + Erläuterung","Variante B: Landwirt erklärt, warum er mitgemacht hat","Variante C: Wissenschaftler erklärt erste Messergebnisse"],"goal":"Innovationsimage aufbauen, neue Kundengruppe ansprechen","pillar":"P2","cta":"Agri-PV-Potenzial prüfen lassen"},{"id":"W10-Fr","format":"F5","day":"Freitag","title":"\"Was bedeutet die neue Solarstrategie der EU für Ihr Unternehmen?\"","hook":"Brüssel hat entschieden. Was das für deutsche Betriebe bedeutet.","idea":"Schnellkommentar zur aktuellen EU-Energiepolitik: neue Ausschreibungsregeln, geplante Netzausbau-Beschleunigung, Auswirkung auf Genehmigungszeiten","variants":["Variante A: Geschäftsführer kommentiert spontan nach Pressemitteilung","Variante B: \"Was bedeutet das in der Praxis?\" – 3 konkrete Punkte","Variante C: Branchenverband-Zitat als Aufhänger für eigene Einordnung"],"goal":"Schnelle Reaktion auf News = Reichweite und Vertrauen","pillar":"P5","cta":"Für Updates folgen"}]},{"week":11,"theme":"Vertiefung: Netzanschluss & Bürokratie","posts":[{"id":"W11-Mo","format":"F1","day":"Montag","title":"\"Der Netzanschluss: Warum er 6 Monate dauern kann\"","hook":"Das größte Problem bei der Solarplanung ist nicht das Dach. Es ist das Amt.","idea":"Detailblick Netzanschluss: Antragstellung beim Netzbetreiber, Wartezeiten, technische Anforderungen, was man selbst beschleunigen kann","variants":["Variante A: Projektleiterin erklärt Schritt für Schritt den Antragsprozess","Variante B: \"Unser schlimmstes Bürokratie-Erlebnis\" – ehrliche Anekdote","Variante C: Infografik: Durchschnittliche Wartezeiten nach Netzbetreiber-Region"],"goal":"Glaubwürdigkeit durch ehrliche Einschätzung, Vertrauen stärken","pillar":"P1","cta":"Wir übernehmen die Genehmigung für Sie"},{"id":"W11-Mi","format":"F2","day":"Mittwoch","title":"\"Übergabe: Das letzte Gespräch auf der Baustelle\"","hook":"Jedes Projekt endet mit diesem Moment. Und der sagt alles.","idea":"Dokumentation der Übergabe-Besprechung: Techniker erklärt dem Kunden das Monitoring, übergibt Dokumentationsmappe, Handschlag-Moment","variants":["Variante A: Authentischer Übergabe-Clip ohne Skript","Variante B: Kunde erzählt im Interview, wie der Prozess war","Variante C: \"Was jetzt noch passiert\" – After-Sales-Prozess erklärt"],"goal":"Kundenzufriedenheit beweisen, Serviceversprechen zeigen","pillar":"P2","cta":"So arbeiten wir – Erstgespräch anfragen"},{"id":"W11-Fr","format":"F3","day":"Freitag","title":"\"11 Wochen, 11 Posts, 11 Dinge die wir gelernt haben\"","hook":"Wir machen das jetzt 11 Wochen. Was hat funktioniert, was nicht?","idea":"Meta-Reflexion über die Content-Kampagne: Transparenter Einblick in die Social-Media-Strategie, was die Community bewegt hat, echte Zahlen","variants":["Variante A: Geschäftsführer zieht persönliches Fazit","Variante B: Community-Fragen wurden gestellt – Antworten kommen jetzt","Variante C: \"Was werden wir im nächsten Quartal anders machen?\""],"goal":"Community-Bindung, Transparenz, Vorschau","pillar":"P3","cta":"Bleibt dabei – nächste Phase kommt"}]},{"week":12,"theme":"Finale: Kundenstory #3 + Kampagnenabschluss","posts":[{"id":"W12-Mo","format":"F1","day":"Montag","title":"\"12 Wochen Solar-Content: Was wir Ihnen sagen wollten\"","hook":"Wenn Sie nur einen Post aus dieser Kampagne mitnehmen, dann diesen.","idea":"Synthese aller Themen: Warum jetzt der richtige Zeitpunkt für gewerbliche PV ist. Die 3 wichtigsten Argumente, die wirklich zählen.","variants":["Variante A: Geschäftsführer hält bewegenden Abschluss-Monolog","Variante B: Schnitt aller wichtigsten Clips aus 12 Wochen","Variante C: \"3 Sätze, die alles zusammenfassen\" – prägnant und mutig"],"goal":"Kampagnen-Abschluss, Conversion-Push","pillar":"P1","cta":"Letzter Aufruf: Jetzt Projekt anfragen"},{"id":"W12-Mi","format":"F4","day":"Mittwoch","title":"\"Kundenstory: Brauerei Hoffmann – Solar als Markenversprechen\"","hook":"Bier brauen mit Solarstrom. Die Hoffmanns machen es vor.","idea":"Interview mit der Inhaberfamilie der Traditionsbrauerei: 200 kWp auf historischem Gebäude, Herausforderungen Denkmalschutz, Stolz auf Nachhaltigkeit als Marketingargument","variants":["Variante A: Interview vor Brauerei-Gebäude mit Anlage sichtbar","Variante B: Prozess: Bier brauen mit Solarstrom – emotionale Verknüpfung","Variante C: \"Unsere Kunden fragen jetzt immer, ob wir solar sind\" – Markeneffekt"],"goal":"Abschluss-Testimonial mit emotionalem Storytelling","pillar":"P4","cta":"Ihre Erfolgsgeschichte anfragen"},{"id":"W12-Fr","format":"F3","day":"Freitag","title":"\"Danke – und was als nächstes kommt\"","hook":"12 Wochen. 36 Posts. Eine Community.","idea":"Aufrichtiger Dank an Follower und Kunden, Ankündigung nächste Content-Phase, Einladung zum persönlichen Gespräch","variants":["Variante A: Persönliches Video des Geschäftsführers, aufgenommen zu Hause","Variante B: Team-Video: Alle bedanken sich kurz","Variante C: \"Was wünscht ihr euch für das nächste Quartal?\" – Community-Frage"],"goal":"Beziehung stärken, Community-Loyalität sichern","pillar":"P3","cta":"Folgt uns weiter – die Reise geht weiter"}]}],"production":[{"post_id":"W1-Mo","location":"Büro/Konferenzraum SolarTech – Whiteboard oder Monitor als Hintergrund","equipment":["Sony A7 IV oder ähnlich","50mm Objektiv","2x Softbox LED-Panel","Rode Wireless GO II Mikrofon","Laptop mit Kalkulations-Mockup"],"effort_hours":3,"team_size":2,"notes":"Infografik-Overlays müssen vorab in After Effects oder CapCut erstellt werden"},{"post_id":"W1-Mi","location":"Aktive Baustelle – Logistikzentrum oder ähnliches Gewerbe-Dach","equipment":["Sony A7 IV","24-70mm Zoom","GoPro Hero 12 als B-Cam auf Helm","DJI Mini 4 Pro Drohne","Sicherheitsgeschirr für Kameraoperator"],"effort_hours":5,"team_size":3,"notes":"Sicherheitseinweisung vor Drehbeginn; Drohne braucht NOTAM-Freigabe falls in Kontrollzone"},{"post_id":"W1-Fr","location":"Firmenparkplatz oder Baustelle – Team steht zusammen","equipment":["Sony A7 IV","35mm Objektiv","1x LED-Panel als Aufheller","Rode Wireless GO II"],"effort_hours":2,"team_size":2,"notes":"Termine mit allen 6 Teammitgliedern koordinieren – Freitag 16:00 Uhr nach Bau ideal"},{"post_id":"W4-Mi","location":"Metzgerei Gruber – Kundenstandort mit Anlage auf dem Dach","equipment":["Sony A7 IV","24-70mm + 85mm Portrait-Optik","2x LED-Panel für Interview","Rode Wireless GO II","DJI Mini 4 für Luftaufnahme der Anlage"],"effort_hours":6,"team_size":3,"notes":"Einverständniserklärung Kunde vorab einholen; Backup-Dreh planen falls Wetter schlecht"},{"post_id":"W7-Mi","location":"Wartungsobjekt – Bestandsanlage, Flachdach bevorzugt","equipment":["Flir-Thermografiekamera (Leihgerät möglich)","Sony A7 IV","Drohne mit Thermalaufsatz","Messkoffer Techniker"],"effort_hours":8,"team_size":3,"notes":"Thermografie bei bewölktem Himmel oder morgens für beste Kontraste; Thermalkamera ggf. mieten ~150€/Tag"},{"post_id":"W8-Mi","location":"Autohaus Schmitt – Showroom mit Dachanlage","equipment":["Sony A7 IV","24-70mm + 85mm","2x LED-Panel","DJI Mini 4","Rode Wireless GO II"],"effort_hours":5,"team_size":3,"notes":"Sonntagsdrehs können schöne leere Parkplatz-Shots liefern; E-Auto-Ladesäule unbedingt ins Bild"},{"post_id":"W9-Mi","location":"Logistikzentrum – Großanlagen-Baustelle","equipment":["Sony A7 IV","DJI Mini 4 Pro","Zeitraffer-Rig (Intervalometer)","GoPro für BTS"],"effort_hours":40,"team_size":2,"notes":"ASSUMPTION: Großprojekt muss vorab identifiziert sein; Zeitraffer über 4 Wochen muss Kamera-Setup auf Dach bedeuten"},{"post_id":"W12-Mi","location":"Brauerei Hoffmann – historisches Brauereigebäude","equipment":["Sony A7 IV","24-70mm + 85mm","2x LED-Panel","DJI Mini 4","Rode Wireless GO II"],"effort_hours":6,"team_size":3,"notes":"Denkmalschutz-Fassade bietet visuell starkes Setting; Brauerei-Prozess als B-Roll nutzen"}],"timeline":[{"post_id":"W1-Mo","publish_date":"2026-07-06","milestones":{"concept":"2026-06-22","shoot":"2026-06-26","edit":"2026-06-29","review":"2026-07-03"}},{"post_id":"W1-Mi","publish_date":"2026-07-08","milestones":{"concept":"2026-06-24","shoot":"2026-06-28","edit":"2026-07-01","review":"2026-07-05"}},{"post_id":"W1-Fr","publish_date":"2026-07-10","milestones":{"concept":"2026-06-26","shoot":"2026-06-30","edit":"2026-07-03","review":"2026-07-07"}},{"post_id":"W2-Mo","publish_date":"2026-07-13","milestones":{"concept":"2026-06-29","shoot":"2026-07-03","edit":"2026-07-06","review":"2026-07-10"}},{"post_id":"W2-Mi","publish_date":"2026-07-15","milestones":{"concept":"2026-07-01","shoot":"2026-07-05","edit":"2026-07-08","review":"2026-07-12"}},{"post_id":"W2-Fr","publish_date":"2026-07-17","milestones":{"concept":"2026-07-03","shoot":"2026-07-07","edit":"2026-07-10","review":"2026-07-14"}},{"post_id":"W3-Mo","publish_date":"2026-07-20","milestones":{"concept":"2026-07-06","shoot":"2026-07-10","edit":"2026-07-13","review":"2026-07-17"}},{"post_id":"W3-Mi","publish_date":"2026-07-22","milestones":{"concept":"2026-07-08","shoot":"2026-07-12","edit":"2026-07-15","review":"2026-07-19"}},{"post_id":"W3-Fr","publish_date":"2026-07-24","milestones":{"concept":"2026-07-10","shoot":"2026-07-14","edit":"2026-07-17","review":"2026-07-21"}},{"post_id":"W4-Mo","publish_date":"2026-07-27","milestones":{"concept":"2026-07-13","shoot":"2026-07-17","edit":"2026-07-20","review":"2026-07-24"}},{"post_id":"W4-Mi","publish_date":"2026-07-29","milestones":{"concept":"2026-07-06","shoot":"2026-07-13","edit":"2026-07-20","review":"2026-07-26"}},{"post_id":"W4-Fr","publish_date":"2026-07-31","milestones":{"concept":"2026-07-17","shoot":"2026-07-21","edit":"2026-07-24","review":"2026-07-28"}},{"post_id":"W5-Mo","publish_date":"2026-08-03","milestones":{"concept":"2026-07-20","shoot":"2026-07-24","edit":"2026-07-27","review":"2026-07-31"}},{"post_id":"W5-Mi","publish_date":"2026-08-05","milestones":{"concept":"2026-07-22","shoot":"2026-07-26","edit":"2026-07-29","review":"2026-08-02"}},{"post_id":"W5-Fr","publish_date":"2026-08-07","milestones":{"concept":"2026-07-24","shoot":"2026-07-28","edit":"2026-07-31","review":"2026-08-04"}},{"post_id":"W6-Mo","publish_date":"2026-08-10","milestones":{"concept":"2026-07-27","shoot":"2026-07-31","edit":"2026-08-03","review":"2026-08-07"}},{"post_id":"W6-Mi","publish_date":"2026-08-12","milestones":{"concept":"2026-07-29","shoot":"2026-08-02","edit":"2026-08-05","review":"2026-08-09"}},{"post_id":"W6-Fr","publish_date":"2026-08-14","milestones":{"concept":"2026-07-31","shoot":"2026-08-04","edit":"2026-08-07","review":"2026-08-11"}},{"post_id":"W7-Mo","publish_date":"2026-08-17","milestones":{"concept":"2026-08-03","shoot":"2026-08-07","edit":"2026-08-10","review":"2026-08-14"}},{"post_id":"W7-Mi","publish_date":"2026-08-19","milestones":{"concept":"2026-08-03","shoot":"2026-08-07","edit":"2026-08-12","review":"2026-08-16"}},{"post_id":"W7-Fr","publish_date":"2026-08-21","milestones":{"concept":"2026-08-07","shoot":"2026-08-11","edit":"2026-08-14","review":"2026-08-18"}},{"post_id":"W8-Mo","publish_date":"2026-08-24","milestones":{"concept":"2026-08-10","shoot":"2026-08-14","edit":"2026-08-17","review":"2026-08-21"}},{"post_id":"W8-Mi","publish_date":"2026-08-26","milestones":{"concept":"2026-08-05","shoot":"2026-08-10","edit":"2026-08-17","review":"2026-08-23"}},{"post_id":"W8-Fr","publish_date":"2026-08-28","milestones":{"concept":"2026-08-14","shoot":"2026-08-18","edit":"2026-08-21","review":"2026-08-25"}},{"post_id":"W9-Mo","publish_date":"2026-08-31","milestones":{"concept":"2026-08-17","shoot":"2026-08-21","edit":"2026-08-24","review":"2026-08-28"}},{"post_id":"W9-Mi","publish_date":"2026-09-02","milestones":{"concept":"2026-07-20","shoot":"2026-07-27","edit":"2026-08-26","review":"2026-08-30"}},{"post_id":"W9-Fr","publish_date":"2026-09-04","milestones":{"concept":"2026-08-21","shoot":"2026-08-25","edit":"2026-08-28","review":"2026-09-01"}},{"post_id":"W10-Mo","publish_date":"2026-09-07","milestones":{"concept":"2026-08-24","shoot":"2026-08-28","edit":"2026-08-31","review":"2026-09-04"}},{"post_id":"W10-Mi","publish_date":"2026-09-09","milestones":{"concept":"2026-08-26","shoot":"2026-08-30","edit":"2026-09-02","review":"2026-09-06"}},{"post_id":"W10-Fr","publish_date":"2026-09-11","milestones":{"concept":"reaktiv – innerhalb 24h nach Newsanlass","shoot":"reaktiv – innerhalb 24h nach Newsanlass","edit":"reaktiv – max. 4h Turnaround","review":"reaktiv – 1h vor Publish"}},{"post_id":"W11-Mo","publish_date":"2026-09-14","milestones":{"concept":"2026-08-31","shoot":"2026-09-04","edit":"2026-09-07","review":"2026-09-11"}},{"post_id":"W11-Mi","publish_date":"2026-09-16","milestones":{"concept":"2026-09-02","shoot":"2026-09-06","edit":"2026-09-09","review":"2026-09-13"}},{"post_id":"W11-Fr","publish_date":"2026-09-18","milestones":{"concept":"2026-09-04","shoot":"keine (nur Auswertung)","edit":"2026-09-11","review":"2026-09-15"}},{"post_id":"W12-Mo","publish_date":"2026-09-21","milestones":{"concept":"2026-09-07","shoot":"2026-09-11","edit":"2026-09-14","review":"2026-09-18"}},{"post_id":"W12-Mi","publish_date":"2026-09-23","milestones":{"concept":"2026-08-26","shoot":"2026-09-02","edit":"2026-09-14","review":"2026-09-20"}},{"post_id":"W12-Fr","publish_date":"2026-09-25","milestones":{"concept":"2026-09-11","shoot":"2026-09-15","edit":"2026-09-18","review":"2026-09-22"}}],"tasks":[{"priority":"SOFORT","category":"Setup","tasks":["Equipment-Liste finalisieren und Equipment-Verfügbarkeit prüfen (Kamera, Drohne, Mikrofone, Licht)","Drehorte für Wochen 1–4 bestätigen (Büro, aktive Baustelle, Teamstandort)","Einverständniserklärungen für Kunden-Features vorbereiten (Metzgerei Gruber, Autohaus Schmitt, Brauerei Hoffmann)","Content-Kalender in Projektmanagement-Tool (Notion / Trello) anlegen","Drohnen-NOTAM-Prozess klären – wer beantragt, wie lange dauert es?"]},{"priority":"DIESE WOCHE","category":"Konzept & Dreh","tasks":["Konzept W1-Mo (Kosten-Erklärer) schreiben und Infografik beauftragen","Konzept W1-Mi (Dachmessung) schreiben, Baustelle für Drehtermin koordinieren","Konzept W1-Fr (Teamvorstellung) schreiben, Teamtermin Freitag 16 Uhr fixieren","Drehtermin W1-Mo (Büro-Dreh) in Kalender eintragen: KW27, Mittwoch oder Donnerstag"]},{"priority":"PARALLEL","category":"Langfristig koordinieren","tasks":["Metzgerei Gruber (W4): Kundenfreigabe bis Woche 2 einholen","Autohaus Schmitt (W8): Kundenfreigabe bis Woche 5 einholen","Brauerei Hoffmann (W12): Kundenfreigabe bis Woche 8 einholen","Großprojekt-Zeitraffer (W9): Drehstart muss in KW29 sein – Projekt identifizieren","Thermalkamera für W7 reservieren: Leih-Anfrage mind. 3 Wochen vorher"]},{"priority":"ENGPÄSSE","category":"Risikoanalyse","tasks":["ENGPASS #1: Drohnen-NOTAM – Genehmigung kann 2–4 Wochen dauern. Sofort beginnen.","ENGPASS #2: Kundentermine (Testimonial-Videos) – Kunden haben eigene Kalender. Mindestens 4 Wochen Vorlauf einplanen.","ENGPASS #3: Großprojekt für Zeitraffer (W9) muss aktiv sein – falls kein Projekt startet, Fallback-Clip aus Archivmaterial planen.","ENGPASS #4: News-Reaktion (W10-Fr) erfordert schnellen Workflow – Dreh-to-Publish in 24h muss geübt sein.","ENGPASS #5: Schnittkapazität – bei 3 Posts/Woche braucht man ~6–8h Schnittzeit. Freelance-Editor-Option prüfen."]}]};
+// ════════════════════════════════════════════════════════════════════════════
+//  SEED DATA (aus dem 12-Wochen-Plan)
+// ════════════════════════════════════════════════════════════════════════════
+const SEED = {
+  pillars:[
+    {id:"P1",name:"Aufklärung & Bildung",goal:"Kaufbarrieren abbauen durch verständliche Erklärung komplexer Themen (ROI, Technik, Förderungen)",types:["Erklärvideo","Infografik-Reel","FAQ-Format"],kpi:"Saves, Shares, Fragen"},
+    {id:"P2",name:"Projekt-Dokumentation",goal:"Sozialer Beweis durch reale Projekte – vom Dach bis zur Inbetriebnahme",types:["Before/After","Timelapse","Walkthrough"],kpi:"Profilaufrufe, DMs, Anfragen"},
+    {id:"P3",name:"Hinter den Kulissen",goal:"Vertrauen durch Transparenz – Team, Prozesse, Qualität zeigen",types:["Day-in-the-Life","Montageprozess","Werkstattblick"],kpi:"Follower, Engagement"},
+    {id:"P4",name:"Kundenstimmen & Erfolge",goal:"Referenzmarketing – Kunden erzählen, was SolarTech gebracht hat",types:["Interview","Testimonial","ROI-Zahlen"],kpi:"Direktanfragen, Lead-Qualität"},
+    {id:"P5",name:"Branche & Zeitgeist",goal:"Relevanz durch Reaktion auf Energiepolitik, Preise, Förderungen",types:["Newsjacking","Meinung","Trendkommentar"],kpi:"Reichweite, neue Follower"}
+  ],
+  formats:[
+    {id:"F1",name:"SolarKlar – Der Erklärer",day:"Montag",pillar:"P1",goal:"Komplexes Thema in unter 90 Sek erklären",content:"ROI, Amortisation, Wechselrichter, EEG-Förderung",length:"60–90 Sek"},
+    {id:"F2",name:"Projekt Live – Die Baustelle",day:"Mittwoch",pillar:"P2",goal:"Echte Projekte dokumentieren",content:"Dachvermessung, Montage, Inbetriebnahme",length:"90–120 Sek"},
+    {id:"F3",name:"Team & Technik – Freitag BTS",day:"Freitag",pillar:"P3",goal:"Menschlichkeit und Kompetenz zeigen",content:"Werkzeug, Sicherheitscheck, Teamvorstellung",length:"45–75 Sek"},
+    {id:"F4",name:"Kundenstory – Monatlich",day:"Mittwoch (W4,8,12)",pillar:"P4",goal:"Testimonial als stärkstes Verkaufsargument",content:"Kundeninterview, ROI-Zahlen, emotionaler Abschluss",length:"2–3 Min + 60-Sek-Cut"},
+    {id:"F5",name:"EnergyPulse – Branchenkommentar",day:"Flexibel",pillar:"P5",goal:"Thought Leadership durch schnelle Einordnung",content:"Förderrichtlinie, Strompreis, EEG-Änderung",length:"30–60 Sek"}
+  ],
+  // posts: id,date,pillar,format,title,hook,idea,variants[],goal,cta + (optional) prod{location,equipment[],hours,team,notes} + milestones{concept,shoot,edit,review}
+  posts:[
+{id:"W1-Mo",date:"2026-07-06",pillar:"P1",format:"F1",title:"Was kostet eine Gewerbe-Solaranlage wirklich?",hook:"Die meisten Unternehmer denken: zu teuer. Hier sind die echten Zahlen.",idea:"Aufschlüsselung der Kosten einer 100-kWp-Anlage: Module, Wechselrichter, Montage, Genehmigung, Netzanschluss",variants:["Kostenaufstellung als Infografik-Overlay","Geschäftsführer erklärt live an echter Kalkulation","Split-Screen: Erwartung vs. Realität"],goal:"Barriere brechen, erste Awareness schaffen",cta:"Frag uns nach deinem Angebot – Link in Bio",prod:{location:"Büro/Konferenzraum SolarTech – Whiteboard/Monitor als Hintergrund",equipment:["Sony A7 IV","50mm Objektiv","2x Softbox LED","Rode Wireless GO II","Laptop mit Kalkulations-Mockup"],hours:3,team:2,notes:"Infografik-Overlays vorab in After Effects/CapCut erstellen"},milestones:{concept:"2026-06-22",shoot:"2026-06-26",edit:"2026-06-29",review:"2026-07-03"}},
+{id:"W1-Mi",date:"2026-07-08",pillar:"P2",format:"F2",title:"So läuft eine Dachmessung ab",hook:"Bevor wir auch nur ein Modul bestellen, passiert das hier.",idea:"Kamerateam begleitet Vorvermessung eines Logistikzentrums: GPS-Messung, Statikcheck, Ausrichtungsanalyse",variants:["POV vom Techniker auf dem Dach","Techniker erklärt am Laptop die 3D-Planung","Zeitraffer der gesamten Messkampagne"],goal:"Professionalität zeigen, Prozess erklären",cta:"Kostenlose Dachanalyse anfragen",prod:{location:"Aktive Baustelle – Logistikzentrum / Gewerbe-Dach",equipment:["Sony A7 IV","24-70mm","GoPro Hero 12 (Helm)","DJI Mini 4 Pro","Sicherheitsgeschirr"],hours:5,team:3,notes:"Sicherheitseinweisung vor Drehbeginn; Drohne braucht NOTAM-Freigabe"},milestones:{concept:"2026-06-24",shoot:"2026-06-28",edit:"2026-07-01",review:"2026-07-05"}},
+{id:"W1-Fr",date:"2026-07-10",pillar:"P3",format:"F3",title:"Das ist unser Montageteam",hook:"6 Leute. 5 Jahre Erfahrung. Jeden Tag auf einem anderen Dach.",idea:"Kurzvorstellung des Montageteams, jeder sagt in einem Satz, warum er den Job macht",variants:["Einzelportraits nacheinander geschnitten","Teamfoto + Voice-Over des Teamleiters","Wer-bin-ich-Quiz: Zuschauer raten Spezialität"],goal:"Vertrauen und Sympathie aufbauen",cta:"Folgt uns für mehr Einblicke",prod:{location:"Firmenparkplatz oder Baustelle – Team steht zusammen",equipment:["Sony A7 IV","35mm","1x LED-Panel","Rode Wireless GO II"],hours:2,team:2,notes:"Termine mit allen 6 Teammitgliedern koordinieren – Fr 16:00 ideal"},milestones:{concept:"2026-06-26",shoot:"2026-06-30",edit:"2026-07-03",review:"2026-07-07"}},
+{id:"W2-Mo",date:"2026-07-13",pillar:"P1",format:"F1",title:"Wann amortisiert sich eine Gewerbe-PV-Anlage?",hook:"Unsere Kunden brauchen im Schnitt 6,3 Jahre. So rechnen wir das.",idea:"Schritt-für-Schritt ROI-Rechnung: Investition, Eigenverbrauchsquote, Strompreis, Einspeisevergütung, Steuereffekte",variants:["Whiteboard-Erklärung mit echten Zahlen","Interaktives Rechenbeispiel als fiktiver Case","Grafik-Overlay: Amortisation bei steigendem Strompreis"],goal:"Kaufentscheidung datenbasiert erleichtern",cta:"Eigene Amortisationsrechnung anfordern",milestones:{concept:"2026-06-29",shoot:"2026-07-03",edit:"2026-07-06",review:"2026-07-10"}},
+{id:"W2-Mi",date:"2026-07-15",pillar:"P2",format:"F2",title:"Tag 1 der Montage – was wirklich passiert",hook:"Um 6:30 Uhr. Das Dach ist frei. Die Arbeit beginnt.",idea:"Erster Montage-Tag: Sicherheitssystem, erste Schienen, erste Module – authentischer Reportage-Stil",variants:["Chronologischer Tagesablauf 6:30–17:00 als 90-Sek-Cut","Techniker kommentiert jeden Arbeitsschritt","Drohne Beginn vs. Drohne Ende – Fortschritt sichtbar"],goal:"Qualität und Zuverlässigkeit beweisen",cta:"Projekt anfragen – wir planen kostenlos",milestones:{concept:"2026-07-01",shoot:"2026-07-05",edit:"2026-07-08",review:"2026-07-12"}},
+{id:"W2-Fr",date:"2026-07-17",pillar:"P3",format:"F3",title:"Das Equipment unserer Monteure",hook:"Ohne dieses Werkzeug würden wir niemals auf ein Firmendach steigen.",idea:"Techniker öffnet Werkzeugkoffer: Sicherheitsgeschirr, Torqueschlüssel, Kabelziehwerkzeug, Messgerät",variants:["Flat Lay der Tools + kurze Erklärung","Azubi hält Tools, Meister erklärt","Before/After: Koffer vor 5 Jahren vs. heute"],goal:"Fachkompetenz zeigen, Qualitätsversprechen untermauern",cta:"Jetzt Kontakt aufnehmen",milestones:{concept:"2026-07-03",shoot:"2026-07-07",edit:"2026-07-10",review:"2026-07-14"}},
+{id:"W3-Mo",date:"2026-07-20",pillar:"P1",format:"F1",title:"Diese Förderungen kennen die meisten Unternehmer nicht",hook:"KfW, BAFA, EEG – drei Abkürzungen, die deine Investition günstiger machen.",idea:"Überblick relevanter Förderprogramme: KfW 270, Zuschüsse der Bundesländer, steuerliche Absetzbarkeit",variants:["Tabelle der Top-3-Förderungen live erklärt","Fiktives Unternehmen rechnet Förderung vor","Interview mit Steuerberater-Partner"],goal:"Kaufbarriere Finanzierung auflösen",cta:"Wir helfen beim Förderantrag – kostenlos",milestones:{concept:"2026-07-06",shoot:"2026-07-10",edit:"2026-07-13",review:"2026-07-17"}},
+{id:"W3-Mi",date:"2026-07-22",pillar:"P2",format:"F2",title:"Inbetriebnahme: Der Moment, auf den wir hinarbeiten",hook:"Nach 4 Tagen Montage. Der Schalter wird umgelegt.",idea:"Inbetriebnahme einer 150-kWp-Anlage: letzter Kabelanschluss, Übergabe-Checkliste, erster Ertragswert",variants:["Slow-Motion beim Einschalten + Kundenreaktion","Techniker erklärt Monitoring-App am Tablet","Zeitraffer: 0% zu 100% Systemcheck"],goal:"Emotionalen Höhepunkt zeigen, Kundenbeziehung demonstrieren",cta:"Eigenes Projekt starten",milestones:{concept:"2026-07-08",shoot:"2026-07-12",edit:"2026-07-15",review:"2026-07-19"}},
+{id:"W3-Fr",date:"2026-07-24",pillar:"P3",format:"F3",title:"Sicherheit zuerst – unser Protokoll vor jedem Dachstieg",hook:"Wir steigen nicht aufs Dach, ohne das hier gecheckt zu haben.",idea:"Sicherheits-Briefing: PSA-Check, Wetterprotokoll, Kommunikationskette, Notfallplan",variants:["Checkliste wird abgehakt, jeder Punkt erklärt","Teamleiter erklärt Konsequenzen bei Nichterfüllung","Versicherungsperspektive – warum auch für Kunden wichtig"],goal:"Professionalität und Verantwortung zeigen",cta:"Anfragen – wir arbeiten nach höchsten Standards",milestones:{concept:"2026-07-10",shoot:"2026-07-14",edit:"2026-07-17",review:"2026-07-21"}},
+{id:"W4-Mo",date:"2026-07-27",pillar:"P1",format:"F1",title:"Wechselrichter: Das Herz deiner Anlage",hook:"Ohne dieses Gerät ist eine Solaranlage nutzlos. So funktioniert es.",idea:"Erklärung Wechselrichter: DC→AC, MPP-Tracker, Monitoring, Dimensionierung nach Anlagengröße",variants:["Animation Energiefluss + Voice-Over","Live-Demontage in der Werkstatt","Vergleich String-WR vs. Mikro-WR"],goal:"Fachkompetenz demonstrieren, Entscheider informieren",cta:"Fachberatung anfragen",milestones:{concept:"2026-07-13",shoot:"2026-07-17",edit:"2026-07-20",review:"2026-07-24"}},
+{id:"W4-Mi",date:"2026-07-29",pillar:"P4",format:"F4",title:"Kundenstory: Metzgerei Gruber – 40% weniger Stromkosten",hook:"Familie Gruber hat gezweifelt. Heute würden sie es sofort wieder machen.",idea:"Interview mit Inhaber (100kWp, 18 Monate in Betrieb). Echte Zahlen: Stromkosten vorher/nachher, Amortisation",variants:["Interview vor der Anlage auf dem Dach","Split-Screen: Stromrechnung alt vs. neu","3-Min-Doku (YouTube) + 60-Sek-Cut (LinkedIn)"],goal:"Stärkstes Vertrauenssignal: echter Kunde, echte Zahlen",cta:"Kontakt aufnehmen – Referenzprojekte besichtigen",prod:{location:"Metzgerei Gruber – Kundenstandort mit Anlage auf dem Dach",equipment:["Sony A7 IV","24-70mm + 85mm","2x LED-Panel","Rode Wireless GO II","DJI Mini 4"],hours:6,team:3,notes:"Einverständniserklärung vorab einholen; Backup-Dreh bei schlechtem Wetter"},milestones:{concept:"2026-07-06",shoot:"2026-07-13",edit:"2026-07-20",review:"2026-07-26"}},
+{id:"W4-Fr",date:"2026-07-31",pillar:"P3",format:"F3",title:"Ein Freitag auf der Baustelle – ungeskriptet",hook:"Was passiert, wenn wir die Kamera einfach mitlaufen lassen?",idea:"Ungeplanter Tagesbegleiter auf aktiver Baustelle – authentisch, mit kleinen Problemen und Lösungen",variants:["Handheld-Vlog-Stil, Monteur kommentiert","GoPro-Perspektive vom Dach den ganzen Tag","Was ist heute schiefgelaufen? – ehrliche Reflexion"],goal:"Authentizität und Menschlichkeit zeigen",cta:"Folgt uns für mehr",milestones:{concept:"2026-07-17",shoot:"2026-07-21",edit:"2026-07-24",review:"2026-07-28"}},
+{id:"W5-Mo",date:"2026-08-03",pillar:"P1",format:"F1",title:"Von der Idee bis zum Baubeginn: Die 5 Schritte",hook:"Die meisten wissen nicht, wie viel vor dem ersten Modul passiert.",idea:"Prozessübersicht: Erstgespräch → Dachanalyse → Planung → Genehmigung → Montage (6–12 Wochen)",variants:["Infografik-Animation der 5 Schritte","Projektleiterin erklärt jede Phase an echtem Projekt","Was dauert am längsten? – Netzanschluss-Faktor"],goal:"Erwartungsmanagement, Vertrauen aufbauen",cta:"Erstgespräch vereinbaren",milestones:{concept:"2026-07-20",shoot:"2026-07-24",edit:"2026-07-27",review:"2026-07-31"}},
+{id:"W5-Mi",date:"2026-08-05",pillar:"P2",format:"F2",title:"Drohnenplanung: So entsteht der Lageplan",hook:"Bevor wir planen, fliegen wir.",idea:"Drohnenbefliegung: Aufmaß, 3D-Modell, Verschattungsanalyse, Ertragsprognose – alles in 90 Sek",variants:["Drohnenflug + Overlay der Planungssoftware","Zeitraffer: Drohne fliegt, Plan entsteht in Echtzeit","Was sehen wir, was ihr nicht seht"],goal:"Technologie und Sorgfalt demonstrieren",cta:"Kostenlose Drohnenanalyse anfragen",milestones:{concept:"2026-07-22",shoot:"2026-07-26",edit:"2026-07-29",review:"2026-08-02"}},
+{id:"W5-Fr",date:"2026-08-07",pillar:"P3",format:"F3",title:"Ausbildung bei SolarTech – so werden unsere Techniker",hook:"Wir bilden selbst aus. Das ist unser Qualitätsstandard.",idea:"Einblick in die Ausbildung: Azubi-Vorstellung, Lernphasen, erste Montage mit Mentor",variants:["Azubi erzählt, warum er den Beruf wählte","Meister erklärt gute vs. schlechte Azubis","Erster Tag auf dem Dach – Erinnerung des ältesten Technikers"],goal:"Employer Branding + Kompetenzversprechen",cta:"Wir suchen Azubis und Fachkräfte – Info im Profil",milestones:{concept:"2026-07-24",shoot:"2026-07-28",edit:"2026-07-31",review:"2026-08-04"}},
+{id:"W6-Mo",date:"2026-08-10",pillar:"P1",format:"F1",title:"Brauche ich einen Batteriespeicher?",hook:"Kurze Antwort: kommt drauf an. Lange Antwort: dieser Post.",idea:"Entscheidungsbaum: Wann lohnt sich Speicher? Eigenverbrauchsquote, Lastprofile, Wirtschaftlichkeit",variants:["Geschäftsführer erklärt an echter Lastgangkurve","Animation Energiefluss PV → Betrieb → Speicher → Netz","3 Typen von Betrieben – wer braucht Speicher"],goal:"Beratungskompetenz zeigen, Vertrauen durch Ehrlichkeit",cta:"Lastprofil-Analyse anfragen",milestones:{concept:"2026-07-27",shoot:"2026-07-31",edit:"2026-08-03",review:"2026-08-07"}},
+{id:"W6-Mi",date:"2026-08-12",pillar:"P2",format:"F2",title:"Großspeicher-Montage: 200 kWh in 2 Tagen",hook:"Das ist kein Heimspeicher. Das ist industrielle Energieinfrastruktur.",idea:"Installation eines 200-kWh-Gewerbe-Batteriespeichers: Aufstellung, Verkabelung, BMS-Konfiguration, Abnahme",variants:["Zeitraffer der 2-tägigen Montage","Techniker erklärt BMS live am Gerät","Vorher/Nachher Energieeffizienz mit Monitoring-Daten"],goal:"Referenzprojekt dokumentieren, Premiumkunden ansprechen",cta:"Speicherlösung anfragen",milestones:{concept:"2026-07-29",shoot:"2026-08-02",edit:"2026-08-05",review:"2026-08-09"}},
+{id:"W6-Fr",date:"2026-08-14",pillar:"P3",format:"F3",title:"Unser Büro läuft auch solar – hier ist der Beweis",hook:"Wir predigen nicht nur – wir leben es.",idea:"Rundgang durch eigenes Büro mit Solaranlage: Monitoring-Dashboard live, Eigenverbrauchsquote, Reflexion nach 2 Jahren",variants:["Geschäftsführer zeigt Monitoring-App am Smartphone","Was haben wir nach 2 Jahren gelernt?","Live-Vergleich: Ertrag heute vs. Vorjahr"],goal:"Glaubwürdigkeit durch gelebte Überzeugung",cta:"Folgt uns – wir teilen alles",milestones:{concept:"2026-07-31",shoot:"2026-08-04",edit:"2026-08-07",review:"2026-08-11"}},
+{id:"W7-Mo",date:"2026-08-17",pillar:"P1",format:"F1",title:"Was passiert, wenn eine Solaranlage ausfällt?",hook:"Spoiler: meistens nichts Dramatisches. Aber ihr solltet das wissen.",idea:"Häufigste Fehlerquellen: Wechselrichter-Alarm, verschmutzte Module, Schatten, Kabeldefekt. Auswirkung auf Ertrag",variants:["Live-Demo im Monitoring: Fehlercode lesen","Die 3 häufigsten Serviceanrufe","Vergleich: mit vs. ohne Wartungsvertrag"],goal:"After-Sales-Vertrauen und Wartungsvertrag-Lead",cta:"Wartungsvertrag anfragen",milestones:{concept:"2026-08-03",shoot:"2026-08-07",edit:"2026-08-10",review:"2026-08-14"}},
+{id:"W7-Mi",date:"2026-08-19",pillar:"P2",format:"F2",title:"Jahresinspektion: 500 Module in 4 Stunden",hook:"Einmal pro Jahr. Systematisch. Mit Thermokamera.",idea:"Wartungseinsatz: Thermografie findet Hotspots, Reinigung, elektrische Messung, Bericht",variants:["Thermografie-Aufnahmen live erklären","Zeitraffer: Inspektion bis Wartungsbericht","Dieses Modul hätte Feuer gefangen – echter Fall"],goal:"Wartungsvertrag-Abschlüsse generieren",cta:"Wartungsinspektion buchen",prod:{location:"Wartungsobjekt – Bestandsanlage, Flachdach bevorzugt",equipment:["Flir-Thermografiekamera (Leihgerät)","Sony A7 IV","Drohne mit Thermalaufsatz","Messkoffer"],hours:8,team:3,notes:"Thermografie bei bewölktem Himmel/morgens für beste Kontraste; Kamera mieten ~150€/Tag"},milestones:{concept:"2026-08-03",shoot:"2026-08-07",edit:"2026-08-12",review:"2026-08-16"}},
+{id:"W7-Fr",date:"2026-08-21",pillar:"P3",format:"F3",title:"So sieht unser Lager aus – 3.000 Module auf Abruf",hook:"Lieferzeit ist das größte Problem der Branche. Unsere Antwort darauf.",idea:"Lager-Tour: Modulbestand, Wechselrichter-Typen, Kabelware, Logistik. Warum Lager = Kundenvorteil",variants:["Lagerleiter gibt Führung pro Zone","Von Lager bis Dach in 72 Stunden","Lieferkettenproblem 2022 vs. heute"],goal:"Lieferfähigkeit als Differenzierungsmerkmal",cta:"Angebot einholen – schnelle Lieferung inklusive",milestones:{concept:"2026-08-07",shoot:"2026-08-11",edit:"2026-08-14",review:"2026-08-18"}},
+{id:"W8-Mo",date:"2026-08-24",pillar:"P1",format:"F1",title:"Flachdach vs. Schrägdach – was ist besser für PV?",hook:"Beide funktionieren. Aber nicht auf die gleiche Art.",idea:"Technischer Vergleich: Aufständerung, Winkeloptimierung, Reinigungsaufwand, Statik, Ertrag pro qm",variants:["Animation beider Dachtypen mit Einstrahlungswinkel","Techniker erklärt an echtem Flachdachprojekt","Was war das schwierigste Dach? – Teamrunde"],goal:"Breite Zielgruppe ansprechen, alle Dachtypen abdecken",cta:"Dach analysieren lassen",milestones:{concept:"2026-08-10",shoot:"2026-08-14",edit:"2026-08-17",review:"2026-08-21"}},
+{id:"W8-Mi",date:"2026-08-26",pillar:"P4",format:"F4",title:"Kundenstory: Autohaus Schmitt – 60 kWp auf dem Showroom",hook:"Ein Autohaus, das zeigt, dass Nachhaltigkeit und Geschäft zusammenpassen.",idea:"Interview mit Geschäftsführer: Motivation, Ablauf, Erfahrungen nach 6 Monaten. Plus E-Auto-Ladeinfrastruktur",variants:["Interview vor Showroom mit PV-Dach","Walkthrough: Module + Ladeinfrastruktur","Was haben Ihre Kunden gesagt?"],goal:"Referenz für Gewerbeimmobilien mit Kombilösungen",cta:"Kombilösung PV + E-Mobilität anfragen",prod:{location:"Autohaus Schmitt – Showroom mit Dachanlage",equipment:["Sony A7 IV","24-70mm + 85mm","2x LED-Panel","DJI Mini 4","Rode Wireless GO II"],hours:5,team:3,notes:"Sonntagsdreh für leere Parkplatz-Shots; E-Auto-Ladesäule ins Bild"},milestones:{concept:"2026-08-05",shoot:"2026-08-10",edit:"2026-08-17",review:"2026-08-23"}},
+{id:"W8-Fr",date:"2026-08-28",pillar:"P3",format:"F3",title:"So feiern wir Projektabschlüsse",hook:"300 Projekte in 5 Jahren. Jedes einzelne hat gezählt.",idea:"Meilenstein-Post: 300. Projekt abgeschlossen. Team-Foto, Reflexion, Dank an Kunden und Team",variants:["Slideshow der schönsten Projektfotos","Jedes Teammitglied nennt Lieblingsprojekt-Moment","Was hat das 300. Projekt gelehrt?"],goal:"Community building, Stolz und Zugehörigkeit",cta:"Wir suchen Projekt Nr. 301 – anfragen",milestones:{concept:"2026-08-14",shoot:"2026-08-18",edit:"2026-08-21",review:"2026-08-25"}},
+{id:"W9-Mo",date:"2026-08-31",pillar:"P1",format:"F1",title:"CO₂-Bilanz einer Gewerbe-Solaranlage – die echten Zahlen",hook:"Wie viel CO₂ spart eine 100-kWp-Anlage wirklich? Wir rechnen es durch.",idea:"CO₂-Äquivalente: Tonnen pro Jahr, Vergleich Autofahrten/Flüge, Amortisationszeit der Herstellungs-CO₂",variants:["Infografik mit konkreten Vergleichszahlen","Ihr Nachhaltigkeitsbericht schreibt sich selbst","CO₂ als Finanzargument: EU-Taxonomie, Bankkredite"],goal:"ESG-Argument für B2B-Entscheider schärfen",cta:"CO₂-Bilanz für Ihr Unternehmen berechnen",milestones:{concept:"2026-08-17",shoot:"2026-08-21",edit:"2026-08-24",review:"2026-08-28"}},
+{id:"W9-Mi",date:"2026-09-02",pillar:"P2",format:"F2",title:"Solarpark-Montage: 500 kWp auf einem Logistikzentrum",hook:"Das größte Projekt unserer Geschichte. Hier ist die Dokumentation.",idea:"Großprojekt: 4-Wochen-Montage auf 10.000 qm, 1.200 Module, 3 Wechselrichter, Erdung, komplexe Statik",variants:["4-Wochen-Zeitraffer in 90 Sekunden","Projektleiter zieht Bilanz","Drohnen-Abschlussflug über fertiger Anlage"],goal:"Großkunden-Referenz, Kompetenz bei Großprojekten",cta:"Großprojekt anfragen",prod:{location:"Logistikzentrum – Großanlagen-Baustelle",equipment:["Sony A7 IV","DJI Mini 4 Pro","Zeitraffer-Rig (Intervalometer)","GoPro für BTS"],hours:40,team:2,notes:"ASSUMPTION: Großprojekt muss vorab identifiziert sein; Zeitraffer-Setup über 4 Wochen auf dem Dach"},milestones:{concept:"2026-07-20",shoot:"2026-07-27",edit:"2026-08-26",review:"2026-08-30"}},
+{id:"W9-Fr",date:"2026-09-04",pillar:"P3",format:"F3",title:"Unsere eigene Nachhaltigkeitsbilanz 2025",hook:"Wir verkaufen Nachhaltigkeit – aber wie nachhaltig sind wir selbst?",idea:"Transparenz-Post: CO₂-Fußabdruck der Firma, Fahrzeuge, Büroenergie, Modulentsorgung, soziales Engagement",variants:["Jahresbericht-Highlights als kurzes Video","Geschäftsführer benennt Schwachstellen ehrlich","Mitarbeiter berichten von persönlichem Engagement"],goal:"Glaubwürdigkeit durch Transparenz, Employer Branding",cta:"Werte teilen? Dann folgt uns.",milestones:{concept:"2026-08-21",shoot:"2026-08-25",edit:"2026-08-28",review:"2026-09-01"}},
+{id:"W10-Mo",date:"2026-09-07",pillar:"P5",format:"F1",title:"Wohin entwickeln sich Solarmodulpreise 2026?",hook:"Die Preise sind gefallen. Aber wie tief gehen sie noch?",idea:"Marktanalyse: Preisverfall der letzten 10 Jahre, chinesische Überproduktion, Auswirkung auf Investitionstiming",variants:["Kurvendiagramm + Empfehlung: jetzt oder warten?","3 Szenarien für 2026 – Experte spekuliert","Kundenveranstaltungs-Zusammenfassung"],goal:"Thought Leadership, Investitionsentscheidung beschleunigen",cta:"Aktuelles Angebot einholen – Preise jetzt sichern",milestones:{concept:"2026-08-24",shoot:"2026-08-28",edit:"2026-08-31",review:"2026-09-04"}},
+{id:"W10-Mi",date:"2026-09-09",pillar:"P2",format:"F2",title:"Agri-PV: Wenn Landwirtschaft und Solar verschmelzen",hook:"Das nächste große Ding – und wir sind dabei.",idea:"Agri-PV-Pilotprojekt: Module über Beeten, Doppelnutzung, Messungen Pflanzenwachstum vs. konventionell",variants:["Drohnenaufnahme Agri-PV-Anlage","Landwirt erklärt, warum er mitmachte","Wissenschaftler erklärt erste Messergebnisse"],goal:"Innovationsimage aufbauen, neue Kundengruppe ansprechen",cta:"Agri-PV-Potenzial prüfen lassen",milestones:{concept:"2026-08-26",shoot:"2026-08-30",edit:"2026-09-02",review:"2026-09-06"}},
+{id:"W10-Fr",date:"2026-09-11",pillar:"P5",format:"F5",title:"Was bedeutet die neue Solarstrategie der EU für Ihr Unternehmen?",hook:"Brüssel hat entschieden. Was das für deutsche Betriebe bedeutet.",idea:"Schnellkommentar EU-Energiepolitik: neue Ausschreibungsregeln, Netzausbau-Beschleunigung, Genehmigungszeiten",variants:["Geschäftsführer kommentiert spontan nach PM","Was bedeutet das in der Praxis? – 3 Punkte","Branchenverband-Zitat als Aufhänger"],goal:"Schnelle Reaktion auf News = Reichweite und Vertrauen",cta:"Für Updates folgen",milestones:{concept:"reaktiv – 24h nach Newsanlass",shoot:"reaktiv – 24h nach Newsanlass",edit:"reaktiv – max. 4h Turnaround",review:"reaktiv – 1h vor Publish"}},
+{id:"W11-Mo",date:"2026-09-14",pillar:"P1",format:"F1",title:"Der Netzanschluss: Warum er 6 Monate dauern kann",hook:"Das größte Problem ist nicht das Dach. Es ist das Amt.",idea:"Detailblick Netzanschluss: Antragstellung beim Netzbetreiber, Wartezeiten, technische Anforderungen",variants:["Projektleiterin erklärt Antragsprozess Schritt für Schritt","Unser schlimmstes Bürokratie-Erlebnis","Infografik: Wartezeiten nach Netzbetreiber-Region"],goal:"Glaubwürdigkeit durch ehrliche Einschätzung",cta:"Wir übernehmen die Genehmigung für Sie",milestones:{concept:"2026-08-31",shoot:"2026-09-04",edit:"2026-09-07",review:"2026-09-11"}},
+{id:"W11-Mi",date:"2026-09-16",pillar:"P2",format:"F2",title:"Übergabe: Das letzte Gespräch auf der Baustelle",hook:"Jedes Projekt endet mit diesem Moment. Und der sagt alles.",idea:"Übergabe-Besprechung: Techniker erklärt Monitoring, übergibt Dokumentationsmappe, Handschlag-Moment",variants:["Authentischer Übergabe-Clip ohne Skript","Kunde erzählt im Interview vom Prozess","Was jetzt noch passiert – After-Sales erklärt"],goal:"Kundenzufriedenheit beweisen, Serviceversprechen zeigen",cta:"So arbeiten wir – Erstgespräch anfragen",milestones:{concept:"2026-09-02",shoot:"2026-09-06",edit:"2026-09-09",review:"2026-09-13"}},
+{id:"W11-Fr",date:"2026-09-18",pillar:"P3",format:"F3",title:"11 Wochen, 11 Posts, 11 Dinge die wir gelernt haben",hook:"Wir machen das jetzt 11 Wochen. Was hat funktioniert, was nicht?",idea:"Meta-Reflexion über die Content-Kampagne: Einblick in die Strategie, was die Community bewegte, echte Zahlen",variants:["Geschäftsführer zieht persönliches Fazit","Community-Fragen werden beantwortet","Was machen wir im nächsten Quartal anders?"],goal:"Community-Bindung, Transparenz, Vorschau",cta:"Bleibt dabei – nächste Phase kommt",milestones:{concept:"2026-09-04",shoot:"keine (nur Auswertung)",edit:"2026-09-11",review:"2026-09-15"}},
+{id:"W12-Mo",date:"2026-09-21",pillar:"P1",format:"F1",title:"12 Wochen Solar-Content: Was wir Ihnen sagen wollten",hook:"Wenn Sie nur einen Post mitnehmen, dann diesen.",idea:"Synthese aller Themen: Warum jetzt der richtige Zeitpunkt für gewerbliche PV ist. Die 3 wichtigsten Argumente",variants:["Geschäftsführer hält Abschluss-Monolog","Schnitt aller wichtigsten Clips aus 12 Wochen","3 Sätze, die alles zusammenfassen"],goal:"Kampagnen-Abschluss, Conversion-Push",cta:"Letzter Aufruf: Jetzt Projekt anfragen",milestones:{concept:"2026-09-07",shoot:"2026-09-11",edit:"2026-09-14",review:"2026-09-18"}},
+{id:"W12-Mi",date:"2026-09-23",pillar:"P4",format:"F4",title:"Kundenstory: Brauerei Hoffmann – Solar als Markenversprechen",hook:"Bier brauen mit Solarstrom. Die Hoffmanns machen es vor.",idea:"Interview mit Inhaberfamilie: 200 kWp auf historischem Gebäude, Denkmalschutz, Nachhaltigkeit als Marketingargument",variants:["Interview vor Brauerei-Gebäude mit Anlage","Bier brauen mit Solarstrom – emotionale Verknüpfung","Unsere Kunden fragen jetzt immer, ob wir solar sind"],goal:"Abschluss-Testimonial mit emotionalem Storytelling",cta:"Ihre Erfolgsgeschichte anfragen",prod:{location:"Brauerei Hoffmann – historisches Brauereigebäude",equipment:["Sony A7 IV","24-70mm + 85mm","2x LED-Panel","DJI Mini 4","Rode Wireless GO II"],hours:6,team:3,notes:"Denkmalschutz-Fassade als visuell starkes Setting; Brauerei-Prozess als B-Roll"},milestones:{concept:"2026-08-26",shoot:"2026-09-02",edit:"2026-09-14",review:"2026-09-20"}},
+{id:"W12-Fr",date:"2026-09-25",pillar:"P3",format:"F3",title:"Danke – und was als nächstes kommt",hook:"12 Wochen. 36 Posts. Eine Community.",idea:"Aufrichtiger Dank an Follower und Kunden, Ankündigung nächste Content-Phase, Einladung zum Gespräch",variants:["Persönliches Video des Geschäftsführers","Team-Video: Alle bedanken sich kurz","Was wünscht ihr euch fürs nächste Quartal?"],goal:"Beziehung stärken, Community-Loyalität sichern",cta:"Folgt uns weiter – die Reise geht weiter",milestones:{concept:"2026-09-11",shoot:"2026-09-15",edit:"2026-09-18",review:"2026-09-22"}}
+  ]
+};
 
-// ── STATE ─────────────────────────────────────────────────────────────────────
-let currentWeek = 1;
-let currentPillarFilter = 'all';
-let currentTimelineWeek = 'all';
-let taskState = {};
+// ════════════════════════════════════════════════════════════════════════════
+//  STATE & PERSISTENCE
+// ════════════════════════════════════════════════════════════════════════════
+const LS_KEY = "solartech_content_calendar_v1";
+const PILLAR_NAMES = {P1:"Aufklärung",P2:"Projekte",P3:"Hinter den Kulissen",P4:"Kundenstimmen",P5:"Branche",custom:"Eigener Termin"};
+const PILLAR_HEX = {P1:"#4a90d9",P2:"#4caf7d",P3:"#f5a623",P4:"#9b6fd4",P5:"#3dbfb8",custom:"#566080"};
+const DAYS = ["Mo","Di","Mi","Do","Fr","Sa","So"];
+const MONTHS = ["Januar","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember"];
 
-const pillarColors = { P1: 'pb-p1', P2: 'pb-p2', P3: 'pb-p3', P4: 'pb-p4', P5: 'pb-p5' };
-const pillarBg = { P1: 'p1', P2: 'p2', P3: 'p3', P4: 'p4', P5: 'p5' };
+let events = [];          // working set
+let viewYear, viewMonth;  // current calendar month
+let activePillars = new Set(["P1","P2","P3","P4","P5","custom"]);
+let editingId = null;
 
-// ── NAV ───────────────────────────────────────────────────────────────────────
-document.querySelectorAll('.nav-item').forEach(el => {
-  el.addEventListener('click', () => {
-    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-    el.classList.add('active');
-    document.getElementById('section-' + el.dataset.section).classList.add('active');
-  });
-});
-
-// ── DASHBOARD ─────────────────────────────────────────────────────────────────
-function renderDashboard() {
-  // Pillar breakdown
-  const counts = {};
-  DATA.content_plan.forEach(w => w.posts.forEach(p => { counts[p.pillar] = (counts[p.pillar]||0)+1; }));
-  const pb = document.getElementById('pillar-breakdown');
-  pb.innerHTML = Object.entries(counts).map(([p, c]) => {
-    const pdata = DATA.strategy.pillars.find(x => x.id === p);
-    const pct = Math.round(c/36*100);
-    return `<div style="margin-bottom:8px">
-      <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px">
-        <span class="post-badge ${pillarColors[p]}" style="padding:2px 8px">${p} ${pdata.name}</span>
-        <span style="color:var(--text2)">${c} Posts (${pct}%)</span>
-      </div>
-      <div class="progress-bar"><div class="progress-fill" style="width:${pct}%;background:${p==='P1'?'#4a90d9':p==='P2'?'#4caf7d':p==='P3'?'#f5a623':p==='P4'?'#9b6fd4':'#3dbfb8'}"></div></div>
-    </div>`;
-  }).join('');
-
-  // Week overview
-  const wo = document.getElementById('week-overview');
-  wo.innerHTML = `<div style="display:grid;grid-template-columns:repeat(6,1fr);gap:8px">
-    ${DATA.content_plan.map(w => `
-      <div style="background:var(--bg3);border-radius:8px;padding:10px;cursor:pointer;border:1px solid var(--border)"
-           onclick="goToPlanWeek(${w.week})">
-        <div style="font-size:11px;color:var(--text2);margin-bottom:4px">Woche ${w.week}</div>
-        <div style="font-size:12px;font-weight:600;color:var(--text);line-height:1.4">${w.theme.split(':')[0]}</div>
-        <div style="display:flex;gap:3px;margin-top:8px">
-          ${w.posts.map(p => `<span style="width:8px;height:8px;border-radius:50%;background:${p.pillar==='P1'?'#4a90d9':p.pillar==='P2'?'#4caf7d':p.pillar==='P3'?'#f5a623':p.pillar==='P4'?'#9b6fd4':'#3dbfb8'}"></span>`).join('')}
-        </div>
-      </div>`).join('')}
-  </div>`;
-}
-
-function goToPlanWeek(w) {
-  currentWeek = w;
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-  document.querySelector('[data-section="plan"]').classList.add('active');
-  document.getElementById('section-plan').classList.add('active');
-  renderPlan();
-}
-
-// ── STRATEGY ──────────────────────────────────────────────────────────────────
-function renderStrategy() {
-  document.getElementById('strategy-overview').innerHTML =
-    `<strong style="color:var(--accent)">Übergeordnetes Ziel:</strong> ${DATA.strategy.overview}`;
-  document.getElementById('pillars-grid').innerHTML = DATA.strategy.pillars.map(p => `
-    <div class="pillar ${pillarBg[p.id]}">
-      <div class="pillar-id">${p.id}</div>
-      <h3>${p.name}</h3>
-      <p>${p.goal}</p>
-      <div class="tags">${p.content_types.map(t => `<span class="tag">${t}</span>`).join('')}</div>
-      <div class="kpi-badge">📈 ${p.kpi}</div>
-    </div>`).join('');
-}
-
-// ── FORMATS ───────────────────────────────────────────────────────────────────
-function renderFormats() {
-  document.getElementById('formats-grid').innerHTML = DATA.formats.map(f => `
-    <div class="format-card">
-      <div class="format-day">${f.day}</div>
-      <div class="format-pillar" style="color:${f.pillar==='P1'?'#4a90d9':f.pillar==='P2'?'#4caf7d':f.pillar==='P3'?'#f5a623':f.pillar==='P4'?'#9b6fd4':'#3dbfb8'}">${f.id} · ${f.pillar}</div>
-      <div class="format-name">${f.name}</div>
-      <div class="format-goal">${f.goal}</div>
-      <div class="tags" style="margin-bottom:8px">
-        <span class="tag" style="font-size:10px">🎨 ${f.style.split(',')[0]}</span>
-      </div>
-      <div style="font-size:11px;color:var(--text2);margin-bottom:4px"><strong style="color:var(--text)">Typische Inhalte:</strong> ${f.typical_content}</div>
-      <div class="format-length">⏱ ${f.length}</div>
-    </div>`).join('');
-}
-
-// ── CONTENT PLAN ──────────────────────────────────────────────────────────────
-function renderPlan() {
-  const weekData = DATA.content_plan.find(w => w.week === currentWeek);
-  const searchVal = document.getElementById('plan-search').value.toLowerCase();
-
-  // Week nav
-  document.getElementById('week-nav').innerHTML = DATA.content_plan.map(w =>
-    `<button class="week-btn ${w.week===currentWeek?'active':''}" onclick="setWeek(${w.week})">W${w.week}</button>`
-  ).join('');
-
-  // Theme
-  document.getElementById('week-theme').innerHTML = `<strong>Woche ${weekData.week}:</strong> ${weekData.theme}`;
-
-  // Posts
-  const posts = weekData.posts.filter(p => {
-    if (currentPillarFilter !== 'all' && p.pillar !== currentPillarFilter) return false;
-    if (searchVal && !p.title.toLowerCase().includes(searchVal) && !p.hook.toLowerCase().includes(searchVal) && !p.idea.toLowerCase().includes(searchVal)) return false;
-    return true;
-  });
-
-  document.getElementById('posts-list').innerHTML = posts.length
-    ? posts.map(p => renderPostCard(p)).join('')
-    : `<div class="empty">Keine Posts gefunden für diesen Filter.</div>`;
-}
-
-function renderPostCard(p) {
-  const dayShort = p.day === 'Montag' ? 'MO' : p.day === 'Mittwoch' ? 'MI' : 'FR';
-  const dayNum = p.day === 'Montag' ? '●' : p.day === 'Mittwoch' ? '●●' : '●●●';
-  return `<div class="post-card" id="post-${p.id}">
-    <div class="post-header" onclick="togglePost('${p.id}')">
-      <div class="post-day-badge">
-        <div class="day">${dayShort}</div>
-        <div class="daynum">${dayShort === 'MO' ? '1' : dayShort === 'MI' ? '3' : '5'}</div>
-      </div>
-      <div class="post-info">
-        <div class="post-title">${p.title}</div>
-        <div class="post-hook">${p.hook}</div>
-        <div class="post-meta">
-          <span class="post-badge ${pillarColors[p.pillar]}">${p.pillar}</span>
-          <span class="post-badge pb-format">${p.format}</span>
-          <span class="post-badge pb-format">${p.id}</span>
-        </div>
-      </div>
-      <div class="expand-icon">▾</div>
-    </div>
-    <div class="post-body">
-      <div class="body-section">
-        <div class="body-label">Idee</div>
-        <div style="font-size:13px;line-height:1.6">${p.idea}</div>
-      </div>
-      <div class="body-section">
-        <div class="body-label">3 Varianten</div>
-        ${p.variants.map((v,i) => `<div class="variant"><span>${['A','B','C'][i]}</span>${v.replace(/^Variante [ABC]: /,'')}</div>`).join('')}
-      </div>
-      <div class="body-section" style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-        <div>
-          <div class="body-label">Ziel</div>
-          <div class="goal-box">${p.goal}</div>
-        </div>
-        <div>
-          <div class="body-label">CTA</div>
-          <div class="cta-box">→ ${p.cta}</div>
-        </div>
-      </div>
-    </div>
-  </div>`;
-}
-
-function togglePost(id) {
-  document.getElementById('post-' + id).classList.toggle('open');
-}
-
-function setWeek(w) {
-  currentWeek = w;
-  renderPlan();
-}
-
-document.getElementById('plan-search').addEventListener('input', renderPlan);
-
-document.getElementById('plan-filters').addEventListener('click', e => {
-  const btn = e.target.closest('.filter-btn');
-  if (!btn) return;
-  document.querySelectorAll('#plan-filters .filter-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  currentPillarFilter = btn.dataset.pillar;
-  renderPlan();
-});
-
-// ── PRODUCTION ────────────────────────────────────────────────────────────────
-function renderProduction() {
-  document.getElementById('production-list').innerHTML = DATA.production.map(p => {
-    const postTitle = findPostTitle(p.post_id);
-    return `<div class="prod-card">
-      <div class="prod-header">
-        <div>
-          <div class="prod-id">${p.post_id}</div>
-          <div style="font-size:13px;font-weight:600;margin-top:2px">${postTitle}</div>
-        </div>
-        <div style="display:flex;gap:10px;align-items:center">
-          <div style="text-align:center;background:var(--bg3);padding:6px 12px;border-radius:8px">
-            <div style="font-size:18px;font-weight:800;color:var(--accent)">${p.effort_hours}h</div>
-            <div style="font-size:10px;color:var(--text2)">Aufwand</div>
-          </div>
-          <div style="text-align:center;background:var(--bg3);padding:6px 12px;border-radius:8px">
-            <div style="font-size:18px;font-weight:800;color:var(--blue)">${p.team_size}</div>
-            <div style="font-size:10px;color:var(--text2)">Personen</div>
-          </div>
-        </div>
-      </div>
-      <div class="prod-section">
-        <div class="prod-label">📍 Drehort</div>
-        <div style="font-size:12px;color:var(--text)">${p.location}</div>
-      </div>
-      <div class="prod-section">
-        <div class="prod-label">🎥 Equipment</div>
-        <div class="equip-list">${p.equipment.map(e => `<span class="equip-tag">${e}</span>`).join('')}</div>
-      </div>
-      <div class="prod-section">
-        <div class="prod-label">⚠ Besondere Anforderungen</div>
-        <div class="prod-note">${p.notes}</div>
-      </div>
-    </div>`;
-  }).join('');
-}
-
-function findPostTitle(postId) {
-  for (const w of DATA.content_plan) {
-    const p = w.posts.find(p => p.id === postId);
-    if (p) return p.title;
+// Build a fresh event object from a seed post (incl. milestone tasks)
+function seedToEvent(p){
+  const tasks = [];
+  if(p.milestones){
+    const m=p.milestones;
+    const mk=(label,date)=>({id:uid(),text:label,date:(date&&date.startsWith("2026"))?date:"",note:(date&&!date.startsWith("2026"))?date:"",done:false});
+    tasks.push(mk("Konzept",m.concept));
+    tasks.push(mk("Dreh",m.shoot));
+    tasks.push(mk("Schnitt",m.edit));
+    tasks.push(mk("Review",m.review));
   }
-  return postId;
+  if(p.prod && p.prod.notes){
+    tasks.push({id:uid(),text:"Produktion: "+p.prod.notes,date:"",note:"Anforderung",done:false});
+  }
+  return {
+    id:p.id, date:p.date, pillar:p.pillar, format:p.format||"",
+    title:p.title, hook:p.hook||"", idea:p.idea||"",
+    variants:(p.variants||[]).slice(), goal:p.goal||"", cta:p.cta||"",
+    location:p.prod?p.prod.location:"", equipment:p.prod?p.prod.equipment.slice():[],
+    hours:p.prod?p.prod.hours:"", team:p.prod?p.prod.team:"", notes:p.prod?p.prod.notes:"",
+    tasks
+  };
+}
+function uid(){return "id"+Math.random().toString(36).slice(2,9)}
+
+function seedAll(){ return SEED.posts.map(seedToEvent); }
+
+function load(){
+  try{
+    const raw=localStorage.getItem(LS_KEY);
+    if(raw){ events=JSON.parse(raw); return; }
+  }catch(e){}
+  events=seedAll();
+  save();
+}
+function save(){
+  try{ localStorage.setItem(LS_KEY,JSON.stringify(events)); }catch(e){}
 }
 
-// ── TIMELINE ──────────────────────────────────────────────────────────────────
-function renderTimeline() {
-  const today = '2026-06-26';
-  const weeks = [...new Set(DATA.timeline.map(t => t.post_id.split('-')[0]))];
-
-  const filterEl = document.getElementById('timeline-week-filter');
-  filterEl.innerHTML = `<button class="filter-btn ${currentTimelineWeek==='all'?'active':''}" onclick="setTimelineWeek('all')">Alle</button>` +
-    weeks.map(w => `<button class="filter-btn ${currentTimelineWeek===w?'active':''}" onclick="setTimelineWeek('${w}')">${w}</button>`).join('');
-
-  const items = DATA.timeline.filter(t => currentTimelineWeek === 'all' || t.post_id.startsWith(currentTimelineWeek));
-
-  document.getElementById('timeline-list').innerHTML = items.map(t => {
-    const postTitle = findPostTitle(t.post_id);
-    const isUrgent = (d) => d && d.startsWith('2026') && d <= '2026-07-10';
-    return `<div class="timeline-card">
-      <div class="tl-id">${t.post_id}</div>
-      <div style="flex:1;min-width:160px">
-        <div style="font-size:12px;font-weight:600;margin-bottom:2px">${postTitle}</div>
-        <div class="tl-week" style="display:inline-block">${t.post_id.split('-')[0]}</div>
-      </div>
-      <div class="tl-steps">
-        ${['concept','shoot','edit','review'].map(step => `
-          <div class="tl-step ${isUrgent(t.milestones[step])?'urgent':''}">
-            <div class="tl-step-label">${step === 'concept' ? 'Konzept' : step === 'shoot' ? 'Dreh' : step === 'edit' ? 'Schnitt' : 'Review'}</div>
-            <div class="tl-step-date">${t.milestones[step]}</div>
-          </div>`).join('')}
-        <div class="tl-step" style="background:rgba(245,166,35,0.15)">
-          <div class="tl-step-label">Publish</div>
-          <div class="tl-step-date" style="color:var(--accent);font-weight:700">${t.publish_date}</div>
-        </div>
-      </div>
-    </div>`;
-  }).join('');
+// ════════════════════════════════════════════════════════════════════════════
+//  CALENDAR RENDERING
+// ════════════════════════════════════════════════════════════════════════════
+function renderLegend(){
+  const el=document.getElementById("legend");
+  el.innerHTML='<span class="legend-label">Säulen:</span>'+
+    ["P1","P2","P3","P4","P5","custom"].map(p=>
+      `<span class="pill ${activePillars.has(p)?'active':'inactive'}" style="color:${PILLAR_HEX[p]}" onclick="togglePillar('${p}')">
+        <span class="dot" style="background:${PILLAR_HEX[p]}"></span>${p==='custom'?'Eigene':p+' '+PILLAR_NAMES[p]}
+      </span>`).join('');
+}
+function togglePillar(p){
+  if(activePillars.has(p)) activePillars.delete(p); else activePillars.add(p);
+  renderLegend(); renderCalendar();
 }
 
-function setTimelineWeek(w) {
-  currentTimelineWeek = w;
-  renderTimeline();
+function renderHead(){
+  document.getElementById("calHead").innerHTML=DAYS.map(d=>`<div class="cal-head">${d}</div>`).join('');
 }
 
-// ── TASKS ─────────────────────────────────────────────────────────────────────
-function renderTasks() {
-  const priorityClass = { 'SOFORT': 'priority-sofort', 'DIESE WOCHE': 'priority-diese', 'PARALLEL': 'priority-parallel', 'ENGPÄSSE': 'priority-engpass' };
-
-  document.getElementById('tasks-list').innerHTML = DATA.tasks.map(group => `
-    <div class="task-group">
-      <div class="task-group-header">
-        <h3>${group.category}</h3>
-        <span class="priority-badge ${priorityClass[group.priority]||''}">${group.priority}</span>
-      </div>
-      ${group.tasks.map((task, i) => {
-        const key = group.priority + '_' + i;
-        const done = taskState[key] || false;
-        return `<div class="task-item ${done?'done':''}" onclick="toggleTask('${key}', this)">
-          <div class="task-check">${done ? '✓' : ''}</div>
-          <div class="task-text">${task}</div>
+function renderCalendar(){
+  document.getElementById("monthLabel").textContent=MONTHS[viewMonth]+" "+viewYear;
+  const grid=document.getElementById("calGrid");
+  const first=new Date(viewYear,viewMonth,1);
+  let startDow=(first.getDay()+6)%7; // Mon=0
+  const start=new Date(viewYear,viewMonth,1-startDow);
+  const todayStr=isoDate(new Date());
+  let html="";
+  for(let i=0;i<42;i++){
+    const d=new Date(start); d.setDate(start.getDate()+i);
+    const ds=isoDate(d);
+    const other=d.getMonth()!==viewMonth;
+    const dayEvents=events.filter(e=>e.date===ds && activePillars.has(e.pillar));
+    html+=`<div class="cal-cell ${other?'other-month':''} ${ds===todayStr?'today':''}" onclick="cellClick(event,'${ds}')">
+      <div class="cell-date"><span>${d.getDate()}</span><span class="cell-add">＋</span></div>
+      ${dayEvents.map(e=>{
+        const total=e.tasks.length, done=e.tasks.filter(t=>t.done).length;
+        const allDone=total>0&&done===total;
+        return `<div class="evt ev-${e.pillar} ${allDone?'done-evt':''}" onclick="event.stopPropagation();openEvent('${e.id}')" title="${esc(e.title)}">
+          ${esc(e.title)}${total?`<span class="evt-task-badge">${done}/${total}</span>`:''}
         </div>`;
       }).join('')}
+    </div>`;
+  }
+  grid.innerHTML=html;
+  updateStats();
+}
+
+function cellClick(ev,ds){ openNewEvent(ds); }
+
+function updateStats(){
+  document.getElementById("statTotal").textContent=events.length;
+  let t=0,d=0; events.forEach(e=>{t+=e.tasks.length; d+=e.tasks.filter(x=>x.done).length;});
+  document.getElementById("statTasks").textContent=t;
+  document.getElementById("statDone").textContent=d;
+}
+
+function changeMonth(delta){
+  viewMonth+=delta;
+  if(viewMonth<0){viewMonth=11;viewYear--;}
+  if(viewMonth>11){viewMonth=0;viewYear++;}
+  renderCalendar();
+}
+function goToday(){ const n=new Date(); viewYear=n.getFullYear(); viewMonth=n.getMonth(); renderCalendar(); }
+
+// ════════════════════════════════════════════════════════════════════════════
+//  EVENT MODAL
+// ════════════════════════════════════════════════════════════════════════════
+let draft=null; // currently edited event copy
+
+function openEvent(id){
+  const e=events.find(x=>x.id===id); if(!e) return;
+  editingId=id;
+  draft=JSON.parse(JSON.stringify(e));
+  renderModal(false);
+}
+function openNewEvent(date){
+  editingId=null;
+  draft={id:uid(),date:(typeof date==="string"?date:isoDate(new Date())),pillar:"custom",format:"",
+    title:"",hook:"",idea:"",variants:[],goal:"",cta:"",location:"",equipment:[],hours:"",team:"",notes:"",tasks:[]};
+  renderModal(true);
+}
+
+function renderModal(isNew){
+  document.getElementById("modalTitle").textContent=isNew?"Neuer Termin":draft.title||"Termin bearbeiten";
+  document.getElementById("mhColor").style.background=PILLAR_HEX[draft.pillar]||"#566080";
+  document.getElementById("deleteBtn").style.display=isNew?"none":"";
+
+  const total=draft.tasks.length, done=draft.tasks.filter(t=>t.done).length;
+
+  document.getElementById("modalBody").innerHTML=`
+    <div class="field"><label>Titel / Hook-Überschrift</label>
+      <input id="f_title" value="${esc(draft.title)}" placeholder="Worum geht es?"></div>
+    <div class="row3">
+      <div class="field"><label>Datum</label><input type="date" id="f_date" value="${draft.date}"></div>
+      <div class="field"><label>Säule</label>
+        <select id="f_pillar">
+          ${Object.keys(PILLAR_NAMES).map(p=>`<option value="${p}" ${draft.pillar===p?'selected':''}>${p==='custom'?'Eigener Termin':p+' · '+PILLAR_NAMES[p]}</option>`).join('')}
+        </select></div>
+      <div class="field"><label>Format</label><input id="f_format" value="${esc(draft.format)}" placeholder="z.B. F1"></div>
+    </div>
+    <div class="field"><label>Hook (Aufhänger)</label>
+      <textarea id="f_hook" placeholder="Der erste Satz, der Aufmerksamkeit erzeugt">${esc(draft.hook)}</textarea></div>
+    <div class="field"><label>Idee / Beschreibung</label>
+      <textarea id="f_idea" placeholder="Konkrete Umsetzungsidee">${esc(draft.idea)}</textarea></div>
+
+    <div class="field"><label>Varianten</label>
+      <div id="variantList"></div>
+      <button class="add-link" onclick="addVariant()">+ Variante hinzufügen</button></div>
+
+    <div class="row2">
+      <div class="field"><label>Ziel</label><textarea id="f_goal" placeholder="Was soll der Post erreichen?">${esc(draft.goal)}</textarea></div>
+      <div class="field"><label>Call-to-Action</label><textarea id="f_cta" placeholder="Handlungsaufforderung">${esc(draft.cta)}</textarea></div>
+    </div>
+
+    <div class="field"><label>📍 Drehort</label><input id="f_location" value="${esc(draft.location)}" placeholder="Realistischer Drehort"></div>
+    <div class="row3">
+      <div class="field"><label>Aufwand (h)</label><input id="f_hours" value="${esc(String(draft.hours))}" placeholder="z.B. 5"></div>
+      <div class="field"><label>Team (Personen)</label><input id="f_team" value="${esc(String(draft.team))}" placeholder="z.B. 3"></div>
+      <div class="field"><label>&nbsp;</label><input id="f_equipdummy" value="" style="visibility:hidden"></div>
+    </div>
+    <div class="field"><label>🎥 Equipment (Komma-getrennt)</label>
+      <input id="f_equipment" value="${esc((draft.equipment||[]).join(', '))}" placeholder="Sony A7 IV, Drohne, LED-Panel"></div>
+    <div class="field"><label>⚠ Besondere Anforderungen / Notizen</label>
+      <textarea id="f_notes" placeholder="Genehmigungen, Vorlaufzeiten, Risiken">${esc(draft.notes)}</textarea></div>
+
+    <div class="task-block">
+      <div class="task-block-head">
+        <span class="tbh-title">✅ Aufgaben in diesem Termin</span>
+        <span class="task-prog" id="taskProg">${done}/${total} erledigt</span>
+      </div>
+      <div id="taskList"></div>
+      <button class="add-link" onclick="addTask()">+ Aufgabe hinzufügen</button>
+    </div>
+  `;
+  renderVariants(); renderTasks();
+  document.getElementById("f_pillar").addEventListener("change",e=>{
+    draft.pillar=e.target.value;
+    document.getElementById("mhColor").style.background=PILLAR_HEX[draft.pillar];
+  });
+  document.getElementById("overlay").classList.add("open");
+}
+
+function renderVariants(){
+  const el=document.getElementById("variantList");
+  el.innerHTML=draft.variants.map((v,i)=>`
+    <div class="list-row">
+      <input value="${esc(v)}" oninput="draft.variants[${i}]=this.value">
+      <button class="mini-del" onclick="delVariant(${i})">×</button>
     </div>`).join('');
+}
+function addVariant(){ draft.variants.push(""); renderVariants(); }
+function delVariant(i){ draft.variants.splice(i,1); renderVariants(); }
 
-  updateTaskProgress();
+function renderTasks(){
+  const el=document.getElementById("taskList");
+  el.innerHTML=draft.tasks.map((t,i)=>`
+    <div class="task-row ${t.done?'done':''}">
+      <div class="task-check" onclick="toggleTask(${i})">${t.done?'✓':''}</div>
+      <input class="task-text-in" value="${esc(t.text)}" oninput="draft.tasks[${i}].text=this.value" placeholder="Aufgabe…">
+      ${t.note?`<span class="task-tag">${esc(t.note)}</span>`:''}
+      <input class="task-date-in" type="date" value="${t.date||''}" onchange="draft.tasks[${i}].date=this.value">
+      <button class="mini-del" onclick="delTask(${i})">×</button>
+    </div>`).join('');
+  const total=draft.tasks.length, done=draft.tasks.filter(t=>t.done).length;
+  const p=document.getElementById("taskProg"); if(p) p.textContent=`${done}/${total} erledigt`;
+}
+function addTask(){ draft.tasks.push({id:uid(),text:"",date:"",note:"",done:false}); renderTasks(); }
+function delTask(i){ draft.tasks.splice(i,1); renderTasks(); }
+function toggleTask(i){ draft.tasks[i].done=!draft.tasks[i].done; renderTasks(); }
+
+function collectDraft(){
+  draft.title=val("f_title"); draft.date=val("f_date"); draft.format=val("f_format");
+  draft.hook=val("f_hook"); draft.idea=val("f_idea"); draft.goal=val("f_goal"); draft.cta=val("f_cta");
+  draft.location=val("f_location"); draft.hours=val("f_hours"); draft.team=val("f_team"); draft.notes=val("f_notes");
+  draft.equipment=val("f_equipment").split(",").map(s=>s.trim()).filter(Boolean);
+  // pillar already synced via change handler; ensure:
+  draft.pillar=val("f_pillar");
+}
+function saveEvent(){
+  collectDraft();
+  if(!draft.title.trim()){ toast("Bitte einen Titel eingeben"); return; }
+  if(editingId){
+    const idx=events.findIndex(e=>e.id===editingId);
+    events[idx]=draft;
+  }else{
+    events.push(draft);
+  }
+  save(); closeModal(); renderCalendar();
+  // jump to the month of the saved event
+  const d=new Date(draft.date); viewYear=d.getFullYear(); viewMonth=d.getMonth(); renderCalendar();
+  toast("Gespeichert");
+}
+function deleteEvent(){
+  if(!editingId) return;
+  if(!confirm("Diesen Termin wirklich löschen?")) return;
+  events=events.filter(e=>e.id!==editingId);
+  save(); closeModal(); renderCalendar(); toast("Gelöscht");
+}
+function closeModal(){ document.getElementById("overlay").classList.remove("open"); draft=null; editingId=null; }
+document.getElementById("overlay").addEventListener("click",e=>{ if(e.target.id==="overlay") closeModal(); });
+
+// ════════════════════════════════════════════════════════════════════════════
+//  DRAWER (Strategie & Formate)
+// ════════════════════════════════════════════════════════════════════════════
+function openDrawer(){ document.getElementById("drawer").classList.add("open"); switchDrawerTab('strategy',document.querySelector('.drawer-tab')); }
+function closeDrawer(){ document.getElementById("drawer").classList.remove("open"); }
+function switchDrawerTab(tab,btn){
+  document.querySelectorAll(".drawer-tab").forEach(b=>b.classList.remove("active"));
+  if(btn) btn.classList.add("active");
+  const el=document.getElementById("drawerContent");
+  if(tab==='strategy'){
+    el.innerHTML=SEED.pillars.map(p=>`
+      <div class="ref-card p${p.id.slice(1)}">
+        <div class="ref-id">${p.id}</div>
+        <h4>${p.name}</h4>
+        <p>${p.goal}</p>
+        <div class="ref-tags">${p.types.map(t=>`<span class="ref-tag">${t}</span>`).join('')}</div>
+        <p style="color:var(--green);margin-top:8px;font-size:11px">📈 ${p.kpi}</p>
+      </div>`).join('');
+  }else{
+    el.innerHTML=SEED.formats.map(f=>`
+      <div class="ref-card p${f.pillar.slice(1)}">
+        <div class="ref-id">${f.id} · ${f.day}</div>
+        <h4>${f.name}</h4>
+        <p>${f.goal}</p>
+        <p style="margin-top:6px"><b style="color:var(--text)">Inhalte:</b> ${f.content}</p>
+        <p style="color:var(--accent);margin-top:6px;font-size:11px">⏱ ${f.length}</p>
+      </div>`).join('');
+  }
 }
 
-function toggleTask(key, el) {
-  taskState[key] = !taskState[key];
-  el.classList.toggle('done', taskState[key]);
-  el.querySelector('.task-check').textContent = taskState[key] ? '✓' : '';
-  updateTaskProgress();
+// ════════════════════════════════════════════════════════════════════════════
+//  EXPORT / RESET / HELPERS
+// ════════════════════════════════════════════════════════════════════════════
+function exportData(){
+  const blob=new Blob([JSON.stringify(events,null,2)],{type:"application/json"});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement("a");
+  a.href=url; a.download="content-kalender-export.json"; a.click();
+  URL.revokeObjectURL(url); toast("Export gestartet");
+}
+function resetData(){
+  if(!confirm("Alle Änderungen verwerfen und auf den Original-Plan zurücksetzen?")) return;
+  events=seedAll(); save(); renderCalendar(); toast("Zurückgesetzt");
 }
 
-function updateTaskProgress() {
-  const total = DATA.tasks.reduce((s, g) => s + g.tasks.length, 0);
-  const done = Object.values(taskState).filter(Boolean).length;
-  document.getElementById('tasks-count').textContent = `${done} / ${total}`;
-  document.getElementById('tasks-progress-fill').style.width = `${Math.round(done/total*100)}%`;
+function isoDate(d){ return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
+function esc(s){ return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+function val(id){ const e=document.getElementById(id); return e?e.value:""; }
+let toastTimer=null;
+function toast(msg){
+  const t=document.getElementById("toast"); t.textContent=msg; t.classList.add("show");
+  clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove("show"),1800);
 }
+document.addEventListener("keydown",e=>{ if(e.key==="Escape"){ closeModal(); closeDrawer(); }});
 
-// ── INIT ──────────────────────────────────────────────────────────────────────
-renderDashboard();
-renderStrategy();
-renderFormats();
-renderPlan();
-renderProduction();
-renderTimeline();
-renderTasks();
+// ── INIT ──
+(function init(){
+  load();
+  // start on the first campaign month (Juli 2026) if events exist, else today
+  if(events.length){ const d=new Date(events.map(e=>e.date).sort()[0]); viewYear=d.getFullYear(); viewMonth=d.getMonth(); }
+  else { const n=new Date(); viewYear=n.getFullYear(); viewMonth=n.getMonth(); }
+  renderLegend(); renderHead(); renderCalendar();
+})();
 </script>
 </body>
 </html>
