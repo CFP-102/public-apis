@@ -141,6 +141,24 @@
   .help code{color:var(--accent)}
   .help pre{white-space:pre-wrap;margin:8px 0 0;font-family:ui-monospace,Menlo,monospace;font-size:11px;line-height:1.5;color:var(--text2)}
   .btn-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+  /* Editable drawer cards */
+  .edit-card{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:10px}
+  .edit-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+  .edit-id{font-size:11px;font-weight:700;color:var(--text2);background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:2px 8px}
+  .edit-color{width:34px;height:30px;border:1px solid var(--border);border-radius:6px;background:none;cursor:pointer;padding:0}
+  .edit-sel{background:var(--bg2);border:1px solid var(--border);color:var(--text);border-radius:6px;font-size:12px;padding:4px;margin-left:auto}
+  .edit-card input,.edit-card textarea{width:100%;background:var(--bg2);border:1px solid var(--border);color:var(--text);border-radius:7px;padding:7px 9px;font-size:12px;outline:none;margin-bottom:6px}
+  .edit-card input:focus,.edit-card textarea:focus{border-color:var(--accent)}
+  .edit-card .edit-name{font-weight:700;font-size:13px}
+  .edit-card textarea{min-height:48px;resize:vertical}
+  /* AI suggestion cards */
+  .ai-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:10px}
+  .ai-head{display:flex;align-items:center;gap:6px;margin-bottom:8px;flex-wrap:wrap}
+  .ai-title{font-size:14px;font-weight:700;margin-bottom:4px}
+  .ai-hook{font-size:12px;font-style:italic;color:var(--text2);margin-bottom:6px}
+  .ai-idea{font-size:12px;margin-bottom:6px}
+  .ai-meta{font-size:11px;color:var(--text2);margin-top:4px}
+  .ai-meta b{color:var(--text)}
 </style>
 </head>
 <body>
@@ -236,17 +254,35 @@ Bestehenden Termin AKTUALISIEREN: Kopf mit vorhandener ID,
 Schnell-Modus: einfach pro Zeile eine Idee (nur Titel, keine Doppelpunkte)
    → jede Zeile wird ein neuer Termin (Datum danach im Kalender anpassen).</pre>
         </details>
-        <textarea id="ideasInput" class="big-ta" placeholder="Ideen hier einfügen … (siehe Format-Hilfe oben)"></textarea>
+        <textarea id="ideasInput" class="big-ta" placeholder="Lose Ideen/Stichworte – eine pro Zeile, z.B.:&#10;30 Sekunden Reel zur Wechselrichter-Wartung&#10;3 Reels zur letzten Baustelle&#10;Behind-the-Scenes Fotos vom Team"></textarea>
         <div class="btn-row">
-          <button class="btn btn-primary" onclick="applyIdeas()">In Plan übernehmen</button>
-          <button class="btn" onclick="copyAIPrompt()">🤖 Als KI-Prompt kopieren</button>
-          <button class="btn" onclick="fillExample()">Beispiel einfügen</button>
+          <button class="btn btn-primary" onclick="aiSuggest()">✨ Mit KI Vorschläge erstellen</button>
+          <button class="btn" onclick="applyIdeas()">Direkt übernehmen (ohne KI)</button>
+          <button class="btn" onclick="fillExample()">Beispiel</button>
         </div>
-        <div class="help" style="margin-top:14px;margin-bottom:0">
-          <b style="color:var(--text)">KI-Workflow:</b> „KI-Prompt kopieren" legt deinen kompletten Plan + deine Ideen
-          als fertigen Prompt in die Zwischenablage. In Claude/ChatGPT einfügen → du bekommst aktualisiertes JSON
-          zurück → dieses im Tab „JSON &amp; Export" einfügen und übernehmen.
-        </div>
+
+        <div id="aiResults" style="margin-top:14px"></div>
+
+        <details class="help" style="margin-top:12px">
+          <summary>⚙️ Anthropic API-Key (für KI-Vorschläge)</summary>
+          <div style="margin-top:10px">
+            <input id="aiKey" type="password" class="big-ta" style="min-height:auto;height:38px" placeholder="sk-ant-…" autocomplete="off">
+            <div class="btn-row" style="margin-top:8px">
+              <button class="btn" onclick="saveKey()">Key speichern</button>
+              <button class="btn" onclick="clearKey()">Key löschen</button>
+              <span id="keyState" style="font-size:11px;color:var(--text2);align-self:center"></span>
+            </div>
+            <div style="font-size:11px;color:var(--text2);margin-top:8px;line-height:1.5">
+              Der Key wird nur lokal in deinem Browser gespeichert (localStorage) und direkt an Anthropic gesendet – nie an Dritte, nie ins Repository. Modell: <b>Claude Haiku 4.5</b>. <a href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener">Key erstellen ↗</a>
+            </div>
+          </div>
+        </details>
+
+        <details class="help" style="margin-top:12px;margin-bottom:0">
+          <summary>Ohne API-Key: manueller KI-Prompt</summary>
+          <div class="btn-row" style="margin-top:8px"><button class="btn" onclick="copyAIPrompt()">🤖 Prompt kopieren</button></div>
+          <div style="font-size:11px;color:var(--text2);margin-top:8px">Kopiert Plan + Ideen als fertigen Prompt. In Claude/ChatGPT einfügen, das zurückgegebene JSON im Tab „JSON &amp; Export" einspielen.</div>
+        </details>
       </div>
 
       <div id="tabJson" style="display:none">
@@ -274,13 +310,14 @@ Schnell-Modus: einfach pro Zeile eine Idee (nur Titel, keine Doppelpunkte)
 <!-- Reference drawer -->
 <div class="drawer" id="drawer">
   <div class="drawer-head">
-    <h3>Referenz</h3>
+    <h3>Strategie &amp; Formate</h3>
     <button class="modal-close" onclick="closeDrawer()">×</button>
   </div>
   <div class="drawer-body">
+    <div class="help" style="margin-bottom:14px">Säulen &amp; Formate sind editierbar. Änderungen an Farbe/Name wirken sofort im Kalender. Neue Säulen stehen danach in jedem Termin zur Auswahl.</div>
     <div class="drawer-tabs">
-      <button class="drawer-tab active" onclick="switchDrawerTab('strategy',this)">5 Säulen</button>
-      <button class="drawer-tab" onclick="switchDrawerTab('formats',this)">5 Formate</button>
+      <button class="drawer-tab active" onclick="switchDrawerTab('strategy',this)">Säulen</button>
+      <button class="drawer-tab" onclick="switchDrawerTab('formats',this)">Formate</button>
     </div>
     <div id="drawerContent"></div>
   </div>
@@ -352,15 +389,25 @@ const SEED = {
 //  STATE & PERSISTENCE
 // ════════════════════════════════════════════════════════════════════════════
 const LS_KEY = "solartech_content_calendar_v1";
-const PILLAR_NAMES = {P1:"Aufklärung",P2:"Projekte",P3:"Hinter den Kulissen",P4:"Kundenstimmen",P5:"Branche",custom:"Eigener Termin"};
-const PILLAR_HEX = {P1:"#4a90d9",P2:"#4caf7d",P3:"#f5a623",P4:"#9b6fd4",P5:"#3dbfb8",custom:"#566080"};
+const DEFAULT_HEX = {P1:"#4a90d9",P2:"#4caf7d",P3:"#f5a623",P4:"#9b6fd4",P5:"#3dbfb8"};
+const CUSTOM_COLOR = "#566080";
 const DAYS = ["Mo","Di","Mi","Do","Fr","Sa","So"];
 const MONTHS = ["Januar","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember"];
 
 let events = [];          // working set
+let pillars = [];         // [{id,name,goal,types,kpi,color}] – editierbar
+let formats = [];         // [{id,name,day,pillar,goal,content,length}] – editierbar
 let viewYear, viewMonth;  // current calendar month
-let activePillars = new Set(["P1","P2","P3","P4","P5","custom"]);
+let activePillars = new Set();
 let editingId = null;
+
+function getPillar(id){ return pillars.find(p=>p.id===id) || null; }
+function pillarColor(id){ const p=getPillar(id); return p?p.color:CUSTOM_COLOR; }
+function pillarName(id){ const p=getPillar(id); return p?p.name:(id==='custom'?'Eigener Termin':id); }
+function pillarExists(id){ return id==='custom' || !!getPillar(id); }
+function legendIds(){ return pillars.map(p=>p.id).concat(['custom']); }
+function nextId(prefix,has){ let n=1; while(has(prefix+n)) n++; return prefix+n; }
+function textOn(bg){ try{ const c=String(bg).replace('#',''); const r=parseInt(c.slice(0,2),16),g=parseInt(c.slice(2,4),16),b=parseInt(c.slice(4,6),16); return (0.299*r+0.587*g+0.114*b)>150?'#1a1a1a':'#fff'; }catch(e){ return '#fff'; } }
 
 // Build a fresh event object from a seed post (incl. milestone tasks)
 function seedToEvent(p){
@@ -388,18 +435,22 @@ function seedToEvent(p){
 function uid(){return "id"+Math.random().toString(36).slice(2,9)}
 
 function seedAll(){ return SEED.posts.map(seedToEvent); }
+function seedPillars(){ return SEED.pillars.map(p=>({id:p.id,name:p.name,goal:p.goal,types:p.types.slice(),kpi:p.kpi,color:DEFAULT_HEX[p.id]||CUSTOM_COLOR})); }
+function seedFormats(){ return SEED.formats.map(f=>({id:f.id,name:f.name,day:f.day,pillar:f.pillar,goal:f.goal,content:f.content,length:f.length})); }
 
 function load(){
-  try{
-    const raw=localStorage.getItem(LS_KEY);
-    if(raw){ events=JSON.parse(raw); return; }
-  }catch(e){}
-  events=seedAll();
+  let saved=null;
+  try{ const raw=localStorage.getItem(LS_KEY); if(raw) saved=JSON.parse(raw); }catch(e){}
+  if(Array.isArray(saved)){ events=saved; pillars=seedPillars(); formats=seedFormats(); }     // altes Format (nur events)
+  else if(saved && typeof saved==="object"){
+    events=Array.isArray(saved.events)?saved.events:seedAll();
+    pillars=(Array.isArray(saved.pillars)&&saved.pillars.length)?saved.pillars:seedPillars();
+    formats=Array.isArray(saved.formats)?saved.formats:seedFormats();
+  } else { events=seedAll(); pillars=seedPillars(); formats=seedFormats(); }
+  activePillars=new Set(legendIds());
   save();
 }
-function save(){
-  try{ localStorage.setItem(LS_KEY,JSON.stringify(events)); }catch(e){}
-}
+function save(){ try{ localStorage.setItem(LS_KEY,JSON.stringify({events,pillars,formats})); }catch(e){} }
 
 // ════════════════════════════════════════════════════════════════════════════
 //  CALENDAR RENDERING
@@ -407,10 +458,12 @@ function save(){
 function renderLegend(){
   const el=document.getElementById("legend");
   el.innerHTML='<span class="legend-label">Säulen:</span>'+
-    ["P1","P2","P3","P4","P5","custom"].map(p=>
-      `<span class="pill ${activePillars.has(p)?'active':'inactive'}" style="color:${PILLAR_HEX[p]}" onclick="togglePillar('${p}')">
-        <span class="dot" style="background:${PILLAR_HEX[p]}"></span>${p==='custom'?'Eigene':p+' '+PILLAR_NAMES[p]}
-      </span>`).join('');
+    legendIds().map(p=>{
+      const col=pillarColor(p);
+      return `<span class="pill ${activePillars.has(p)?'active':'inactive'}" style="color:${col}" onclick="togglePillar('${p}')">
+        <span class="dot" style="background:${col}"></span>${p==='custom'?'Eigene':p+' '+esc(pillarName(p))}
+      </span>`;
+    }).join('');
 }
 function togglePillar(p){
   if(activePillars.has(p)) activePillars.delete(p); else activePillars.add(p);
@@ -439,7 +492,8 @@ function renderCalendar(){
       ${dayEvents.map(e=>{
         const total=e.tasks.length, done=e.tasks.filter(t=>t.done).length;
         const allDone=total>0&&done===total;
-        return `<div class="evt ev-${e.pillar} ${allDone?'done-evt':''}" onclick="event.stopPropagation();openEvent('${e.id}')" title="${esc(e.title)}">
+        const col=pillarColor(e.pillar);
+        return `<div class="evt ${allDone?'done-evt':''}" style="background:${col};color:${textOn(col)}" onclick="event.stopPropagation();openEvent('${e.id}')" title="${esc(e.title)}">
           ${esc(e.title)}${total?`<span class="evt-task-badge">${done}/${total}</span>`:''}
         </div>`;
       }).join('')}
@@ -486,7 +540,7 @@ function openNewEvent(date){
 
 function renderModal(isNew){
   document.getElementById("modalTitle").textContent=isNew?"Neuer Termin":draft.title||"Termin bearbeiten";
-  document.getElementById("mhColor").style.background=PILLAR_HEX[draft.pillar]||"#566080";
+  document.getElementById("mhColor").style.background=pillarColor(draft.pillar);
   document.getElementById("deleteBtn").style.display=isNew?"none":"";
 
   const total=draft.tasks.length, done=draft.tasks.filter(t=>t.done).length;
@@ -498,7 +552,7 @@ function renderModal(isNew){
       <div class="field"><label>Datum</label><input type="date" id="f_date" value="${draft.date}"></div>
       <div class="field"><label>Säule</label>
         <select id="f_pillar">
-          ${Object.keys(PILLAR_NAMES).map(p=>`<option value="${p}" ${draft.pillar===p?'selected':''}>${p==='custom'?'Eigener Termin':p+' · '+PILLAR_NAMES[p]}</option>`).join('')}
+          ${legendIds().map(p=>`<option value="${p}" ${draft.pillar===p?'selected':''}>${p==='custom'?'Eigener Termin':p+' · '+esc(pillarName(p))}</option>`).join('')}
         </select></div>
       <div class="field"><label>Format</label><input id="f_format" value="${esc(draft.format)}" placeholder="z.B. F1"></div>
     </div>
@@ -539,7 +593,7 @@ function renderModal(isNew){
   renderVariants(); renderTasks();
   document.getElementById("f_pillar").addEventListener("change",e=>{
     draft.pillar=e.target.value;
-    document.getElementById("mhColor").style.background=PILLAR_HEX[draft.pillar];
+    document.getElementById("mhColor").style.background=pillarColor(draft.pillar);
   });
   document.getElementById("overlay").classList.add("open");
 }
@@ -606,31 +660,70 @@ document.getElementById("overlay").addEventListener("click",e=>{ if(e.target.id=
 // ════════════════════════════════════════════════════════════════════════════
 //  DRAWER (Strategie & Formate)
 // ════════════════════════════════════════════════════════════════════════════
+let drawerTab="strategy";
 function openDrawer(){ document.getElementById("drawer").classList.add("open"); switchDrawerTab('strategy',document.querySelector('.drawer-tab')); }
 function closeDrawer(){ document.getElementById("drawer").classList.remove("open"); }
 function switchDrawerTab(tab,btn){
+  drawerTab=tab;
   document.querySelectorAll(".drawer-tab").forEach(b=>b.classList.remove("active"));
   if(btn) btn.classList.add("active");
+  renderDrawer();
+}
+function renderDrawer(){
   const el=document.getElementById("drawerContent");
-  if(tab==='strategy'){
-    el.innerHTML=SEED.pillars.map(p=>`
-      <div class="ref-card p${p.id.slice(1)}">
-        <div class="ref-id">${p.id}</div>
-        <h4>${p.name}</h4>
-        <p>${p.goal}</p>
-        <div class="ref-tags">${p.types.map(t=>`<span class="ref-tag">${t}</span>`).join('')}</div>
-        <p style="color:var(--green);margin-top:8px;font-size:11px">📈 ${p.kpi}</p>
-      </div>`).join('');
-  }else{
-    el.innerHTML=SEED.formats.map(f=>`
-      <div class="ref-card p${f.pillar.slice(1)}">
-        <div class="ref-id">${f.id} · ${f.day}</div>
-        <h4>${f.name}</h4>
-        <p>${f.goal}</p>
-        <p style="margin-top:6px"><b style="color:var(--text)">Inhalte:</b> ${f.content}</p>
-        <p style="color:var(--accent);margin-top:6px;font-size:11px">⏱ ${f.length}</p>
-      </div>`).join('');
+  if(drawerTab==='strategy'){
+    el.innerHTML=pillars.map((p,i)=>`
+      <div class="edit-card" style="border-left:4px solid ${p.color}">
+        <div class="edit-row">
+          <span class="edit-id">${esc(p.id)}</span>
+          <input class="edit-color" type="color" value="${p.color}" oninput="updPillar(${i},'color',this.value)" title="Farbe">
+          <button class="mini-del" style="margin-left:auto" onclick="delPillar(${i})">×</button>
+        </div>
+        <input class="edit-name" value="${esc(p.name)}" placeholder="Name der Säule" oninput="updPillar(${i},'name',this.value)">
+        <textarea placeholder="Ziel / Nutzen" oninput="updPillar(${i},'goal',this.value)">${esc(p.goal)}</textarea>
+        <input value="${esc((p.types||[]).join(', '))}" placeholder="Content-Typen (Komma-getrennt)" oninput="updPillarTypes(${i},this.value)">
+        <input value="${esc(p.kpi)}" placeholder="KPI" oninput="updPillar(${i},'kpi',this.value)">
+      </div>`).join('')
+      + `<button class="add-link" onclick="addPillar()">+ Säule hinzufügen</button>`;
+  } else {
+    el.innerHTML=formats.map((f,i)=>`
+      <div class="edit-card" style="border-left:4px solid ${pillarColor(f.pillar)}">
+        <div class="edit-row">
+          <span class="edit-id">${esc(f.id)}</span>
+          <select class="edit-sel" onchange="updFormat(${i},'pillar',this.value)">
+            ${pillars.map(p=>`<option value="${p.id}" ${f.pillar===p.id?'selected':''}>${esc(p.id)} · ${esc(p.name)}</option>`).join('')}
+            <option value="custom" ${f.pillar==='custom'?'selected':''}>– keine Säule</option>
+          </select>
+          <button class="mini-del" onclick="delFormat(${i})">×</button>
+        </div>
+        <input class="edit-name" value="${esc(f.name)}" placeholder="Format-Name" oninput="updFormat(${i},'name',this.value)">
+        <input value="${esc(f.day)}" placeholder="Wochentag" oninput="updFormat(${i},'day',this.value)">
+        <textarea placeholder="Ziel des Formats" oninput="updFormat(${i},'goal',this.value)">${esc(f.goal)}</textarea>
+        <input value="${esc(f.content)}" placeholder="Typische Inhalte" oninput="updFormat(${i},'content',this.value)">
+        <input value="${esc(f.length)}" placeholder="Länge (z.B. 60–90 Sek)" oninput="updFormat(${i},'length',this.value)">
+      </div>`).join('')
+      + `<button class="add-link" onclick="addFormat()">+ Format hinzufügen</button>`;
   }
+}
+function updPillar(i,k,v){ pillars[i][k]=v; save(); renderLegend(); if(k==='color'||k==='name') renderCalendar(); }
+function updPillarTypes(i,v){ pillars[i].types=v.split(',').map(s=>s.trim()).filter(Boolean); save(); }
+function delPillar(i){
+  if(!confirm('Säule „'+pillars[i].name+'“ löschen? Bestehende Termine dieser Säule bleiben erhalten, werden aber grau dargestellt.')) return;
+  const id=pillars[i].id; pillars.splice(i,1); activePillars.delete(id);
+  save(); renderDrawer(); renderLegend(); renderCalendar();
+}
+function addPillar(){
+  const id=nextId('P',x=>!!getPillar(x));
+  const palette=['#d4675a','#5aa9d4','#8e7ad4','#5ac4a0','#d4a55a','#c45a9b'];
+  pillars.push({id,name:'Neue Säule',goal:'',types:[],kpi:'',color:palette[pillars.length%palette.length]});
+  activePillars.add(id); save(); renderDrawer(); renderLegend();
+}
+function updFormat(i,k,v){ formats[i][k]=v; save(); if(k==='pillar') renderDrawer(); }
+function delFormat(i){ if(!confirm('Format löschen?')) return; formats.splice(i,1); save(); renderDrawer(); }
+function addFormat(){
+  const id=nextId('F',x=>formats.some(f=>f.id===x));
+  formats.push({id,name:'Neues Format',day:'',pillar:(pillars[0]?pillars[0].id:'custom'),goal:'',content:'',length:''});
+  save(); renderDrawer();
 }
 
 // ════════════════════════════════════════════════════════════════════════════
@@ -645,7 +738,8 @@ function exportData(){
 }
 function resetData(){
   if(!confirm("Alle Änderungen verwerfen und auf den Original-Plan zurücksetzen?")) return;
-  events=seedAll(); save(); renderCalendar(); toast("Zurückgesetzt");
+  events=seedAll(); pillars=seedPillars(); formats=seedFormats(); activePillars=new Set(legendIds());
+  save(); renderLegend(); renderCalendar(); toast("Zurückgesetzt");
 }
 
 function isoDate(d){ return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
@@ -661,7 +755,7 @@ document.addEventListener("keydown",e=>{ if(e.key==="Escape"){ closeModal(); clo
 // ════════════════════════════════════════════════════════════════════════════
 //  IMPORT / EXPORT  (.ics · Text-Ideen · KI-Workflow · JSON)
 // ════════════════════════════════════════════════════════════════════════════
-function openImport(){ document.getElementById("importOverlay").classList.add("open"); switchImportTab("ideas"); }
+function openImport(){ document.getElementById("importOverlay").classList.add("open"); switchImportTab("ideas"); const k=localStorage.getItem(AI_KEY_LS); const e=document.getElementById("aiKey"); if(e&&k) e.value=k; refreshKeyState(); }
 function closeImport(){ document.getElementById("importOverlay").classList.remove("open"); }
 function switchImportTab(tab){
   const ideas=tab==="ideas";
@@ -721,7 +815,7 @@ function buildICS(includeTasks){
     lines.push(fold("SUMMARY:"+icsEscape(pillarIcon(e.pillar)+" "+e.title)));
     const desc=postDescription(e);
     if(desc) lines.push(fold("DESCRIPTION:"+icsEscape(desc)));
-    lines.push(fold("CATEGORIES:"+icsEscape(PILLAR_NAMES[e.pillar]||"Termin")));
+    lines.push(fold("CATEGORIES:"+icsEscape(pillarName(e.pillar))));
     lines.push("END:VEVENT");
     if(includeTasks && e.tasks){
       e.tasks.forEach(t=>{
@@ -919,6 +1013,126 @@ function importJSON(replace){
   }
   save(); closeImport(); renderCalendar(); toast((replace?"Ersetzt: ":"Zusammengeführt: ")+arr.length+" Termine");
 }
+
+// ════════════════════════════════════════════════════════════════════════════
+//  KI-DIREKTANBINDUNG (Anthropic · Claude Haiku 4.5)
+// ════════════════════════════════════════════════════════════════════════════
+const AI_KEY_LS="anthropic_api_key";
+let aiSuggestions=[];
+function saveKey(){ const v=val("aiKey").trim(); if(!v){ toast("Kein Key eingegeben"); return; } localStorage.setItem(AI_KEY_LS,v); refreshKeyState(); toast("API-Key gespeichert"); }
+function clearKey(){ localStorage.removeItem(AI_KEY_LS); const e=document.getElementById("aiKey"); if(e) e.value=""; refreshKeyState(); toast("API-Key gelöscht"); }
+function refreshKeyState(){ const s=document.getElementById("keyState"); if(!s) return; const k=localStorage.getItem(AI_KEY_LS); s.textContent=k?("✓ gespeichert ("+k.slice(0,7)+"…)"):"kein Key gespeichert"; }
+
+function aiSystemPrompt(){
+  const pl=pillars.map(p=>p.id+" = "+p.name+(p.goal?" ("+p.goal+")":"")).join("\n");
+  const fm=formats.map(f=>f.id+" = "+f.name+" · "+f.day+(f.length?" · "+f.length:"")).join("\n");
+  return [
+"Du bist ein erfahrener Creative Producer für B2B-Video-Content (Social Media).",
+"Aus losen Stichworten machst du fertig formulierte Termin-Vorschläge für einen Content-Kalender.",
+"",
+"Verfügbare Content-Säulen (Feld \"pillar\") – verwende EXAKT diese IDs:",
+pl,
+"",
+"Verfügbare Formate (Feld \"format\") – verwende diese IDs oder lass das Feld leer:",
+fm||"(keine)",
+"",
+"Regeln:",
+"- Erzeuge NUR neue Vorschläge aus den Stichworten des Nutzers. Schreibe nichts Bestehendes um.",
+"- Pro Stichwort genau 1 Vorschlag – außer es ist eine Anzahl gefordert (z.B. \"3 Reels\" → 3 Vorschläge).",
+"- Wähle die am besten passende pillar-ID; wenn nichts passt: \"custom\".",
+"- hook = aufmerksamkeitsstarker erster Satz. idea = konkrete, praxisnahe Umsetzung.",
+"- variants = 2–3 unterschiedliche Umsetzungsvarianten (kurze Stichpunkte).",
+"- tasks = sinnvolle Produktionsschritte als Stichpunkte (z.B. Konzept, Dreh, Schnitt, Review) OHNE Datum.",
+"- length = empfohlene Videolänge (z.B. \"30 Sek\", \"60–90 Sek\").",
+"- Antworte auf Deutsch."
+].join("\n");
+}
+const AI_SCHEMA={type:"object",additionalProperties:false,required:["suggestions"],properties:{
+  suggestions:{type:"array",items:{
+    type:"object",additionalProperties:false,
+    required:["title","pillar","format","hook","idea","variants","goal","cta","length","tasks"],
+    properties:{
+      title:{type:"string"},pillar:{type:"string"},format:{type:"string"},
+      hook:{type:"string"},idea:{type:"string"},
+      variants:{type:"array",items:{type:"string"}},
+      goal:{type:"string"},cta:{type:"string"},length:{type:"string"},
+      tasks:{type:"array",items:{type:"string"}}
+    }
+  }}
+}};
+async function aiSuggest(){
+  const key=localStorage.getItem(AI_KEY_LS);
+  if(!key){ toast("Bitte zuerst API-Key speichern (⚙️ unten)"); return; }
+  const ideas=val("ideasInput").trim();
+  if(!ideas){ toast("Bitte Ideen/Stichworte eingeben"); return; }
+  const box=document.getElementById("aiResults");
+  box.innerHTML='<div class="help">⏳ Claude Haiku erstellt Vorschläge …</div>';
+  try{
+    const res=await fetch("https://api.anthropic.com/v1/messages",{
+      method:"POST",
+      headers:{
+        "content-type":"application/json",
+        "x-api-key":key,
+        "anthropic-version":"2023-06-01",
+        "anthropic-dangerous-direct-browser-access":"true"
+      },
+      body:JSON.stringify({
+        model:"claude-haiku-4-5",
+        max_tokens:4000,
+        system:aiSystemPrompt(),
+        messages:[{role:"user",content:ideas}],
+        output_config:{format:{type:"json_schema",schema:AI_SCHEMA}}
+      })
+    });
+    if(!res.ok){ const t=await res.text(); throw new Error("HTTP "+res.status+" – "+t.slice(0,200)); }
+    const data=await res.json();
+    const text=(data.content||[]).filter(b=>b.type==="text").map(b=>b.text).join("");
+    let parsed; try{ parsed=JSON.parse(text); }catch(e){ const m=text.match(/\{[\s\S]*\}/); parsed=m?JSON.parse(m[0]):null; }
+    aiSuggestions=(parsed&&Array.isArray(parsed.suggestions))?parsed.suggestions:[];
+    renderAiResults();
+    if(!aiSuggestions.length) toast("Keine Vorschläge erhalten");
+  }catch(err){
+    box.innerHTML='<div class="help" style="border-color:var(--red);color:#e8a0a0">❌ KI-Fehler: '+esc(err.message)+'</div>';
+  }
+}
+function renderAiResults(){
+  const box=document.getElementById("aiResults");
+  if(!aiSuggestions.length){ box.innerHTML=''; return; }
+  box.innerHTML=`<div class="task-block-head" style="margin-bottom:10px"><span class="tbh-title">${aiSuggestions.length} KI-Vorschläge</span>`+
+    `<button class="btn btn-primary" style="padding:4px 12px" onclick="adoptAll()">Alle übernehmen</button></div>`+
+    aiSuggestions.map((s,i)=>{
+      const pid=pillarExists(s.pillar)?s.pillar:'custom';
+      const col=pillarColor(pid);
+      return `<div class="ai-card" style="border-left:4px solid ${col}">
+        <div class="ai-head">
+          <span class="post-badge" style="background:${col};color:${textOn(col)}">${esc(pid)}</span>
+          ${s.format?`<span class="post-badge pb-format">${esc(s.format)}</span>`:''}
+          ${s.length?`<span class="post-badge pb-format">⏱ ${esc(s.length)}</span>`:''}
+          <button class="btn" style="margin-left:auto;padding:4px 10px" onclick="adoptOne(${i},this)">+ Übernehmen</button>
+        </div>
+        <div class="ai-title">${esc(s.title||'')}</div>
+        ${s.hook?`<div class="ai-hook">${esc(s.hook)}</div>`:''}
+        ${s.idea?`<div class="ai-idea">${esc(s.idea)}</div>`:''}
+        ${(s.variants&&s.variants.length)?`<div class="ai-meta"><b>Varianten:</b> ${s.variants.map(esc).join(' · ')}</div>`:''}
+        ${(s.tasks&&s.tasks.length)?`<div class="ai-meta"><b>Aufgaben:</b> ${s.tasks.map(t=>esc(typeof t==='string'?t:(t&&t.text||''))).join(' · ')}</div>`:''}
+        ${s.cta?`<div class="ai-meta"><b>CTA:</b> ${esc(s.cta)}</div>`:''}
+      </div>`;
+    }).join('');
+}
+function suggestionToEvent(s){
+  return newEventFrom({
+    title:s.title||"(Ohne Titel)",
+    pillar:pillarExists(s.pillar)?s.pillar:"custom",
+    format:s.format||"",
+    hook:s.hook||"", idea:s.idea||"",
+    variants:Array.isArray(s.variants)?s.variants.slice():[],
+    goal:s.goal||"", cta:s.cta||"",
+    notes:s.length?("Länge: "+s.length):"",
+    tasks:Array.isArray(s.tasks)?s.tasks.map(t=>({id:uid(),text:(typeof t==='string'?t:(t&&t.text||"")),date:"",note:"",done:false})):[]
+  });
+}
+function adoptOne(i,btn){ events.push(suggestionToEvent(aiSuggestions[i])); save(); renderCalendar(); if(btn){ btn.textContent="✓ Übernommen"; btn.disabled=true; btn.style.opacity=".55"; } toast("Als Termin angelegt – Datum im Kalender anpassen"); }
+function adoptAll(){ _newIdeaCounter=0; aiSuggestions.forEach(s=>events.push(suggestionToEvent(s))); save(); renderCalendar(); closeImport(); toast(aiSuggestions.length+" Termine angelegt – Daten im Kalender anpassen"); }
 
 // ── INIT ──
 (function init(){
