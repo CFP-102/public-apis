@@ -44,7 +44,7 @@
 
   /* Phase colors (Konzept→Dreh→Schnitt→Veröffentlichung) – das EINE Farbsystem */
   :root{
-    --ph-concept:#e8910a; --ph-shoot:#e0533f; --ph-review:#3f7fd0; --ph-publish:#2faa5e;
+    --ph-concept:#e8910a; --ph-shoot:#e0533f; --ph-edit:#8a63d4; --ph-review:#3f7fd0; --ph-publish:#2faa5e;
     --pillar-neutral:#4a5170;
   }
 
@@ -195,8 +195,15 @@
   .task-milestone{display:inline-block;padding:3px 8px;border-radius:6px;font-size:10px;font-weight:700;margin-right:6px;margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px}
   .tm-concept{background:var(--ph-concept);color:#1a1a1a}
   .tm-shoot{background:var(--ph-shoot);color:#fff}
+  .tm-edit{background:var(--ph-edit);color:#fff}
   .tm-review{background:var(--ph-review);color:#fff}
   .tm-publish{background:var(--ph-publish);color:#06140c}
+
+  /* Phasen-Zeilen im Termin-Modal */
+  .phase-row{display:flex;gap:9px;align-items:center;padding:7px 8px;background:var(--bg2);border:1px solid var(--border);border-radius:7px;margin-bottom:6px}
+  .phase-swatch{width:14px;height:14px;border-radius:50%;flex-shrink:0}
+  .phase-sel{flex:1;background:var(--bg3);border:1px solid var(--border);color:var(--text);border-radius:6px;font-size:13px;padding:5px 8px;outline:none}
+  .phase-sel:focus{border-color:var(--accent)}
 
   /* Phase legend */
   .phase-legend{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
@@ -255,10 +262,10 @@
 <div class="legend" id="legend"></div>
 
 <div class="infobar">
-  <span><b id="statTotal">0</b> Termine</span>
-  <span><b id="statTasks">0</b> Aufgaben gesamt</span>
-  <span><b id="statDone">0</b> erledigt</span>
-  <span style="color:var(--accent)">💡 Tag anklicken = neuer Termin · Termin anklicken = bearbeiten</span>
+  <span><b id="statTotal">0</b> Haupt-Termine</span>
+  <span><b id="statTasks">0</b> Phasen-Termine</span>
+  <span><b id="statDone">0</b> gesamt im Kalender</span>
+  <span style="color:var(--accent)">💡 Phasen mit Datum werden automatisch als verknüpfte Termine angelegt</span>
 </div>
 
 <div class="cal-wrap">
@@ -506,7 +513,8 @@ let editingId = null;
 const PHASES={
   concept:{label:"Konzept",color:"#e8910a",icon:"🟠"},
   shoot:  {label:"Dreh",color:"#e0533f",icon:"🔴"},
-  review: {label:"Schnitt / Review",color:"#3f7fd0",icon:"🔵"},
+  edit:   {label:"Schnitt",color:"#8a63d4",icon:"🟣"},
+  review: {label:"Review",color:"#3f7fd0",icon:"🔵"},
   publish:{label:"Veröffentlichung",color:"#2faa5e",icon:"🟢"}
 };
 const PILLAR_NEUTRAL="#4a5170";
@@ -531,32 +539,43 @@ function legendIds(){ return pillars.map(p=>p.id).concat(['custom']); }
 function nextId(prefix,has){ let n=1; while(has(prefix+n)) n++; return prefix+n; }
 function textOn(bg){ try{ const c=String(bg).replace('#',''); const r=parseInt(c.slice(0,2),16),g=parseInt(c.slice(2,4),16),b=parseInt(c.slice(4,6),16); return (0.299*r+0.587*g+0.114*b)>150?'#1a1a1a':'#fff'; }catch(e){ return '#fff'; } }
 
-// Build a fresh event object from a seed post (incl. milestone tasks)
+// Build the main post event from a seed post (Phasen entstehen separat als verknüpfte Termine)
 function seedToEvent(p){
-  const tasks = [];
-  if(p.milestones){
-    const m=p.milestones;
-    const mk=(label,date)=>({id:uid(),text:label,date:(date&&date.startsWith("2026"))?date:"",note:(date&&!date.startsWith("2026"))?date:"",done:false});
-    tasks.push(mk("Konzept",m.concept));
-    tasks.push(mk("Dreh",m.shoot));
-    tasks.push(mk("Schnitt",m.edit));
-    tasks.push(mk("Review",m.review));
-  }
-  if(p.prod && p.prod.notes){
-    tasks.push({id:uid(),text:"Produktion: "+p.prod.notes,date:"",note:"Anforderung",done:false});
-  }
   return {
     id:p.id, date:p.date, pillar:p.pillar, format:p.format||"", series:"",
     title:p.title, hook:p.hook||"", idea:p.idea||"",
     variants:(p.variants||[]).slice(), goal:p.goal||"", cta:p.cta||"",
     location:p.prod?p.prod.location:"", equipment:p.prod?p.prod.equipment.slice():[],
     hours:p.prod?p.prod.hours:"", team:p.prod?p.prod.team:"", notes:p.prod?p.prod.notes:"",
-    tasks, parent:"", milestone:"", color:"", skip:false
+    tasks:[], parent:"", milestone:"", color:"", skip:false
   };
 }
 function uid(){return "id"+Math.random().toString(36).slice(2,9)}
 
-function seedAll(){ return SEED.posts.map(seedToEvent); }
+// Datum einer Seed-Phase ermitteln (publish = Post-Datum)
+function phaseDateForSeed(p,key){
+  if(key==='publish') return p.date;
+  const d=(p.milestones||{})[key];
+  return (d&&/^\d{4}-\d{2}-\d{2}$/.test(d))?d:"";
+}
+// Ein verknüpftes Phasen-Event für einen Seed-Post bauen (oder null, wenn kein Datum)
+function buildSeedPhaseEvent(p,key){
+  const ph=PHASES[key]; const date=phaseDateForSeed(p,key);
+  if(!ph||!date) return null;
+  return {
+    id:p.id+"-"+key, date, parent:p.id, milestone:key,
+    pillar:p.pillar, format:p.format||"", series:"",
+    title:ph.icon+" "+ph.label+" · "+p.title,
+    hook:"", idea:"Produktionsschritt für: "+p.title,
+    variants:[], goal:"", cta:"",
+    location:p.prod?p.prod.location:"", equipment:[], hours:"", team:"", notes:ph.label,
+    color:ph.color, tasks:[], skip:false
+  };
+}
+function seedPhaseEvents(p,keys){ return (keys||['concept','shoot','edit','review']).map(k=>buildSeedPhaseEvent(p,k)).filter(Boolean); }
+
+// Standard-Kalender: Posts + ihre verknüpften Produktions-Phasen
+function seedAll(){ return SEED.posts.flatMap(p=>[seedToEvent(p), ...seedPhaseEvents(p)]); }
 function seedPillars(){ return SEED.pillars.map(p=>({id:p.id,name:p.name,goal:p.goal,types:p.types.slice(),kpi:p.kpi,color:DEFAULT_HEX[p.id]||CUSTOM_COLOR})); }
 function seedFormats(){ return SEED.formats.map(f=>({id:f.id,name:f.name,day:f.day,pillar:f.pillar,goal:f.goal,content:f.content,length:f.length})); }
 
@@ -581,7 +600,7 @@ function renderLegend(){
   const el=document.getElementById("legend");
   const phaseLeg=`<div class="phase-legend">
     <span class="legend-label">Phase:</span>
-    ${["concept","shoot","review","publish"].map((k,i)=>{
+    ${Object.keys(PHASES).map((k,i)=>{
       const p=PHASES[k];
       return `${i>0?'<span class="phase-arrow">→</span>':''}<span class="phase-item"><span class="pdot" style="background:${p.color}"></span>${esc(p.label)}</span>`;
     }).join('')}
@@ -619,14 +638,13 @@ function renderCalendar(){
     html+=`<div class="cal-cell ${other?'other-month':''} ${ds===todayStr?'today':''}" onclick="cellClick(event,'${ds}')">
       <div class="cell-date"><span>${d.getDate()}</span><span class="cell-add">＋</span></div>
       ${dayEvents.map(e=>{
-        const total=e.tasks.length, done=e.tasks.filter(t=>t.done).length;
-        const allDone=total>0&&done===total;
         const col=eventColor(e);
         const phase=PHASES[eventPhase(e)];
         const cleanTitle=(e.milestone&&e.parent)?((events.find(x=>x.id===e.parent)||{}).title||e.title.replace(/^[^·]*·\s*/,'')):e.title;
         const len=e.notes&&/L[äa]nge:/i.test(e.notes)?e.notes.replace(/.*L[äa]nge:\s*/i,'').slice(0,14):"";
+        const phaseCount=e.milestone?0:events.filter(x=>x.parent===e.id&&x.milestone).length;
         const parentTip=e.parent?' ← '+((events.find(x=>x.id===e.parent)||{}).title||''):'';
-        return `<div class="evt ${allDone?'done-evt':''}" style="border-left-color:${col}" onclick="event.stopPropagation();openEvent('${e.id}')" title="${esc(phase.label)} · ${esc(cleanTitle)}${esc(parentTip)}">
+        return `<div class="evt" style="border-left-color:${col}" onclick="event.stopPropagation();openEvent('${e.id}')" title="${esc(phase.label)} · ${esc(cleanTitle)}${esc(parentTip)}">
           <div class="evt-top">
             <span class="evt-dot" style="background:${col}"></span>
             <span class="evt-phase" style="color:${col}">${phase.icon} ${esc(phase.label)}</span>
@@ -637,7 +655,7 @@ function renderCalendar(){
             ${e.format?`<span class="evt-tag">${esc(e.format)}</span>`:''}
             ${len?`<span class="evt-tag">⏱ ${esc(len)}</span>`:''}
             ${e.series?`<span class="evt-tag">📺</span>`:''}
-            ${(total&&!e.milestone)?`<span class="evt-prog ${allDone?'done':''}">${done}/${total}</span>`:''}
+            ${phaseCount?`<span class="evt-prog" title="${phaseCount} verknüpfte Phasen">⚙ ${phaseCount}</span>`:''}
           </div>
         </div>`;
       }).join('')}
@@ -651,10 +669,11 @@ function cellClick(ev,ds){ openNewEvent(ds); }
 
 function updateStats(){
   const active=events.filter(e=>!e.skip);
-  document.getElementById("statTotal").textContent=active.length+(events.length>active.length?" ("+events.length+" total)":"");
-  let t=0,d=0; active.forEach(e=>{t+=e.tasks.length; d+=e.tasks.filter(x=>x.done).length;});
-  document.getElementById("statTasks").textContent=t;
-  document.getElementById("statDone").textContent=d;
+  const posts=active.filter(e=>!e.milestone);
+  const phaseEvts=active.filter(e=>e.milestone);
+  document.getElementById("statTotal").textContent=posts.length;
+  document.getElementById("statTasks").textContent=phaseEvts.length;
+  document.getElementById("statDone").textContent=active.length;
 }
 
 function changeMonth(delta){
@@ -674,12 +693,15 @@ function openEvent(id){
   const e=events.find(x=>x.id===id); if(!e) return;
   editingId=id;
   draft=JSON.parse(JSON.stringify(e));
+  // verknüpfte Phasen-Termine als editierbare Phasenliste laden
+  draft.phases=events.filter(x=>x.parent===id && x.milestone).map(x=>({key:x.milestone,date:x.date}))
+    .sort((a,b)=>Object.keys(PHASES).indexOf(a.key)-Object.keys(PHASES).indexOf(b.key));
   renderModal(false);
 }
 function openNewEvent(date){
   editingId=null;
   draft={id:uid(),date:(typeof date==="string"?date:isoDate(new Date())),pillar:"custom",format:"",series:"",
-    title:"",hook:"",idea:"",variants:[],goal:"",cta:"",location:"",equipment:[],hours:"",team:"",notes:"",tasks:[]};
+    title:"",hook:"",idea:"",variants:[],goal:"",cta:"",location:"",equipment:[],hours:"",team:"",notes:"",tasks:[],phases:[]};
   renderModal(true);
 }
 
@@ -744,17 +766,21 @@ function renderModal(isNew){
     <input id="f_equipment" value="${esc((draft.equipment||[]).join(', '))}" placeholder="Sony A7 IV, Drohne, LED-Panel"></div>
   <div class="field"><label>⚠ Besondere Anforderungen / Notizen</label>
     <textarea id="f_notes" placeholder="Genehmigungen, Vorlaufzeiten, Risiken">${esc(draft.notes)}</textarea></div>
-  <div class="task-block">
-    <div class="task-block-head">
-      <span class="tbh-title">✅ Aufgaben in diesem Termin</span>
-      <span class="task-prog" id="taskProg">${done}/${total} erledigt</span>
-    </div>
-    <div id="taskList"></div>
-    <button class="add-link" onclick="addTask()">+ Aufgabe hinzufügen</button>
-  </div>`;
+  `;
+
+  if(!isMilestone){
+    html+=`<div class="task-block">
+      <div class="task-block-head">
+        <span class="tbh-title">🎬 Produktions-Phasen</span>
+      </div>
+      <div id="phaseList"></div>
+      <button class="add-link" onclick="addPhase()">+ Phase hinzufügen</button>
+      <div style="font-size:11px;color:var(--text2);margin-top:8px;line-height:1.5">Wähle eine Phase (Konzept, Dreh, Schnitt, Review, Veröffentlichung) und ein Datum. Jede Phase mit Datum wird beim Speichern als eigener, farbiger Termin im Kalender angelegt und mit diesem Termin verknüpft.</div>
+    </div>`;
+  }
 
   document.getElementById("modalBody").innerHTML=html;
-  renderVariants(); renderTasks();
+  renderVariants(); if(!isMilestone) renderPhases();
   document.getElementById("f_pillar").addEventListener("change",e=>{
     draft.pillar=e.target.value;
     document.getElementById("mhColor").style.background=eventColor(draft);
@@ -772,6 +798,35 @@ function renderVariants(){
 }
 function addVariant(){ draft.variants.push(""); renderVariants(); }
 function delVariant(i){ draft.variants.splice(i,1); renderVariants(); }
+
+// ── Produktions-Phasen (werden zu verknüpften Terminen) ──
+function renderPhases(){
+  const el=document.getElementById("phaseList"); if(!el) return;
+  if(!draft.phases) draft.phases=[];
+  const used=draft.phases.map(p=>p.key);
+  el.innerHTML=draft.phases.map((ph,i)=>{
+    const info=PHASES[ph.key]||PHASES.concept;
+    return `<div class="phase-row">
+      <span class="phase-swatch" style="background:${info.color}"></span>
+      <select class="phase-sel" onchange="setPhaseKey(${i},this.value)">
+        ${Object.keys(PHASES).map(k=>`<option value="${k}" ${ph.key===k?'selected':''} ${(used.includes(k)&&k!==ph.key)?'disabled':''}>${PHASES[k].icon} ${PHASES[k].label}</option>`).join('')}
+      </select>
+      <input class="task-date-in" type="date" value="${ph.date||''}" onchange="draft.phases[${i}].date=this.value">
+      <button class="mini-del" onclick="delPhase(${i})">×</button>
+    </div>`;
+  }).join('') || '<div style="font-size:12px;color:var(--text2);padding:4px 0">Noch keine Phasen – mit „+ Phase hinzufügen" verknüpfte Termine erstellen.</div>';
+}
+function setPhaseKey(i,k){ draft.phases[i].key=k; renderPhases(); }
+function delPhase(i){ draft.phases.splice(i,1); renderPhases(); }
+function addPhase(){
+  if(!draft.phases) draft.phases=[];
+  const used=new Set(draft.phases.map(p=>p.key));
+  const next=Object.keys(PHASES).find(k=>!used.has(k));
+  if(!next){ toast("Alle Phasen sind bereits hinzugefügt"); return; }
+  // Standard-Datum: Post-Datum für publish, sonst leer
+  draft.phases.push({key:next,date:next==='publish'?(val("f_date")||draft.date||""):""});
+  renderPhases();
+}
 
 function renderTasks(){
   const el=document.getElementById("taskList");
@@ -801,24 +856,62 @@ function collectDraft(){
   // pillar already synced via change handler; ensure:
   draft.pillar=val("f_pillar");
 }
+// Verknüpfte Phasen-Termine eines Haupttermins anlegen/aktualisieren/entfernen
+function syncPhaseEvents(parent, phases){
+  if(parent.milestone) return 0; // ein Phasen-Termin hat selbst keine Unterphasen
+  const parentId=parent.id;
+  const wanted=[]; const seen=new Set();
+  (phases||[]).forEach(p=>{ if(p.key && p.date && PHASES[p.key] && !seen.has(p.key)){ seen.add(p.key); wanted.push(p); } });
+  // entfernte Phasen löschen
+  events=events.filter(e=>{
+    if(e.parent===parentId && e.milestone) return wanted.some(w=>w.key===e.milestone);
+    return true;
+  });
+  // anlegen/aktualisieren
+  wanted.forEach(w=>{
+    const ph=PHASES[w.key]; const id=parentId+"-"+w.key;
+    const title=ph.icon+" "+ph.label+" · "+parent.title;
+    let ev=events.find(e=>e.id===id);
+    if(ev){
+      ev.date=w.date; ev.milestone=w.key; ev.parent=parentId; ev.color=ph.color;
+      ev.pillar=parent.pillar; ev.format=parent.format||""; ev.title=title;
+      ev.idea="Produktionsschritt für: "+parent.title; ev.notes=ph.label;
+    } else {
+      events.push({
+        id, date:w.date, parent:parentId, milestone:w.key,
+        pillar:parent.pillar, format:parent.format||"", series:"",
+        title, hook:"", idea:"Produktionsschritt für: "+parent.title,
+        variants:[], goal:"", cta:"",
+        location:parent.location||"", equipment:[], hours:"", team:"", notes:ph.label,
+        color:ph.color, tasks:[], skip:false
+      });
+    }
+  });
+  return wanted.length;
+}
 function saveEvent(){
   collectDraft();
   if(!draft.title.trim()){ toast("Bitte einen Titel eingeben"); return; }
+  const phases=draft.phases||[];
+  delete draft.phases; // transient – nicht am Event speichern
   if(editingId){
     const idx=events.findIndex(e=>e.id===editingId);
     events[idx]=draft;
   }else{
     events.push(draft);
   }
+  const n=syncPhaseEvents(draft, phases);
+  const savedDate=draft.date;
   save(); closeModal(); renderCalendar();
   // jump to the month of the saved event
-  const d=new Date(draft.date); viewYear=d.getFullYear(); viewMonth=d.getMonth(); renderCalendar();
-  toast("Gespeichert");
+  if(savedDate){ const d=new Date(savedDate); viewYear=d.getFullYear(); viewMonth=d.getMonth(); renderCalendar(); }
+  toast(n?("Gespeichert · "+n+" Phasen-Termin"+(n>1?"e":"")+" verknüpft"):"Gespeichert");
 }
 function deleteEvent(){
   if(!editingId) return;
-  if(!confirm("Diesen Termin wirklich löschen?")) return;
-  events=events.filter(e=>e.id!==editingId);
+  const kids=events.filter(e=>e.parent===editingId && e.milestone).length;
+  if(!confirm("Diesen Termin"+(kids?(" und seine "+kids+" verknüpften Phasen-Termine"):"")+" wirklich löschen?")) return;
+  events=events.filter(e=>e.id!==editingId && e.parent!==editingId);
   save(); closeModal(); renderCalendar(); toast("Gelöscht");
 }
 function closeModal(){ document.getElementById("overlay").classList.remove("open"); draft=null; editingId=null; }
@@ -861,9 +954,6 @@ function renderDrawer(){
           <h5>Bulk-Bearbeitung · ${esc(p.id)}</h5>
           <div class="field" style="margin-bottom:8px"><label>Format für alle setzen</label>
             <div style="display:flex;gap:6px"><input class="bulk-input" id="bulkFmt_${esc(p.id)}" placeholder="z.B. F1"><button class="btn" onclick="bulkSetFormat('${esc(p.id)}')">Setzen</button></div>
-          </div>
-          <div class="field" style="margin-bottom:8px"><label>Aufgabe zu allen hinzufügen</label>
-            <div style="display:flex;gap:6px"><input class="bulk-input" id="bulkTask_${esc(p.id)}" placeholder="Aufgabentext…"><button class="btn" onclick="bulkAddTask('${esc(p.id)}')">Hinzufügen</button></div>
           </div>
           <div class="field" style="margin-bottom:0"><label>Alle Termine verschieben (Tage, negativ = früher)</label>
             <div style="display:flex;gap:6px"><input class="bulk-input" id="bulkShift_${esc(p.id)}" type="number" placeholder="z.B. 7 oder -3"><button class="btn" onclick="bulkShiftDates('${esc(p.id)}')">Verschieben</button></div>
@@ -1455,7 +1545,7 @@ function exportPDF(){
 <h1>Content Kalender · SolarTech B2B Video Plan</h1>
 <div class="meta">Exportiert am ${new Date().toLocaleDateString("de-DE")} · ${posts.length} Posts${rangeNote}</div>
 <div class="legend">
-  ${["concept","shoot","review","publish"].map(k=>`<span><i style="background:${PHASES[k].color}"></i>${esc(PHASES[k].label)}</span>`).join("")}
+  ${Object.keys(PHASES).map(k=>`<span><i style="background:${PHASES[k].color}"></i>${esc(PHASES[k].label)}</span>`).join("")}
 </div>
 ${posts.map(e=>{
   const tasks=e.tasks||[];
@@ -1572,16 +1662,10 @@ function renderSeriesTab(){
         <button class="btn" onclick="seriesBulkSetPillar('${esc(name)}','serPillar_${sid}')">Setzen</button>
       </div>
     </div>
-    <div class="field" style="margin-bottom:8px"><label>Termine um N Tage verschieben</label>
+    <div class="field" style="margin-bottom:0"><label>Termine um N Tage verschieben</label>
       <div style="display:flex;gap:6px">
         <input class="bulk-input" id="serShift_${sid}" type="number" placeholder="z.B. 7 oder -3">
         <button class="btn" onclick="seriesBulkShift('${esc(name)}','serShift_${sid}')">Verschieben</button>
-      </div>
-    </div>
-    <div class="field" style="margin-bottom:0"><label>Aufgabe zu allen hinzufügen</label>
-      <div style="display:flex;gap:6px">
-        <input class="bulk-input" id="serTask_${sid}" placeholder="z.B. Review, Schnitt…">
-        <button class="btn" onclick="seriesBulkAddTask('${esc(name)}','serTask_${sid}')">Hinzufügen</button>
       </div>
     </div>
   </div>
@@ -1671,7 +1755,8 @@ function renderGenWizard(){
         <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
           <label style="display:flex;gap:6px;align-items:center;cursor:pointer"><input type="checkbox" id="genConcept" checked><span class="task-milestone tm-concept">🟠 Konzept</span></label>
           <label style="display:flex;gap:6px;align-items:center;cursor:pointer"><input type="checkbox" id="genShoot" checked><span class="task-milestone tm-shoot">🔴 Dreh</span></label>
-          <label style="display:flex;gap:6px;align-items:center;cursor:pointer"><input type="checkbox" id="genReview" checked><span class="task-milestone tm-review">🔵 Schnitt/Review</span></label>
+          <label style="display:flex;gap:6px;align-items:center;cursor:pointer"><input type="checkbox" id="genEdit" checked><span class="task-milestone tm-edit">🟣 Schnitt</span></label>
+          <label style="display:flex;gap:6px;align-items:center;cursor:pointer"><input type="checkbox" id="genReview" checked><span class="task-milestone tm-review">🔵 Review</span></label>
           <label style="display:flex;gap:6px;align-items:center;cursor:pointer"><input type="checkbox" id="genPublish" checked><span class="task-milestone tm-publish">🟢 Veröffentlichung</span></label>
         </div>
       </div>
@@ -1730,10 +1815,12 @@ function generateCalendar(){
     endDate=isoDate(d);
   }
 
-  const genConcept=document.getElementById("genConcept").checked;
-  const genShoot=document.getElementById("genShoot").checked;
-  const genReview=document.getElementById("genReview").checked;
-  const genPublish=document.getElementById("genPublish").checked;
+  const keys=[];
+  if(document.getElementById("genConcept").checked) keys.push("concept");
+  if(document.getElementById("genShoot").checked) keys.push("shoot");
+  if(document.getElementById("genEdit").checked) keys.push("edit");
+  if(document.getElementById("genReview").checked) keys.push("review");
+  if(document.getElementById("genPublish").checked) keys.push("publish");
 
   if(clearFirst){
     if(!confirm("Alle bestehenden Termine löschen und neu generieren?")) return;
@@ -1743,57 +1830,15 @@ function generateCalendar(){
   let seedPostCount=0, milestoneCount=0;
 
   SEED.posts.forEach(p=>{
-    const eventDate=new Date(p.date);
-    if(isoDate(eventDate)<=endDate){
-      const ev=seedToEvent(p);
-      ev.skip=false;
-      events.push(ev);
-      seedPostCount++;
-
-      // Milestones generieren
-      if(p.milestones){
-        const m=p.milestones;
-        const milestones=[
-          {key:"concept",label:PHASES.concept.label,date:m.concept,color:PHASES.concept.color,icon:PHASES.concept.icon,enabled:genConcept},
-          {key:"shoot",label:PHASES.shoot.label,date:m.shoot,color:PHASES.shoot.color,icon:PHASES.shoot.icon,enabled:genShoot},
-          {key:"review",label:PHASES.review.label,date:m.review,color:PHASES.review.color,icon:PHASES.review.icon,enabled:genReview}
-        ];
-        milestones.forEach(ms=>{
-          if(ms.enabled && ms.date && /^\d{4}-\d{2}-\d{2}$/.test(ms.date)){
-            const milevent={
-              id:p.id+"-"+ms.key, date:ms.date, parent:p.id, milestone:ms.key,
-              pillar:p.pillar, format:p.format||"", series:"",
-              title:ms.icon+" "+ms.label+" · "+p.title,
-              hook:"", idea:"Produktionsschritt für: "+p.title,
-              variants:[], goal:"", cta:"",
-              location:p.prod?.location||"", equipment:[], hours:"", team:"", notes:ms.label,
-              color:ms.color, tasks:[]
-            };
-            events.push(milevent);
-            milestoneCount++;
-          }
-        });
-
-        // Veröffentlichung (Publish) auf Haupt-Post-Datum
-        if(genPublish){
-          const publev={
-            id:p.id+"-publish", date:p.date, parent:p.id, milestone:"publish",
-            pillar:p.pillar, format:p.format||"", series:"",
-            title:PHASES.publish.icon+" "+PHASES.publish.label+" · "+p.title,
-            hook:"", idea:"Post live: "+p.title,
-            variants:[], goal:"", cta:"",
-            location:"", equipment:[], hours:"", team:"", notes:PHASES.publish.label,
-            color:PHASES.publish.color, tasks:[]
-          };
-          events.push(publev);
-          milestoneCount++;
-        }
-      }
+    if(isoDate(new Date(p.date))<=endDate){
+      const ev=seedToEvent(p); ev.skip=false;
+      events.push(ev); seedPostCount++;
+      seedPhaseEvents(p,keys).forEach(pe=>{ events.push(pe); milestoneCount++; });
     }
   });
 
   save(); renderCalendar(); closeGenModal();
-  toast(seedPostCount+" Posts + "+milestoneCount+" Milestones bis "+endDate+" generiert");
+  toast(seedPostCount+" Posts + "+milestoneCount+" Phasen-Termine bis "+endDate+" generiert");
 }
 
 // ── INIT ──
