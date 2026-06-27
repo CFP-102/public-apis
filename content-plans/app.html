@@ -544,6 +544,7 @@ const MONTHS = ["Januar","Februar","März","April","Mai","Juni","Juli","August",
 let events = [];          // working set
 let pillars = [];         // [{id,name,goal,types,kpi,color}] – editierbar
 let formats = [];         // [{id,name,day,pillar,goal,content,length}] – editierbar
+let shootGroups = [];     // [{id,name,date}] – Multi-Event-Drehtage
 let viewYear, viewMonth;  // current calendar month
 let activePillars = new Set();
 let editingId = null;
@@ -584,7 +585,7 @@ function textOn(bg){ try{ const c=String(bg).replace('#',''); const r=parseInt(c
 // Build the main post event from a seed post (Phasen entstehen separat als verknüpfte Termine)
 function seedToEvent(p){
   return {
-    id:p.id, date:p.date, pillar:p.pillar, format:p.format||"", series:"",
+    id:p.id, date:p.date, pillar:p.pillar, format:p.format||"", series:"", shootGroupId:"",
     title:p.title, hook:p.hook||"", idea:p.idea||"",
     variants:(p.variants||[]).slice(), goal:p.goal||"", cta:p.cta||"",
     location:p.prod?p.prod.location:"", equipment:p.prod?p.prod.equipment.slice():[],
@@ -606,7 +607,7 @@ function buildSeedPhaseEvent(p,key){
   if(!ph||!date) return null;
   return {
     id:p.id+"-"+key, date, parent:p.id, milestone:key,
-    pillar:p.pillar, format:p.format||"", series:"",
+    pillar:p.pillar, format:p.format||"", series:"", shootGroupId:"",
     title:ph.icon+" "+ph.label+" · "+p.title,
     hook:"", idea:"Produktionsschritt für: "+p.title,
     variants:[], goal:"", cta:"",
@@ -624,19 +625,22 @@ function seedFormats(){ return SEED.formats.map(f=>({id:f.id,name:f.name,day:f.d
 function load(){
   let saved=null;
   try{ const raw=localStorage.getItem(LS_KEY); if(raw) saved=JSON.parse(raw); }catch(e){}
-  if(Array.isArray(saved)){ events=saved; pillars=seedPillars(); formats=seedFormats(); }     // altes Format (nur events)
+  if(Array.isArray(saved)){ events=saved; pillars=seedPillars(); formats=seedFormats(); shootGroups=[]; }     // altes Format (nur events)
   else if(saved && typeof saved==="object"){
     events=Array.isArray(saved.events)?saved.events:seedAll();
     pillars=(Array.isArray(saved.pillars)&&saved.pillars.length)?saved.pillars:seedPillars();
     formats=Array.isArray(saved.formats)?saved.formats:seedFormats();
-  } else { events=seedAll(); pillars=seedPillars(); formats=seedFormats(); }
+    shootGroups=Array.isArray(saved.shootGroups)?saved.shootGroups:[];
+  } else { events=seedAll(); pillars=seedPillars(); formats=seedFormats(); shootGroups=[]; }
   // Migration: separate "Veröffentlichung"-Phasentermine entfernen – der
   // Haupttermin selbst ist die Veröffentlichung (keine Dopplung mehr).
   events=events.filter(e=>e.milestone!=='publish');
+  // verwaiste Drehgruppen-Zuweisungen bereinigen
+  events.forEach(e=>{ if(e.shootGroupId && !shootGroups.some(g=>g.id===e.shootGroupId)) e.shootGroupId=""; });
   activePillars=new Set(legendIds());
   save();
 }
-function save(){ try{ localStorage.setItem(LS_KEY,JSON.stringify({events,pillars,formats})); }catch(e){} }
+function save(){ try{ localStorage.setItem(LS_KEY,JSON.stringify({events,pillars,formats,shootGroups})); }catch(e){} }
 
 // ════════════════════════════════════════════════════════════════════════════
 //  CALENDAR RENDERING
@@ -790,7 +794,7 @@ function openEvent(id){
 }
 function openNewEvent(date){
   editingId=null;
-  draft={id:uid(),date:(typeof date==="string"?date:isoDate(new Date())),pillar:"custom",format:"",series:"",
+  draft={id:uid(),date:(typeof date==="string"?date:isoDate(new Date())),pillar:"custom",format:"",series:"",shootGroupId:"",
     title:"",hook:"",idea:"",variants:[],goal:"",cta:"",location:"",equipment:[],hours:"",team:"",notes:"",tasks:[],phases:[]};
   renderModal(true);
 }
@@ -832,7 +836,15 @@ function renderModal(isNew){
 
   if(!isMilestone){
     html+=`<div class="field"><label>📺 Serie (optional – für einheitliche Videoserien)</label>
-      <input id="f_series" value="${esc(draft.series||'')}" placeholder="z.B. Solar-Basics-Reihe, Kundenstory-Serie, Behind-the-Scenes"></div>`;
+      <input id="f_series" value="${esc(draft.series||'')}" placeholder="z.B. Solar-Basics-Reihe, Kundenstory-Serie, Behind-the-Scenes"></div>
+    <div class="field"><label>🎬 Drehgruppe (mehrere Termine an einem Drehtag bündeln)</label>
+      <div style="display:flex;gap:8px">
+        <select id="f_shootgroup" class="phase-sel" style="flex:1">
+          <option value="">– keine Drehgruppe</option>
+          ${shootGroups.map(g=>`<option value="${esc(g.id)}" ${draft.shootGroupId===g.id?'selected':''}>${esc(g.name)}</option>`).join('')}
+        </select>
+        <button type="button" class="btn" onclick="addShootGroupInline()">+ Neue</button>
+      </div></div>`;
   }
 
   html+=`<div class="field"><label>Hook (Aufhänger)</label>
@@ -866,6 +878,16 @@ function renderModal(isNew){
       <div id="phaseList"></div>
       <button class="add-link" onclick="addPhase()">+ Phase hinzufügen</button>
       <div style="font-size:11px;color:var(--text2);margin-top:8px;line-height:1.5">Dieser Termin ist die <b style="color:var(--ph-publish)">🟢 Veröffentlichung</b>. Füge die Produktions-Phasen davor hinzu (Konzept, Dreh, Schnitt, Review) – jede Phase mit Datum wird als eigener, farbiger Termin angelegt und mit diesem Termin verknüpft.</div>
+    </div>`;
+
+    html+=`<div class="task-block" style="border-color:${PHASES.shoot.color}">
+      <div class="task-block-head"><span class="tbh-title" style="color:${PHASES.shoot.color}">🎬 Drehplan</span></div>
+      <div class="btn-row" style="margin-top:4px">
+        <button type="button" class="btn btn-primary" onclick="collectDraft();openShootPlan(draft)">🎬 Drehplan PDF</button>
+        <button type="button" class="btn" onclick="collectDraft();copyShootPlan(draft)">📋 Kopieren</button>
+        <button type="button" class="btn" onclick="collectDraft();exportGroupFromDraft()">🧩 Gruppen-Drehplan</button>
+      </div>
+      <div style="font-size:11px;color:var(--text2);margin-top:8px;line-height:1.5">Erstellt einen professionellen Drehplan (Ort, Team, Equipment, Notizen, Dreh-Aufgaben &amp; automatische Shotlist). „Gruppen-Drehplan" fasst alle Termine der gewählten Drehgruppe zusammen.</div>
     </div>`;
   }
 
@@ -942,6 +964,8 @@ function collectDraft(){
   draft.series=val("f_series").trim();
   const skipEl=document.getElementById("f_skip");
   draft.skip=skipEl?skipEl.checked:false;
+  const grpEl=document.getElementById("f_shootgroup");
+  if(grpEl) draft.shootGroupId=grpEl.value;
   // pillar already synced via change handler; ensure:
   draft.pillar=val("f_pillar");
 }
@@ -968,7 +992,7 @@ function syncPhaseEvents(parent, phases){
     } else {
       events.push({
         id, date:w.date, parent:parentId, milestone:w.key,
-        pillar:parent.pillar, format:parent.format||"", series:"",
+        pillar:parent.pillar, format:parent.format||"", series:"", shootGroupId:"",
         title, hook:"", idea:"Produktionsschritt für: "+parent.title,
         variants:[], goal:"", cta:"",
         location:parent.location||"", equipment:[], hours:"", team:"", notes:ph.label,
@@ -1104,7 +1128,7 @@ function exportData(){
 }
 function resetData(){
   if(!confirm("Alle Änderungen verwerfen und auf den Original-Plan zurücksetzen?")) return;
-  events=seedAll(); pillars=seedPillars(); formats=seedFormats(); activePillars=new Set(legendIds());
+  events=seedAll(); pillars=seedPillars(); formats=seedFormats(); shootGroups=[]; activePillars=new Set(legendIds());
   save(); renderLegend(); renderCalendar(); toast("Zurückgesetzt");
 }
 
@@ -1234,7 +1258,7 @@ const KEYMAP={
 };
 let _newIdeaCounter=0;
 function defaultDate(){ const b=new Date(viewYear,viewMonth,1); b.setDate(b.getDate()+_newIdeaCounter*2); _newIdeaCounter++; return isoDate(b); }
-function newEventFrom(o){ return Object.assign({id:uid(),date:defaultDate(),pillar:"custom",format:"",series:"",title:"(Ohne Titel)",hook:"",idea:"",variants:[],goal:"",cta:"",location:"",equipment:[],hours:"",team:"",notes:"",tasks:[],parent:"",milestone:"",color:"",skip:false}, o); }
+function newEventFrom(o){ return Object.assign({id:uid(),date:defaultDate(),pillar:"custom",format:"",series:"",shootGroupId:"",title:"(Ohne Titel)",hook:"",idea:"",variants:[],goal:"",cta:"",location:"",equipment:[],hours:"",team:"",notes:"",tasks:[],parent:"",milestone:"",color:"",skip:false}, o); }
 function parseHeader(line){
   const parts=line.split("|").map(s=>s.trim());
   let date="",pillar="",id="",titleParts=[];
@@ -1359,12 +1383,12 @@ function fallbackCopy(t){
 function normalizeEvent(e){
   if(!e||typeof e!=="object") return null;
   return {
-    id:e.id||uid(), date:e.date||"", pillar:e.pillar||"custom", format:e.format||"", series:e.series||"",
+    id:e.id||uid(), date:e.date||"", pillar:e.pillar||"custom", format:e.format||"", series:e.series||"", shootGroupId:e.shootGroupId||"",
     title:e.title||"(Ohne Titel)", hook:e.hook||"", idea:e.idea||"",
     variants:Array.isArray(e.variants)?e.variants:[], goal:e.goal||"", cta:e.cta||"",
     location:e.location||"", equipment:Array.isArray(e.equipment)?e.equipment:[],
     hours:e.hours==null?"":e.hours, team:e.team==null?"":e.team, notes:e.notes||"",
-    tasks:Array.isArray(e.tasks)?e.tasks.map(t=>({id:t.id||uid(),text:t.text||"",date:t.date||"",note:t.note||"",done:!!t.done})):[],
+    tasks:Array.isArray(e.tasks)?e.tasks.map(t=>({id:t.id||uid(),text:t.text||"",date:t.date||"",note:t.note||"",done:!!t.done,tag:t.tag||""})):[],
     parent:e.parent||"", milestone:e.milestone||"", color:e.color||"", skip:!!e.skip
   };
 }
@@ -1590,7 +1614,9 @@ function renderQualityResults(issues){
 // ════════════════════════════════════════════════════════════════════════════
 //  PDF EXPORT
 // ════════════════════════════════════════════════════════════════════════════
-function exportPDF(){
+function exportPDF(eventId){
+  // Mit Event-ID aufgerufen → automatisch der Drehplan dieses Termins.
+  if(eventId && typeof eventId==="string"){ return exportShootPlan(eventId); }
   const sorted=[...events].sort((a,b)=>(a.date||"").localeCompare(b.date||""));
   const evts=filterByRange(sorted);
   if(!evts.length){ toast("Keine Termine im gewählten Zeitraum"); return; }
@@ -1927,6 +1953,242 @@ function generateCalendar(){
 
   save(); renderCalendar(); closeGenModal();
   toast(seedPostCount+" Posts + "+milestoneCount+" Phasen-Termine bis "+endDate+" generiert");
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+//  VIDEO-PRODUKTION · DREHPLAN, SHOTLIST & MULTI-EVENT-DREH
+// ════════════════════════════════════════════════════════════════════════════
+
+// ── Helfer ──
+function sanitizeFilename(s){
+  return String(s||"Drehplan")
+    .replace(/[ä]/g,"ae").replace(/[ö]/g,"oe").replace(/[ü]/g,"ue")
+    .replace(/[Ä]/g,"Ae").replace(/[Ö]/g,"Oe").replace(/[Ü]/g,"Ue").replace(/[ß]/g,"ss")
+    .replace(/[^\w\s-]/g,"").trim().replace(/\s+/g,"_").slice(0,60) || "Drehplan";
+}
+function fmtDateDE(iso){ return iso?new Date(iso+"T00:00:00").toLocaleDateString("de-DE",{weekday:"long",day:"2-digit",month:"long",year:"numeric"}):"—"; }
+function pad2n(n){ return String(n).padStart(2,"0"); }
+function minsToHHMM(m){ return pad2n(Math.floor(m/60))+":"+pad2n(m%60); }
+
+// Drehdatum eines Haupttermins: verknüpfter Dreh-Phasentermin > Phasen-Entwurf > Termin-Datum
+function shootDateForEvent(main){
+  const child=events.find(x=>x.parent===main.id && x.milestone==="shoot");
+  if(child && child.date) return child.date;
+  if(Array.isArray(main.phases)){ const p=main.phases.find(p=>p.key==="shoot"); if(p && p.date) return p.date; }
+  return main.date||"";
+}
+// Nur Dreh-relevante Aufgaben (Tag "shoot" oder Text enthält "dreh")
+function shootTasksFor(event){
+  return (event.tasks||[]).filter(t => t.tag==="shoot" || (t.text||"").toLowerCase().includes("dreh"));
+}
+
+// ── Automatische Shotlist ──
+function generateShotlist(event){
+  const shots=[];
+  if(event.hook)  shots.push({label:"Einstieg / Hook", desc:event.hook});
+  if(event.idea)  shots.push({label:"Hauptteil",        desc:event.idea});
+  (event.variants||[]).forEach((v,i)=>{ if(v && v.trim()) shots.push({label:"Zusatz-Shot "+(i+1), desc:v}); });
+  if(!shots.length) shots.push({label:"Shot 1", desc:event.title||"(ohne Titel)"});
+  return shots;
+}
+
+// ── Gemeinsamer Druck-/PDF-Ausgabe-Helfer (echter Browser-PDF-Export via Print) ──
+function printDoc(docTitle, innerHtml, accent){
+  accent=accent||PHASES.shoot.color;
+  const html=`<!DOCTYPE html>
+<html lang="de"><head><meta charset="UTF-8"><title>${esc(docTitle)}</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#1c1c1c;padding:16mm 18mm;line-height:1.45}
+  h1{font-size:21px;color:${accent};border-bottom:3px solid ${accent};padding-bottom:8px;margin-bottom:6px}
+  h2{font-size:14px;margin:18px 0 8px;color:#222;border-left:4px solid ${accent};padding-left:8px}
+  .meta{font-size:11px;color:#777;margin-bottom:6px}
+  .grid{display:grid;grid-template-columns:130px 1fr;gap:4px 12px;font-size:12px;margin:6px 0}
+  .grid .k{font-weight:bold;color:#444}
+  ul{margin:4px 0 4px 20px}
+  ol{margin:4px 0 4px 22px}
+  li{margin:3px 0}
+  .shot{border:1px solid #ddd;border-left:4px solid ${accent};border-radius:5px;padding:7px 11px;margin-bottom:7px;break-inside:avoid}
+  .shot b{display:block;font-size:12px;color:#111;margin-bottom:2px}
+  .shot span{font-size:11px;color:#444}
+  .block{border:1px solid #ddd;border-radius:6px;padding:10px 13px;margin-bottom:10px;break-inside:avoid;page-break-inside:avoid}
+  .badge{display:inline-block;border-radius:4px;padding:2px 8px;font-size:10px;font-weight:bold;color:#fff;margin-right:6px}
+  .tasks li{list-style:none}
+  .run{width:100%;border-collapse:collapse;font-size:11px;margin-top:4px}
+  .run th,.run td{border:1px solid #ddd;padding:5px 8px;text-align:left}
+  .run th{background:#f3f3f3}
+  .muted{color:#888;font-size:11px}
+  @page{margin:12mm 15mm}
+  @media print{body{padding:8mm 10mm}}
+</style></head><body>${innerHtml}</body></html>`;
+  const w=window.open("","_blank");
+  if(!w){ toast("Pop-up blockiert – bitte im Browser erlauben"); return false; }
+  w.document.write(html); w.document.close(); w.focus();
+  setTimeout(()=>{ try{ w.print(); }catch(e){} },500);
+  return true;
+}
+
+// ── Drehplan (Einzeltermin) ──
+function buildShootPlanInner(main){
+  const shootDate=shootDateForEvent(main);
+  const shots=generateShotlist(main);
+  const sTasks=shootTasksFor(main);
+  const equip=(main.equipment||[]).filter(Boolean);
+  return `
+  <h1>🎬 Drehplan</h1>
+  <div class="meta">Erstellt am ${new Date().toLocaleDateString("de-DE")} · SolarTech Content-Produktion</div>
+  <div class="block">
+    <div style="font-size:17px;font-weight:bold;margin-bottom:6px">${esc(main.title||"(ohne Titel)")}</div>
+    <div class="grid">
+      <div class="k">📅 Drehtag</div><div>${esc(fmtDateDE(shootDate))}</div>
+      <div class="k">📤 Veröffentlichung</div><div>${esc(fmtDateDE(main.date))}</div>
+      <div class="k">📍 Drehort</div><div>${esc(main.location||"—")}</div>
+      <div class="k">👥 Team</div><div>${esc(main.team?String(main.team)+" Person(en)":"—")}</div>
+      <div class="k">⏱ Aufwand</div><div>${esc(main.hours?String(main.hours)+" h":"—")}</div>
+      <div class="k">🏷 Säule / Format</div><div>${esc(pillarName(main.pillar))}${main.format?" · "+esc(main.format):""}</div>
+    </div>
+  </div>
+
+  <h2>🎥 Equipment</h2>
+  ${equip.length?`<ul>${equip.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`:'<div class="muted">Kein Equipment hinterlegt.</div>'}
+
+  ${main.notes?`<h2>⚠ Notizen / Anforderungen</h2><div>${esc(main.notes)}</div>`:""}
+
+  <h2>✅ Dreh-Aufgaben</h2>
+  ${sTasks.length?`<ul class="tasks">${sTasks.map(t=>`<li>${t.done?"☑":"☐"} ${esc(t.text)}${t.date?` <span class="muted">(${esc(t.date)})</span>`:""}</li>`).join("")}</ul>`:'<div class="muted">Keine spezifischen Dreh-Aufgaben markiert.</div>'}
+
+  <h2>🎞 Shotlist</h2>
+  ${shots.map((s,i)=>`<div class="shot"><b>${i+1}. ${esc(s.label)}</b><span>${esc(s.desc)}</span></div>`).join("")}
+  `;
+}
+function openShootPlan(main){
+  if(!main || !main.title || !main.title.trim()){ toast("Bitte zuerst einen Titel eingeben"); return; }
+  const ok=printDoc("Drehplan_"+sanitizeFilename(main.title), buildShootPlanInner(main), PHASES.shoot.color);
+  if(ok) toast("Drehplan erstellt");
+}
+function exportShootPlan(eventId){
+  const e=events.find(x=>x.id===eventId);
+  if(!e){ toast("Termin nicht gefunden"); return; }
+  const main=(e.milestone && e.parent)?(events.find(x=>x.id===e.parent)||e):e;
+  openShootPlan(main);
+}
+
+// ── Drehplan als Text (Copy to Clipboard) ──
+function shootPlanText(main){
+  const shootDate=shootDateForEvent(main);
+  const shots=generateShotlist(main);
+  const sTasks=shootTasksFor(main);
+  const L=[];
+  L.push("🎬 DREHPLAN · "+(main.title||"(ohne Titel)"));
+  L.push("".padEnd(40,"="));
+  L.push("Drehtag:         "+fmtDateDE(shootDate));
+  L.push("Veröffentlichung:"+fmtDateDE(main.date));
+  L.push("Drehort:         "+(main.location||"—"));
+  L.push("Team:            "+(main.team?main.team+" Person(en)":"—"));
+  L.push("Aufwand:         "+(main.hours?main.hours+" h":"—"));
+  L.push("");
+  L.push("EQUIPMENT:");
+  (main.equipment||[]).filter(Boolean).forEach(x=>L.push("  - "+x));
+  if(main.notes){ L.push(""); L.push("NOTIZEN: "+main.notes); }
+  if(sTasks.length){ L.push(""); L.push("DREH-AUFGABEN:"); sTasks.forEach(t=>L.push("  "+(t.done?"[x]":"[ ]")+" "+t.text+(t.date?" ("+t.date+")":""))); }
+  L.push("");
+  L.push("SHOTLIST:");
+  shots.forEach((s,i)=>L.push("  "+(i+1)+". "+s.label+" — "+s.desc));
+  return L.join("\n");
+}
+function copyShootPlan(main){
+  if(!main || !main.title || !main.title.trim()){ toast("Bitte zuerst einen Titel eingeben"); return; }
+  const text=shootPlanText(main);
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(()=>toast("Drehplan kopiert ✓")).catch(()=>legacyCopy(text));
+  } else legacyCopy(text);
+}
+function legacyCopy(t){
+  const ta=document.createElement("textarea"); ta.value=t; ta.style.position="fixed"; ta.style.opacity="0";
+  document.body.appendChild(ta); ta.select();
+  try{ document.execCommand("copy"); toast("Drehplan kopiert ✓"); }catch(e){ toast("Kopieren nicht möglich"); }
+  document.body.removeChild(ta);
+}
+
+// ── Drehgruppen (Multi-Event-Dreh) ──
+function createShootGroup(name,date){
+  const id="g"+uid();
+  shootGroups.push({id, name:name||"Drehgruppe", date:date||""});
+  save();
+  return id;
+}
+function assignEventToGroup(eventId, groupId){
+  const e=events.find(x=>x.id===eventId);
+  if(!e) return;
+  e.shootGroupId=groupId||"";
+  save(); renderCalendar();
+}
+function addShootGroupInline(){
+  const suggested="Drehtag"+(draft && draft.date?" "+new Date(draft.date+"T00:00:00").toLocaleDateString("de-DE"):"");
+  const name=prompt("Name der neuen Drehgruppe:", suggested);
+  if(name===null) return;
+  const nm=name.trim(); if(!nm){ toast("Kein Name eingegeben"); return; }
+  const id=createShootGroup(nm, draft?shootDateForEvent(draft):"");
+  if(draft) draft.shootGroupId=id;
+  const sel=document.getElementById("f_shootgroup");
+  if(sel){
+    sel.innerHTML=`<option value="">– keine Drehgruppe</option>`+
+      shootGroups.map(g=>`<option value="${esc(g.id)}" ${draft && draft.shootGroupId===g.id?'selected':''}>${esc(g.name)}</option>`).join('');
+  }
+  toast("Drehgruppe „"+nm+"“ erstellt");
+}
+function exportGroupFromDraft(){
+  if(!draft || !draft.shootGroupId){ toast("Bitte zuerst eine Drehgruppe wählen"); return; }
+  exportMultiShootPlan(draft.shootGroupId, draft);
+}
+function exportMultiShootPlan(groupId, extraDraft){
+  const grp=shootGroups.find(g=>g.id===groupId);
+  let members=events.filter(e=>!e.milestone && e.shootGroupId===groupId);
+  if(extraDraft && extraDraft.shootGroupId===groupId && !members.some(m=>m.id===extraDraft.id)){
+    members=members.concat([extraDraft]);
+  }
+  if(!members.length){ toast("Keine Termine in dieser Drehgruppe"); return; }
+  // nach Drehdatum, dann Titel sortieren
+  members=members.slice().sort((a,b)=> (shootDateForEvent(a)||"").localeCompare(shootDateForEvent(b)||"") || (a.title||"").localeCompare(b.title||""));
+
+  // kombiniertes Equipment ohne Duplikate
+  const equip=[...new Set(members.flatMap(m=>(m.equipment||[]).filter(Boolean)))];
+  // kombinierte Dreh-Aufgaben
+  const allTasks=members.flatMap(m=>shootTasksFor(m).map(t=>({text:t.text,date:t.date,done:t.done,from:m.title})));
+  // Ablaufplan: sequentiell ab 09:00, Dauer aus hours (Fallback 1h), 30 Min Puffer
+  let cursor=9*60;
+  const runRows=members.map((m,i)=>{
+    const dur=(parseFloat(m.hours)||1)*60;
+    const start=minsToHHMM(cursor); const end=minsToHHMM(cursor+dur);
+    cursor+=dur+30;
+    return `<tr><td>${i+1}</td><td>${start}–${end}</td><td>${esc(m.title)}</td><td>${esc(m.location||"—")}</td></tr>`;
+  }).join("");
+
+  const groupShootDate=shootDateForEvent(members[0]);
+  const inner=`
+  <h1>🧩 Multi-Drehplan</h1>
+  <div class="meta">${esc((grp&&grp.name)||"Drehgruppe")} · ${members.length} Termine · ${esc(fmtDateDE(groupShootDate))}</div>
+
+  <h2>📋 Termine an diesem Drehtag</h2>
+  <ul>${members.map(m=>`<li><b>${esc(m.title)}</b>${m.format?` <span class="muted">(${esc(m.format)})</span>`:""}</li>`).join("")}</ul>
+
+  <h2>🎥 Kombiniertes Equipment (ohne Duplikate)</h2>
+  ${equip.length?`<ul>${equip.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`:'<div class="muted">Kein Equipment hinterlegt.</div>'}
+
+  <h2>✅ Kombinierte Dreh-Aufgaben</h2>
+  ${allTasks.length?`<ul class="tasks">${allTasks.map(t=>`<li>${t.done?"☑":"☐"} ${esc(t.text)} <span class="muted">— ${esc(t.from)}${t.date?", "+esc(t.date):""}</span></li>`).join("")}</ul>`:'<div class="muted">Keine spezifischen Dreh-Aufgaben markiert.</div>'}
+
+  <h2>🕘 Ablaufplan (Vorschlag)</h2>
+  <table class="run"><thead><tr><th>#</th><th>Zeit</th><th>Termin</th><th>Ort</th></tr></thead><tbody>${runRows}</tbody></table>
+
+  <h2>🎞 Kombinierte Shotlists</h2>
+  ${members.map(m=>{
+    const shots=generateShotlist(m);
+    return `<div class="block"><b style="font-size:13px">${esc(m.title)}</b><ol>${shots.map(s=>`<li><b>${esc(s.label)}:</b> ${esc(s.desc)}</li>`).join("")}</ol></div>`;
+  }).join("")}
+  `;
+  const ok=printDoc("Drehplan_"+sanitizeFilename((grp&&grp.name)||"Drehgruppe"), inner, PHASES.shoot.color);
+  if(ok) toast("Gruppen-Drehplan erstellt ("+members.length+" Termine)");
 }
 
 // ── INIT ──
